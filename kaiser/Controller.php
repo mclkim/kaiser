@@ -19,7 +19,6 @@ class Controller {
 		}
 		$this->container = $container;
 		
-		$this->info ( '-------------------------------------' );
 		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
 		$this->timestamp = new Timer ();
 	}

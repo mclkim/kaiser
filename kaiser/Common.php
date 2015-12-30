@@ -18,7 +18,7 @@ defined ( 'DEV_MYSQL' ) or define ( 'DEV_MYSQL', 'Mysql/5.6.26' );
  */
 // TODO::
 defined ( 'DS' ) or define ( 'DS', '/' );
-defined ( 'APP_PATH' ) or define ( 'APP_PATH', BASE_PATH . '/app' );
+// defined ( 'APP_PATH' ) or define ( 'APP_PATH', BASE_PATH . '/app' );
 
 /**
  * ---------------------------------------------------------------
@@ -120,7 +120,7 @@ class Common {
 		);
 	}
 	function load_class($class, $directory = APP_PATH) {
-		static $_classes = array ();
+		// static $_classes = array ();
 		
 		// Does the class exist? If so, we're done...
 		// if (isset ( $_classes [$class] )) {

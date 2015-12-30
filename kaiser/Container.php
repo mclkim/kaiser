@@ -29,13 +29,13 @@ class Container extends PimpleContainer implements ContainerInterface {
 		// https://github.com/katzgrau/KLogger
 		if (! isset ( $this ['logger'] )) {
 			$this ['logger'] = function ($c) {
-				$logger = new Manager\LogManager ();
+				$logger = new Manager\LogManager (__DIR__.'/../log');
 				return $logger;
 			};
 		}
 		if (! isset ( $this ['session'] )) {
 			$this ['session'] = function ($c) {
-				$session = new Session\FileSession ();
+				$session = new Session\FileSession (__DIR__.'/../tmp');
 				$session->start_session ();
 				return $session;
 			};

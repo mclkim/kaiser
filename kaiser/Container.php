@@ -33,6 +33,13 @@ class Container extends PimpleContainer implements ContainerInterface {
 				return $logger;
 			};
 		}
+		if (! isset ( $this ['session'] )) {
+			$this ['session'] = function ($c) {
+				$session = new Session\FileSession ();
+				$session->start_session ();
+				return $session;
+			};
+		}
 	}
 	function get($id) {
 		if (! $this->offsetExists ( $id )) {

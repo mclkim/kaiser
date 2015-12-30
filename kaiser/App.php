@@ -3,23 +3,14 @@
 namespace Kaiser;
 
 class App extends Controller {
-	// 타임 스템프
-	protected $timestamp = null;
-	protected $callable;
-	protected $params = array ();
-	function __construct($container = []) {
-		parent::__construct ( $container );
+	protected $AppDirectory;
+// 	function __construct($container = []) {
+// 		parent::__construct ( $container );
 		
-		$this->info ( '-------------------------------------' );
-		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
-		$this->timestamp = new Timer ();
-	}
-	function __destruct() {
-		/**
-		 * 타입스템프를 기록한 시간 차이를 계산하여 출력한다.
-		 */
-		$this->info ( sprintf ( 'The Class "%s" total execution time: ', get_class ( $this ) ) . $this->timestamp->fetch () );
-	}
+// 		$this->info ( '-------------------------------------' );
+// 		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
+// 		$this->timestamp = new Timer ();
+// 	}
 	function run() {
 		try {
 			/**
@@ -90,6 +81,12 @@ class App extends Controller {
 		
 		$callable ();
 	}
+	function setAppDir($directory = []) {
+		$this->AppDirectory = $directory;
+	}
+	function getAppDir() {
+		return $this->AppDirectory;
+	}
 	private function resolve($toResolve) {
 		$resolved = $toResolve;
 		
@@ -97,7 +94,7 @@ class App extends Controller {
 		$class = $toResolve->controller;
 		$method = $toResolve->action;
 		
-		$common = new \Kaiser\Common ();
+		$common = new \Kaiser\Common ( $this->getAppDir () );
 		$common->load_class ( $class, $path );
 		
 		$resolved = [ 

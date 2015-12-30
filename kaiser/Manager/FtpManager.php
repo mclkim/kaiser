@@ -159,7 +159,6 @@ class FtpManager {
 		try {
 			$list = $this->FTP->rawlist ( $path );
 		} catch ( Exception $e ) {
-			// $this->err ( $e->getMessage () );
 			throw new FtpException ( $e->getMessage () );
 			return false;
 		}
@@ -277,7 +276,6 @@ class FtpManager {
 		try {
 			$list = $this->FTP->rawlist ( $path );
 		} catch ( Exception $e ) {
-			// $this->err ( $e->getMessage () );
 			throw new FtpException ( $e->getMessage () );
 			return false;
 		}

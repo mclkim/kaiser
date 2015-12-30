@@ -4,3 +4,5 @@
 .settings
 composer.lock
 vendor
+log
+logs

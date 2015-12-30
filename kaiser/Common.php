@@ -130,8 +130,8 @@ class Common {
 		// Look for the class first in the local application/libraries folder
 		// then in the native system/libraries folder
 		foreach ( $this->directory as $path ) {
-			var_dump ( $this->directory );
-			var_dump ( $path . DS . $directory . DS . $class . '.php' );
+			// var_dump ( $this->directory );
+			// var_dump ( $path . DS . $directory . DS . $class . '.php' );
 			if (file_exists ( $path . DS . $directory . DS . $class . '.php' )) {
 				if (class_exists ( $class ) === FALSE) {
 					require ($path . DS . $directory . DS . $class . '.php');

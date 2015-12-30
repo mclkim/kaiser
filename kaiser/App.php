@@ -4,13 +4,6 @@ namespace Kaiser;
 
 class App extends Controller {
 	protected $AppDirectory;
-// 	function __construct($container = []) {
-// 		parent::__construct ( $container );
-		
-// 		$this->info ( '-------------------------------------' );
-// 		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
-// 		$this->timestamp = new Timer ();
-// 	}
 	function run() {
 		try {
 			/**

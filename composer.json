@@ -13,10 +13,5 @@
         "psr-4": {
             "Kaiser\\": "kaiser"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
-    }    
+    }  
 }

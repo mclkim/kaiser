@@ -29,8 +29,7 @@ class Container extends PimpleContainer implements ContainerInterface {
 		// https://github.com/katzgrau/KLogger
 		if (! isset ( $this ['logger'] )) {
 			$this ['logger'] = function ($c) {
-				$logger = new Manager\LogManager ( $c ['settings'] ['logger'] ['path'] );
-				$logger->setLogLevelThreshold ( $c ['settings'] ['logger'] ['level'] );
+				$logger = new Manager\LogManager ();
 				return $logger;
 			};
 		}

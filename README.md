@@ -1,2 +1,0 @@
-# kaiser
-Kaiser PHP framework

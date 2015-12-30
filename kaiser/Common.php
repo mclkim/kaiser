@@ -181,4 +181,3 @@ if (! function_exists ( 'is_loaded' )) {
 	}
 }
 
-?>

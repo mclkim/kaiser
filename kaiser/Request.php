@@ -174,4 +174,3 @@ class Request {
 		return $this->user_agent;
 	}
 }
-?>

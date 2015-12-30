@@ -223,4 +223,3 @@ END;
 		return $buffer;
 	}
 }
-?>

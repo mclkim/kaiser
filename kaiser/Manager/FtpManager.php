@@ -299,4 +299,3 @@ class FtpManager {
 		return $this->sort_on_field ( $result, $by, $order );
 	}
 }
-?>

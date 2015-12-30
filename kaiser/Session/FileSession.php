@@ -4,21 +4,32 @@ namespace Kaiser\Session;
 
 final class FileSession {
 	var $key = 'nh9a6d2b6s6g9ynh';
-	var $iv  = 'ddky2235gee1g3mr';
+	var $iv = 'ddky2235gee1g3mr';
 	private $savePath;
 	public function __construct($savePath) {
 		$this->savePath = $savePath;
 		
 		// set our custom session functions.
-		session_set_save_handler(
-				array($this, "open"),
-				array($this, "close"),
-				array($this, "read"),
-				array($this, "write"),
-				array($this, "destroy"),
-				array($this, "gc")
-		);
-				
+		session_set_save_handler ( array (
+				$this,
+				"open" 
+		), array (
+				$this,
+				"close" 
+		), array (
+				$this,
+				"read" 
+		), array (
+				$this,
+				"write" 
+		), array (
+				$this,
+				"destroy" 
+		), array (
+				$this,
+				"gc" 
+		) );
+		
 		// This line prevents unexpected effects when using objects as save handlers.
 		register_shutdown_function ( 'session_write_close' );
 	}
@@ -47,7 +58,7 @@ final class FileSession {
 		session_start ();
 	}
 	function open($savePath, $sessionName) {
-// 		$this->savePath = $savePath;
+		// $this->savePath = $savePath;
 		if (! is_dir ( $this->savePath )) {
 			mkdir ( $this->savePath, 0777 );
 		}
@@ -61,14 +72,14 @@ final class FileSession {
 		$key = $this->getkey ( $id );
 		
 		// TODO::sudo php5enmod mcrypt
-// 		$crypt = new Crypt ();
-// 		$crypt->setComplexTypes ( TRUE );
-// 		$crypt->setKey ( $key );
-// 		$crypt->setData ( $data );
-// 		$decrypted = $crypt->decrypt ();
+		// $crypt = new Crypt ();
+		// $crypt->setComplexTypes ( TRUE );
+		// $crypt->setKey ( $key );
+		// $crypt->setData ( $data );
+		// $decrypted = $crypt->decrypt ();
 		
-		$crypt   = new \Crypt\AES();
-		$decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+		$crypt = new \Crypt\AES ();
+		$decrypt = $crypt->decrypt ( $data, $this->key, $this->iv );
 		return $decrypt;
 	}
 	function write($id, $data) {
@@ -76,14 +87,14 @@ final class FileSession {
 		$key = $this->getkey ( $id );
 		
 		// TODO::sudo php5enmod mcrypt
-// 		$crypt = new Crypt ();
-// 		$crypt->setComplexTypes ( TRUE );
-// 		$crypt->setKey ( $key );
-// 		$crypt->setData ( $data );
-// 		$encrypted = $crypt->encrypt ();
-
-		$crypt   = new \Crypt\AES();
-		$encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+		// $crypt = new Crypt ();
+		// $crypt->setComplexTypes ( TRUE );
+		// $crypt->setKey ( $key );
+		// $crypt->setData ( $data );
+		// $encrypted = $crypt->encrypt ();
+		
+		$crypt = new \Crypt\AES ();
+		$encrypt = $crypt->encrypt ( $data, $this->key, $this->iv );
 		
 		return file_put_contents ( "$this->savePath/sess_$id", $encrypt ) === false ? false : true;
 	}
@@ -110,4 +121,3 @@ final class FileSession {
 		return $id;
 	}
 }
-?>

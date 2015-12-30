@@ -144,4 +144,3 @@ if (! function_exists ( 'if_empty' )) {
 		return ! empty ( $ret ) ? $ret : $def;
 	}
 }
-?>

@@ -10,4 +10,3 @@ class PageNotFound extends DefaultException {
 		$this->class = null;
 	}
 }
-?>

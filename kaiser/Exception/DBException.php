@@ -8,4 +8,3 @@ class DBException extends DefaultException {
 		parent::__construct ( $message, $code );
 	}
 }
-?>

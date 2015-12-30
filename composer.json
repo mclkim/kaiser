@@ -10,8 +10,13 @@
      	"katzgrau/klogger": "^1.2"
     },
     "autoload": {
-        "psr-4": {
-            "App\\": "app/"
+        "psr-0": {
+            "Kaiser": "kaiser/"
         }
-    }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }    
 }

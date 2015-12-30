@@ -10,8 +10,8 @@
      	"katzgrau/klogger": "^1.2"
     },
     "autoload": {
-        "psr-0": {
-            "Kaiser": "kaiser/"
+        "psr-4": {
+            "Kaiser\\": "kaiser"
         }
     },
     "extra": {

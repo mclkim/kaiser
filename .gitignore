@@ -1,0 +1,60 @@
+﻿#.1 유저정보는 관리할 필요가 없지
+#.2 git rm -r --cached .
+#.3 git add .
+#.4 git commit -m ".gitignore apply"
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+ 
+# Locally stored "Eclipse launch configurations"
+*.launch
+ 
+# CDT-specific
+.cproject
+ 
+# PDT-specific
+.buildpath 
+**/_compile/**
+**/_compile/*.php
+*.*~
+*.bak
+*.gz
+*.log
+*.swp
+*.tar
+*.tmp
+*.zip
+*.~*
+.buildpath
+.classpath
+.cproject
+.externalToolBuilders
+.launch
+.loadpath
+.metadata
+.project
+.pydevproject
+.settings
+/.idea/*
+/backup/
+/config/
+/log/
+/tmp/
+/work/
+/test/
+
+/logs/

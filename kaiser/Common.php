@@ -110,10 +110,14 @@ if (! is_php ( '5.3' )) {
  * ---------------------------------------------------------------
  */
 class Common {
-	function __construct() {
+	protected $directory;
+	function __construct($directory) {
 		if (! is_php ( '5.5' )) {
 			exit ( 'Kaiser Framework support higher than PHP 5.5' );
 		}
+		$this->directory = is_array ( $directory ) ? $directory : array (
+				$directory 
+		);
 	}
 	function load_class($class, $directory = APP_PATH) {
 		static $_classes = array ();
@@ -125,9 +129,9 @@ class Common {
 		
 		// Look for the class first in the local application/libraries folder
 		// then in the native system/libraries folder
-		foreach ( array (
-				APP_PATH 
-		) as $path ) {
+		foreach ( $this->directory as $path ) {
+			var_dump ( $this->directory );
+			var_dump ( $path . DS . $directory . DS . $class . '.php' );
 			if (file_exists ( $path . DS . $directory . DS . $class . '.php' )) {
 				if (class_exists ( $class ) === FALSE) {
 					require ($path . DS . $directory . DS . $class . '.php');

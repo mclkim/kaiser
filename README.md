@@ -24,12 +24,32 @@ $app->run ();
 ``` public/app/index.php
 <?php
 use \Kaiser\Controller;
+/**
+ * http://localhost/test/public/?index
+ */
 class index extends Controller {
 	protected function requireLogin() {
 		return false;
 	}
 	function execute() {
-		echo 'hello world';
+		echo 'Kaiser PHP framework~~~';
+	}
+}
+```
+
+<Application Folder>/public/app/hello.php
+``` public/app/hello.php
+<?php
+use \Kaiser\Controller;
+/**
+ * http://localhost/test/public/?hello.world
+ */
+class hello extends Controller {
+	protected function requireLogin() {
+		return false;
+	}
+	function world() {
+		echo 'hello world~~~';
 	}
 }
 ```

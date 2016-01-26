@@ -13,7 +13,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = new Kaiser\App ();
 
 $app->setAppDir ( [ 
-		__DIR__ . '/app' 
+		__DIR__ . '/../app' 
 ] );
 
 $app->run ();

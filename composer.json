@@ -25,10 +25,10 @@
             "Kaiser\\": "src"
         },
         "classmap": [
-        	"/src/Template_/Template_.class.php",
+        	"src/Template_/Template_.class.php"
         ],
        "files": [
-            "src/helpers.php",
+            "src/helpers.php"
         ],        
     }  
 }

@@ -1,11 +1,18 @@
 # kaiser
 Kaiser PHP framework
 
+Installation
+------------
+
 ```
 composer require mclkim/kaiser=dev-master
 ```
 
+Testing
+-------
+
 <Application Folder>/public/index.php
+
 ``` public/index.php
 <?php
 require __DIR__ . '/../vendor/autoload.php';
@@ -19,13 +26,12 @@ $app->setAppDir ( [
 $app->run ();
 ```
 
-
 <Application Folder>/public/app/index.php
 ``` public/app/index.php
 <?php
 use \Kaiser\Controller;
 /**
- * http://localhost/test/public/?index
+ * http://localhost/<Application Folder>/public/?index
  */
 class index extends Controller {
 	protected function requireLogin() {
@@ -42,7 +48,7 @@ class index extends Controller {
 <?php
 use \Kaiser\Controller;
 /**
- * http://localhost/test/public/?hello.world
+ * http://localhost/<Application Folder>/public/?hello.world
  */
 class hello extends Controller {
 	protected function requireLogin() {

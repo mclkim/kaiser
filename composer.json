@@ -25,7 +25,7 @@
         	"src/Template_/Template_.class.php"
         ],
        "files": [
-            "src/helpers.php"
+            "src/Helpers.php"
         ],        
         "psr-4": {
             "Kaiser\\": "src"

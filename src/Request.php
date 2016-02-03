@@ -31,8 +31,8 @@ class Request {
 	 * --------------------------------------------------------------------
 	 */
 	private function _fetch_from_array(&$array, $index = '', $no_result = FALSE) {
-// 		$ret = if_exists ( $array, $index, $no_result );
-		$ret = (! isset ( $array [$index] )) ? $no_result : stripslashes ( htmlspecialchars ( $array [$index] ) );
+		$ret = if_exists ( $array, $index, $no_result );
+// 		$ret = (! isset ( $array [$index] )) ? $no_result : stripslashes ( htmlspecialchars ( $array [$index] ) );
 		return ! empty ( $ret ) ? $ret : $no_result;
 	}
 	/**

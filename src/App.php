@@ -3,7 +3,24 @@
 namespace Kaiser;
 
 class App extends Controller {
+	const VERSION = '5.0.34';
+	// 타임 스템프
+	protected $timestamp = null;
 	protected $AppDirectory;
+	function __construct($container = [], $basePath = null) {
+		parent::__construct ( $container );
+		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
+		$this->timestamp = new \Kaiser\Timer ();
+	}
+	function __destruct() {
+		/**
+		 * 타입스템프를 기록한 시간 차이를 계산하여 출력한다.
+		 */
+		$this->info ( sprintf ( 'The Class "%s" total execution time: ', get_class ( $this ) ) . $this->timestamp->fetch () );
+	}
+	public function version() {
+		return static::VERSION;
+	}
 	public function getAjaxHandler() {
 		$request = $this->request ();
 		
@@ -25,7 +42,7 @@ class App extends Controller {
 		 * Execute AJAX event
 		 */
 		if ($ajaxResponse = $this->execAjaxHandlers ()) {
-			$this->debug ( $ajaxResponse );
+			// $this->debug ( $ajaxResponse );
 			echo $ajaxResponse;
 			return null;
 		}
@@ -75,23 +92,10 @@ class App extends Controller {
 					$responseContents ['result'] = $result;
 				}
 				
-				$responseContents ['X_OCTOBER_ASSETS'] = array (
-						'js' => array (
-								0 => 'http://localhost/october/modules/cms/widgets/mediamanager/assets/js/mediamanager.js?v314' 
-						),
-						'css' => array (
-								0 => 'http://localhost/october/modules/cms/widgets/mediamanager/assets/css/mediamanager.css?v314' 
-						),
-						'rss' => array () 
-				);
+				// $this->debug ( $responseContents );
 				
-				$this->debug ( $responseContents );
-				
-				// $this->header('Content-Type', 'application/json');
 				header ( 'HTTP/1.1 200 OK' );
 				header ( 'Content-Type: application/json' );
-				// if ($responseContents instanceof Jsonable)
-// 				return $responseContents->toJson ();
 				return json_encode ( $responseContents );
 			} catch ( \Kaiser\Exception\ApplicationException $e ) {
 				$this->error ( $e );

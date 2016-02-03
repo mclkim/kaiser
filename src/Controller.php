@@ -2,9 +2,7 @@
 
 namespace Kaiser;
 
-class Controller {
-	// 타임 스템프
-	protected $timestamp = null;
+class Controller extends Singleton {
 	protected $container;
 	var $_defaultPage = '?';
 	var $_loginPage = '?login';
@@ -18,18 +16,12 @@ class Controller {
 			throw new \RuntimeException ( 'Expected a ContainerInterface' );
 		}
 		$this->container = $container;
-		
-		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
-		$this->timestamp = new Timer ();
-	}
-	function __destruct() {
-	/**
-	 * 타입스템프를 기록한 시간 차이를 계산하여 출력한다.
-	 */
-		// $this->info ( sprintf ( 'The Class "%s" total execution time: ', get_class ( $this ) ) . $this->timestamp->fetch () );
 	}
 	public function getContainer() {
 		return $this->container;
+	}
+	public function setContainer($id, $value) {
+		return $this->container->offsetSet ( $id, $value );
 	}
 	public function ajax() {
 		return $this->request ()->isXmlHttpRequest ();

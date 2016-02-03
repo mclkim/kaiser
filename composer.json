@@ -21,14 +21,14 @@
   		"lancerhe/php-crypt": "^1.0"     	
     },
     "autoload": {
-        "psr-4": {
-            "Kaiser\\": "src"
-        },
         "classmap": [
         	"src/Template_/Template_.class.php"
         ],
        "files": [
             "src/helpers.php"
         ],        
+        "psr-4": {
+            "Kaiser\\": "src"
+        }
     }  
 }

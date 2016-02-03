@@ -3,10 +3,15 @@
 namespace Kaiser;
 
 class Request {
+	var $headers = array ();
 	var $params = array ();
 	var $ip_address = FALSE;
 	var $user_agent = FALSE;
+	protected $method;
+	protected static $_request_headers;
+	protected static $httpMethodParameterOverride = false;
 	function __construct() {
+		$this->headers = self::request_headers ();
 		// $this->debug ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
 		// 일반 request parameter도 함께 처리하도록
 		if (is_array ( $_REQUEST )) {
@@ -26,7 +31,8 @@ class Request {
 	 * --------------------------------------------------------------------
 	 */
 	private function _fetch_from_array(&$array, $index = '', $no_result = FALSE) {
-		$ret = if_exists ( $array, $index, $no_result );
+// 		$ret = if_exists ( $array, $index, $no_result );
+		$ret = (! isset ( $array [$index] )) ? $no_result : stripslashes ( htmlspecialchars ( $array [$index] ) );
 		return ! empty ( $ret ) ? $ret : $no_result;
 	}
 	/**
@@ -172,5 +178,45 @@ class Request {
 		$this->user_agent = (isset ( $_SERVER ['HTTP_USER_AGENT'] )) ? $_SERVER ['HTTP_USER_AGENT'] : FALSE;
 		
 		return $this->user_agent;
+	}
+	/**
+	 * @TODO::
+	 */
+	function getMethod() {
+		if (null === $this->method) {
+			$this->method = strtoupper ( $this->server ( 'REQUEST_METHOD', 'GET' ) );
+			
+			if ('POST' === $this->method) {
+				if ($method = $this->header ( 'X-HTTP-METHOD-OVERRIDE' )) {
+					$this->method = strtoupper ( $method );
+				} elseif (self::$httpMethodParameterOverride) {
+					$this->method = strtoupper ( $this->request->get ( '_method', $this->query->get ( '_method', 'POST' ) ) );
+				}
+			}
+		}
+		
+		return $this->method;
+	}
+	function isXmlHttpRequest() {
+		return 'XMLHttpRequest' == $this->header ( 'X-Requested-With' );
+	}
+	function header($index = '', $no_result = FALSE) {
+		return $this->_fetch_from_array ( $this->headers, $index, $no_result );
+	}
+	protected static function request_headers() {
+		if (! self::$_request_headers) {
+			self::$_request_headers = array ();
+			foreach ( $_SERVER as $name => $value ) {
+				if (preg_match ( '/^HTTP_/', $name )) {
+					$name = strtolower ( substr ( $name, 5 ) );
+					$name = ucwords ( str_replace ( '_', ' ', $name ) );
+					$name = str_replace ( ' ', '-', $name );
+					self::$_request_headers [$name] = $value;
+				}
+			}
+			// self::$_request_headers ['X-Requested-With'] = 'PHPHttpRequest';
+			// self::$_request_headers ['Connection'] = 'close';
+		}
+		return self::$_request_headers;
 	}
 }

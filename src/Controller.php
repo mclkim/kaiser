@@ -23,13 +23,19 @@ class Controller {
 		$this->timestamp = new Timer ();
 	}
 	function __destruct() {
-		/**
-		 * 타입스템프를 기록한 시간 차이를 계산하여 출력한다.
-		 */
-		$this->info ( sprintf ( 'The Class "%s" total execution time: ', get_class ( $this ) ) . $this->timestamp->fetch () );
+	/**
+	 * 타입스템프를 기록한 시간 차이를 계산하여 출력한다.
+	 */
+		// $this->info ( sprintf ( 'The Class "%s" total execution time: ', get_class ( $this ) ) . $this->timestamp->fetch () );
 	}
 	public function getContainer() {
 		return $this->container;
+	}
+	public function ajax() {
+		return $this->request ()->isXmlHttpRequest ();
+	}
+	public function method() {
+		return $this->request ()->getMethod ();
 	}
 	protected function logger() {
 		return $this->container->get ( 'logger' );

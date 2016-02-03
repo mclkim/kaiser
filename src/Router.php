@@ -5,6 +5,7 @@ namespace Kaiser;
 class Router {
 	protected $query;
 	protected $uri;
+	protected $param;
 	function __construct() {
 	}
 	function getRoute() {
@@ -43,6 +44,12 @@ class Router {
 				'extension' => isset ( $m [5] ) ? $m [5] : '',
 				'filename' => isset ( $m [3] ) ? $m [3] : '' 
 		);
+	}
+	function setQuery($query) {
+		if (strpos ( $query, '::' )) {
+			$query = str_replace ( '::', '.', $query );
+		}
+		$this->query = $query;
 	}
 	protected function getQueryString() {
 		if ($this->query)

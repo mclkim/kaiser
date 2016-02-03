@@ -8,6 +8,8 @@ class LogManager extends \Katzgrau\KLogger\Logger {
 			return;
 		}
 		list ( $file, $line, $func, $class ) = $this->_getBacktraceVars ( 2 );
+		
+		// TODO::
 		$message = is_array ( $message ) ? var_export ( $message, true ) : $message;
 		$message = $this->_formatMessage ( $level, $message, $context, $file, $line, $func, $class );
 		$this->write ( $message );
@@ -27,6 +29,9 @@ class LogManager extends \Katzgrau\KLogger\Logger {
 		return "[{$this->getTimestamp()}] [{$level}] [{$file} {$line} {$func}] {$message}" . PHP_EOL;
 	}
 	private function _getBacktraceVars($depth) {
+		// From http://pear.php.net/package-info.php?package=Log
+		// modified slightly to work here
+		
 		/* Start by generating a backtrace from the current call (here). */
 		$bt = debug_backtrace ();
 		

@@ -41,14 +41,14 @@ class Controller extends Singleton {
 	protected function getParameter($index, $no_result = FALSE) {
 		return $this->request ()->get_post ( $index, $no_result );
 	}
-	public function info($message) {
-		$this->logger ()->info ( $message );
+	public function info($message = null, array $context = array()) {
+		$this->logger ()->info ( $message, $context );
 	}
-	public function debug($message) {
-		$this->logger ()->debug ( $message );
+	public function debug($message = null, array $context = array()) {
+		$this->logger ()->debug ( $message, $context );
 	}
-	public function err($message) {
-		$this->logger ()->error ( $message );
+	public function err($message = null, array $context = array()) {
+		$this->logger ()->error ( $message, $context );
 	}
 	/**
 	 * 로그인 여부를 체크 할 페이지 인지에 대한 세팅을 한다.
@@ -61,11 +61,40 @@ class Controller extends Singleton {
 	/**
 	 * 로그아웃
 	 */
-	function logout() {
+	public function logout() {
 		session_unset ();
 		session_destroy ();
 		unset ( $_SESSION );
 		// $this->setRedirect ( $this->_defaultPage );
 		$this->router ()->redirect ( $this->_defaultPage );
+	}
+	protected function setToken() {
+		if (function_exists ( 'mcrypt_create_iv' )) {
+			$_SESSION ['token'] = bin2hex ( mcrypt_create_iv ( 32, MCRYPT_DEV_URANDOM ) );
+		} else {
+			$_SESSION ['token'] = bin2hex ( openssl_random_pseudo_bytes ( 32 ) );
+		}
+		$_SESSION ['token_time'] = time ();
+	}
+	public function getToken() {
+		return if_exists ( $_SESSION, 'token', null );
+	}
+	protected function verifyCsrfToken() {
+		if ($this->container->get ( 'config' )->get ( 'enableCsrfProtection' )) {
+			return true;
+		}
+		
+		if (in_array ( $this->method (), [ 
+				'HEAD',
+				'GET',
+				'OPTIONS' 
+		] )) {
+			return true;
+		}
+		
+		$token = $this->getParameter ( 'token' );
+		// $this->debug ( $token );
+		// $this->debug ( $this->getToken () );
+		return $this->getToken () === $token;
 	}
 }

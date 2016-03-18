@@ -18,7 +18,6 @@ defined ( 'DEV_MYSQL' ) or define ( 'DEV_MYSQL', 'Mysql/5.6.26' );
  */
 // TODO::
 defined ( 'DS' ) or define ( 'DS', '/' );
-// defined ( 'APP_PATH' ) or define ( 'APP_PATH', BASE_PATH . '/app' );
 
 /**
  * ---------------------------------------------------------------

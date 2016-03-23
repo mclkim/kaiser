@@ -2,7 +2,9 @@
 
 namespace Kaiser;
 
-class Request {
+use ArrayAccess;
+
+class Request implements ArrayAccess {
 	var $headers = array ();
 	var $params = array ();
 	var $ip_address = FALSE;
@@ -20,6 +22,14 @@ class Request {
 			}
 		}
 	}
+	public function offsetExists($offset) {
+	}
+	public function offsetGet($offset) {
+	}
+	public function offsetSet($offset, $value) {
+	}
+	public function offsetUnset($offset) {
+	}
 	function getParameter($index, $no_result = FALSE) {
 		return (! isset ( $this->params [$index] )) ? $no_result : stripslashes ( htmlspecialchars ( $this->params [$index] ) );
 	}
@@ -32,7 +42,7 @@ class Request {
 	 */
 	private function _fetch_from_array(&$array, $index = '', $no_result = FALSE) {
 		$ret = if_exists ( $array, $index, $no_result );
-// 		$ret = (! isset ( $array [$index] )) ? $no_result : stripslashes ( htmlspecialchars ( $array [$index] ) );
+		// $ret = (! isset ( $array [$index] )) ? $no_result : stripslashes ( htmlspecialchars ( $array [$index] ) );
 		return ! empty ( $ret ) ? $ret : $no_result;
 	}
 	/**
@@ -155,12 +165,11 @@ class Request {
 			return $this->ip_address;
 		}
 		
-		if (isset ( $_SESSION ['client_addr'] ))
+		if (isset ( $_SESSION ['client_addr'] )) {
 			return $this->ip_address = $_SESSION ['client_addr'];
-		
-		$this->ip_address = (isset ( $_SERVER ['REMOTE_ADDR'] )) ? $_SERVER ['REMOTE_ADDR'] : FALSE;
-		
-		return $this->ip_address;
+		}
+		// $this->ip_address = (isset ( $_SERVER ['REMOTE_ADDR'] )) ? $_SERVER ['REMOTE_ADDR'] : FALSE;
+		return $this->ip_address = $this->server ( 'REMOTE_ADDR', FALSE );
 	}
 	/**
 	 * --------------------------------------------------------------------
@@ -172,12 +181,11 @@ class Request {
 			return $this->user_agent;
 		}
 		
-		if (isset ( $_SESSION ['client_agent'] ))
+		if (isset ( $_SESSION ['client_agent'] )) {
 			return $this->user_agent = $_SESSION ['client_agent'];
-		
-		$this->user_agent = (isset ( $_SERVER ['HTTP_USER_AGENT'] )) ? $_SERVER ['HTTP_USER_AGENT'] : FALSE;
-		
-		return $this->user_agent;
+		}
+		// $this->user_agent = (isset ( $_SERVER ['HTTP_USER_AGENT'] )) ? $_SERVER ['HTTP_USER_AGENT'] : FALSE;
+		return $this->ip_address = $this->server ( 'HTTP_USER_AGENT', FALSE );
 	}
 	/**
 	 * @TODO::

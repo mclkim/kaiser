@@ -1,9 +1,10 @@
 {
     "name": "mclkim/kaiser",
-    "description": "Kaiser PHP framework",
+    "description": "The Kaiser framework",
     "type": "library",
     "keywords": ["framework","kaiser"],
     "license": "MIT",
+ 	"homepage": "http://mclkim.github.com",    
     "support": {
         "issues": "https://github.com/mclkim/kaiser/issues",
         "source": "https://github.com/mclkim/kaiser"
@@ -14,12 +15,17 @@
             "email": "mclkims@gmail.com"
         }
     ],    
+    "replace": {
+    },
     "require": {
-     	"php": ">=5.5.0",
+     	"php": ">=5.4.0",
      	"pimple/pimple": "^3.0",
      	"katzgrau/klogger": "^1.2",
   		"lancerhe/php-crypt": "^1.0"     	
     },
+    "require-dev": {
+        "monolog/monolog": "~1.11"    
+    },    
     "autoload": {
         "classmap": [
         	"src/Template_/Template_.class.php"

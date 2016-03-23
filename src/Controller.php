@@ -3,6 +3,7 @@
 namespace Kaiser;
 
 class Controller extends Singleton {
+	protected $user;
 	protected $container;
 	var $_defaultPage = '?';
 	var $_loginPage = '?login';
@@ -80,7 +81,7 @@ class Controller extends Singleton {
 		return if_exists ( $_SESSION, 'token', null );
 	}
 	protected function verifyCsrfToken() {
-		if ($this->container->get ( 'config' )->get ( 'enableCsrfProtection' )) {
+		if (! $this->container->get ( 'config' )->get ( 'enableCsrfProtection' )) {
 			return true;
 		}
 		
@@ -93,8 +94,14 @@ class Controller extends Singleton {
 		}
 		
 		$token = $this->getParameter ( 'token' );
-		// $this->debug ( $token );
-		// $this->debug ( $this->getToken () );
+// 		$this->debug ( $token );
+// 		$this->debug ( $this->getToken () );
 		return $this->getToken () === $token;
+	}
+	public function setUser($user) {
+		$_SESSION ['user'] = $user;
+	}
+	protected function getUser() {
+		return if_exists ( $_SESSION, 'user', false );
 	}
 }

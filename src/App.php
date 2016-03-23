@@ -2,6 +2,8 @@
 
 namespace Kaiser;
 
+use \Kaiser\Exception\SystemException;
+
 class App extends Controller {
 	const VERSION = '16.03.18';
 	// 타임 스템프
@@ -11,11 +13,14 @@ class App extends Controller {
 	function __construct($container = []) {
 		parent::__construct ( $container );
 		$this->info ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
+		/**
+		 * 타임스템프를 기록..
+		 */
 		$this->timestamp = new \Kaiser\Timer ();
 	}
 	function __destruct() {
 		/**
-		 * 타입스템프를 기록한 시간 차이를 계산하여 출력한다.
+		 * 타임스템프를 기록한 시간 차이를 계산하여 출력한다.
 		 */
 		$this->info ( sprintf ( 'The Class "%s" total execution time: ', get_class ( $this ) ) . $this->timestamp->fetch () );
 	}
@@ -69,6 +74,7 @@ class App extends Controller {
 		if (! $this->getToken ()) {
 			$this->setToken ();
 		}
+		
 		/**
 		 * Check security token.
 		 */
@@ -76,27 +82,17 @@ class App extends Controller {
 			throw new ApplicationException ( '잘못된 보안 토큰입니다.' );
 			return null;
 		}
+		
 		/**
-		 * Not logged in, redirect to login screen or show ajax error.
-		 */
-		// if (! \Kaiser\Manager\AuthManager::getInstance ()->check ()) {
-		// return $this->ajax () ? '' : $this->router ()->redirect ( $this->_loginPage . '&returnURI=' . $redirect );
-		// }
-		
-		// if (! BackendAuth::check ()) {
-		// return Request::ajax () ? Response::make ( '액세스가 거부되었습니다.', 403 ) : Backend::redirectGuest ( 'backend/auth' );
-		// }
-		
-		/*
 		 * Execute AJAX event
 		 */
 		if ($ajaxResponse = $this->execAjaxHandlers ()) {
-			// $this->debug ( $ajaxResponse );
+			$this->debug ( $ajaxResponse );
 			echo $ajaxResponse;
 			return null;
 		}
 		
-		/*
+		/**
 		 * Execute page action
 		 */
 		$result = $this->execPageAction ();
@@ -123,16 +119,16 @@ class App extends Controller {
 				 */
 				$callable = $this->resolve ( $router );
 				
-				$responseContents = [ ];
-				
-				/*
+				/**
 				 * Execute the handler
 				 */
 				if (! $result = $this->runAjaxHandler ( $callable )) {
 					throw new ApplicationException ( 'execAjaxHandlers' );
 				}
 				
-				/*
+				$responseContents = [ ];
+				
+				/**
 				 * If the handler returned an array, we should add it to output for rendering.
 				 * If it is a string, add it to the array with the key "result".
 				 */
@@ -141,10 +137,24 @@ class App extends Controller {
 				} elseif (is_string ( $result )) {
 					$responseContents ['result'] = $result;
 				}
-				
-				header ( 'HTTP/1.1 200 OK' );
-				header ( 'Content-Type: application/json' );
-				return json_encode ( $responseContents );
+$this->debug($responseContents);				
+				// header ( 'HTTP/1.1 200 OK' );
+				// header ( 'Content-Type: application/json' );
+				// return json_encode ( $responseContents );
+				return Response::getInstance()->setContent($responseContents);
+			}
+            catch (ValidationException $ex) {
+                /*
+                 * Handle validation error gracefully
+                 */
+                Flash::error($ex->getMessage());
+                $responseContents = [];
+                $responseContents['#layout-flash-messages'] = $this->makeLayoutPartial('flash_messages');
+                $responseContents['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
+                throw new AjaxException($responseContents);
+            }
+            catch (MassAssignmentException $ex) {
+                throw new ApplicationException(Lang::get('backend::lang.model.mass_assignment_failed', ['attribute' => $ex->getMessage()]));
 			} catch ( Exception $ex ) {
 				throw $ex;
 			}
@@ -152,34 +162,54 @@ class App extends Controller {
 		
 		return null;
 	}
-	protected function runAjaxHandler($callable) {
+	private function check($callable) {
+// 		$this->debug ( $callable );
+// 		$this->debug ( $callable [0]->requireLogin () );
+// 		$this->debug ( $this->user );
+		
+		if ($callable [0]->requireLogin ()) {
+			if (is_null ( $this->user )) {
+				/**
+				 * Check supplied session/cookie is an array (username, persist code)
+				 */
+				if (! ($user = $this->getUser ())) {
+					return false;
+				}
+				/**
+				 * Pass
+				 */
+				$this->user = $user;
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	private function runAjaxHandler($callable) {
 		try {
+			$result = null;
+			
+			/**
+			 * Not logged in, redirect to login screen or show ajax error.
+			 * 로그인 여부를 체크 할 페이지 인지 확인한다.
+			 * TODO::다른 방법이 있을 것 같은데~
+			 */
+			if (! $this->check ( $callable )) {
+				$returnURI = $callable [0]->getParameter ( 'returnURI', $_SERVER ['REQUEST_URI'] );
+				$redirect = implode ( "/", array_map ( "rawurlencode", explode ( "/", $returnURI ) ) );
+				return $this->ajax () ? '액세스가 거부되었습니다' : $this->router ()->redirect ( $this->_loginPage . '&returnURI=' . $redirect );
+			}
+			
+			if (! method_exists ( $callable [0], $callable [1] )) {
+				throw new SystemException ( sprintf ( "Action %s is not found in the controller %s", $callable [1], $callable [0] ) );
+			}
+			
 			/**
 			 * Execute the handler
 			 */
 			$this->info ( sprintf ( 'The Class "%s" does "%s" method', get_class ( $callable [0] ), $callable [1] ) );
-			
-			// Execute the action
 			$result = call_user_func_array ( $callable, [ ] );
 			return ($result) ?  : true;
-		} catch ( \Kaiser\Exception\AlertException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\ApplicationException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\CallException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\DBException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\EchoException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\FileException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\FtpException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\LoginException $e ) {
-			$this->error ( $e );
-		} catch ( \Kaiser\Exception\PageNotFound $e ) {
-			$this->error ( $e );
 		} catch ( \Exception $e ) {
 			$this->err ( $e );
 			$e = new \Kaiser\Exception\DefaultException ( $e );

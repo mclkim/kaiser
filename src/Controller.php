@@ -28,7 +28,7 @@ class Controller extends Singleton {
 		return $this->request ()->isXmlHttpRequest ();
 	}
 	public function method() {
-		return $this->request ()->getMethod ();
+		return $this->request ()->method ();
 	}
 	protected function logger() {
 		return $this->container->get ( 'logger' );
@@ -94,8 +94,8 @@ class Controller extends Singleton {
 		}
 		
 		$token = $this->getParameter ( 'token' );
-// 		$this->debug ( $token );
-// 		$this->debug ( $this->getToken () );
+		// $this->debug ( $token );
+		// $this->debug ( $this->getToken () );
 		return $this->getToken () === $token;
 	}
 	public function setUser($user) {

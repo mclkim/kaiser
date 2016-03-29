@@ -33,7 +33,7 @@ class App extends Controller {
 		if (! $this->ajax () || $this->method () != 'POST') {
 			return null;
 		}
-// logger()		
+
 		if ($handler = $request->header ( 'X-October-Request-Handler' )) {
 			return trim ( $handler );
 		}

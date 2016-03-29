@@ -22,7 +22,6 @@
      	"pimple/pimple": "^3.0",
      	"katzgrau/klogger": "^1.2",
   		"lancerhe/php-crypt": "^1.0",
-        "aura/http": "^1.0",
         "aura/web": "^2.0"     	
     },
     "require-dev": {

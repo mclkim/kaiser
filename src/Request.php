@@ -7,7 +7,7 @@ use Aura\Web\WebFactory;
 class Request extends Singleton {
 	protected $request;
 	function __construct() {
-		$web_factory = new WebFactory ( array (
+		$factory = new WebFactory ( array (
 				'_ENV' => $_ENV,
 				'_GET' => $_GET,
 				'_POST' => $_POST,
@@ -15,7 +15,7 @@ class Request extends Singleton {
 				'_SERVER' => $_SERVER 
 		) );
 		
-		$this->request = $web_factory->newRequest ();
+		$this->request = $factory->newRequest ();
 	}
 	function method() {
 		return $this->request->method->get ();

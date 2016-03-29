@@ -2,11 +2,18 @@
 
 namespace Kaiser;
 
+use Aura\Web\WebFactory;
+use Aura\Web\ResponseSender;
+
 class Response extends Singleton {
-	protected $http;
+	protected $response;
+	protected $response_sender;
 	protected $original;
 	function __construct() {
-		$this->http = require BASE_PATH . '/vendor/mclkim/kaiser/vendor/aura/http/scripts/instance.php';
+		$globals = array ();
+		$factory = new WebFactory ( $globals );
+		$this->response = $factory->newResponse ();
+		$this->response_sender = new ResponseSender ( $this->response );
 	}
 	protected function morphToJson($content) {
 		if ($content instanceof Jsonable)
@@ -20,14 +27,11 @@ class Response extends Singleton {
 	function setContent($content) {
 		$this->original = $content;
 		
-		$response = $this->http->newResponse ();
-		
 		// If the content is "JSONable" we will set the appropriate header and convert
 		// the content to JSON. This is useful when returning something like models
 		// from routes that will be automatically transformed to their JSON form.
 		if ($this->shouldBeJson ( $content )) {
-			$response->headers->set ( 'Content-Type', 'application/json' );
-			
+			$this->response->headers->set ( 'Content-Type', 'application/json' );
 			$content = $this->morphToJson ( $content );
 		}		
 
@@ -38,8 +42,7 @@ class Response extends Singleton {
 			$content = $content->render ();
 		}
 		
-		$response->setContent ( $content );
-		
-		return $this->http->send ( $response );
+		$this->response->content->set ( $content );
+		return $this->response_sender->__invoke ();
 	}
 }

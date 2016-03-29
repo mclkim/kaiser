@@ -33,7 +33,7 @@ class App extends Controller {
 		if (! $this->ajax () || $this->method () != 'POST') {
 			return null;
 		}
-		
+// logger()		
 		if ($handler = $request->header ( 'X-October-Request-Handler' )) {
 			return trim ( $handler );
 		}
@@ -88,8 +88,8 @@ class App extends Controller {
 		 */
 		if ($ajaxResponse = $this->execAjaxHandlers ()) {
 			$this->debug ( $ajaxResponse );
-			echo $ajaxResponse;
-			return null;
+			// echo $ajaxResponse;
+			return $ajaxResponse;
 		}
 		
 		/**
@@ -137,7 +137,7 @@ class App extends Controller {
 				} elseif (is_string ( $result )) {
 					$responseContents ['result'] = $result;
 				}
-$this->debug($responseContents);				
+// $this->debug($responseContents);				
 				// header ( 'HTTP/1.1 200 OK' );
 				// header ( 'Content-Type: application/json' );
 				// return json_encode ( $responseContents );
@@ -209,14 +209,15 @@ $this->debug($responseContents);
 			 */
 			$this->info ( sprintf ( 'The Class "%s" does "%s" method', get_class ( $callable [0] ), $callable [1] ) );
 			$result = call_user_func_array ( $callable, [ ] );
+			$this->debug($result);
 			return ($result) ?  : true;
 		} catch ( \Exception $e ) {
 			$this->err ( $e );
-			$e = new \Kaiser\Exception\DefaultException ( $e );
-			$e->displayError ();
+			// $e = new \Kaiser\Exception\DefaultException ( $e );
+			// $e->displayError ();
 		}
 		
-		return null;
+		return false;
 	}
 	protected function execPageAction() {
 		$rout = $this->router ();
@@ -235,15 +236,15 @@ $this->debug($responseContents);
 		 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
 		 */
 		$callable = $this->resolve ( $router );
-		
+		// $this->debug($callable);
 		/**
 		 * 클래스 인스턴스를 실행한다.
 		 */
 		if (! $result = $this->runAjaxHandler ( $callable )) {
-			throw new ApplicationException ( 'execPageAction' );
+			// throw new ApplicationException ( 'execPageAction' );
 			// return false;
 		}
-		
+		// $this->debug($result);
 		return ($result) ?  : true;
 	}
 	function setAppDir($directory = []) {

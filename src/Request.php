@@ -4,15 +4,17 @@ namespace Kaiser;
 
 use ArrayAccess;
 
-class Request implements ArrayAccess {
+class Request extends Singleton implements ArrayAccess {
 	var $headers = array ();
 	var $params = array ();
 	var $ip_address = FALSE;
 	var $user_agent = FALSE;
+	protected $http;
 	protected $method;
 	protected static $_request_headers;
 	protected static $httpMethodParameterOverride = false;
 	function __construct() {
+		$this->http = require BASE_PATH . '/vendor/mclkim/kaiser/vendor/aura/http/scripts/instance.php';
 		$this->headers = self::request_headers ();
 		// $this->debug ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
 		// 일반 request parameter도 함께 처리하도록
@@ -227,4 +229,9 @@ class Request implements ArrayAccess {
 		}
 		return self::$_request_headers;
 	}
+	// function header($index = '', $no_result = FALSE) {
+	// $request = $this->http->newRequest ();
+	// logger($request->headers);
+	// return $this->_fetch_from_array ( $request->headers, $index, $no_result );
+	// }
 }

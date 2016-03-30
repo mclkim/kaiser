@@ -2,6 +2,8 @@
 
 namespace Kaiser;
 
+use \Kaiser\Exception\ApplicationException;
+use \Kaiser\Exception\AjaxException;
 use \Kaiser\Exception\SystemException;
 
 class App extends Controller {
@@ -164,24 +166,18 @@ class App extends Controller {
 	}
 	private function check($callable) {
 // 		$this->debug ( $callable );
-// 		$this->debug ( $callable [0]->requireLogin () );
-// 		$this->debug ( $this->user );
+		$this->debug ( get_class($callable [0] ));
+		$this->debug ( $callable [0]->requireLogin () );
 		
 		if ($callable [0]->requireLogin ()) {
-			if (is_null ( $this->user )) {
 				/**
 				 * Check supplied session/cookie is an array (username, persist code)
 				 */
-				if (! ($user = $this->getUser ())) {
-					return false;
+				if ($user = $callable [0]->getUser ()) {
+					$this->debug ( $user );
+					return true;
 				}
-				/**
-				 * Pass
-				 */
-				$this->user = $user;
-				return true;
-			}
-			return false;
+				return false;
 		}
 		return true;
 	}
@@ -209,7 +205,6 @@ class App extends Controller {
 			 */
 			$this->info ( sprintf ( 'The Class "%s" does "%s" method', get_class ( $callable [0] ), $callable [1] ) );
 			$result = call_user_func_array ( $callable, [ ] );
-			$this->debug($result);
 			return ($result) ?  : true;
 		} catch ( \Exception $e ) {
 			$this->err ( $e );

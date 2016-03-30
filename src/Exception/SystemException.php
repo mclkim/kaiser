@@ -2,15 +2,18 @@
 
 namespace Kaiser\Exception;
 
-class SystemException extends \ErrorException {
-	var $charset = 'utf-8';
-	function __construct($message = false, $code = false) {
-		parent::__construct ( $message, $code );
-	}
-	function displayError() {
-		echo json_encode ( array (
-				'code' => $this->code,
-				'message' => $this->message 
-		) );
+use App;
+use Log;
+
+/**
+ * This class represents a critical system exception.
+ * System exceptions are logged in the error log.
+ *
+ * @package october\exception
+ * @author Alexey Bobkov, Samuel Georges
+ */
+class SystemException extends ExceptionBase {
+	public function __construct($message = "", $code = 0, \Exception $previous = null) {
+		parent::__construct ( $message, $code, $previous );
 	}
 }

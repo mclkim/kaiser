@@ -45,4 +45,8 @@ class Response extends Singleton {
 		$this->response->content->set ( $content );
 		return $this->response_sender->__invoke ();
 	}
+	function redirect($location, $code = 302, $phrase = null) {
+		$this->response->redirect->to ( $location, $code, $phrase );
+		return $this->response_sender->__invoke ();
+	}
 }

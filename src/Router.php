@@ -2,27 +2,13 @@
 
 namespace Kaiser;
 
-class Router {
+use Kaiser\Request;
+
+class Router extends Singleton {
 	protected $query;
-	protected $uri;
+	protected $route;
 	protected $param;
 	function __construct() {
-	}
-	function getRoute() {
-		if ($this->uri)
-			return $this->uri;
-		
-		$query = $this->splitQueryString ( $this->getQueryString () );
-		
-		$x = isset ( $query [0] ) ? $this->__URIPath ( $query [0] ) : array ();
-		
-		$this->uri = new \stdClass ();
-		$this->uri->path = if_empty ( $x, 'dirname', '' );
-		$this->uri->controller = if_empty ( $x, 'filename', 'index' );
-		$this->uri->action = if_empty ( $x, 'extension', 'execute' );
-		$this->uri->file = rtrim ( $this->uri->path, '/' ) . '/' . $this->uri->controller . '.php';
-		
-		return $this->uri;
 	}
 	/**
 	 * 클래스명 앞에 경로(/)가 있을경우를
@@ -55,80 +41,44 @@ class Router {
 		if ($this->query)
 			return $this->query;
 		
-		return $this->query = urldecode ( preg_replace ( '/\?.*$/', '', $_SERVER ['QUERY_STRING'] ) );
+		return $this->query = Request::getInstance ()->url ( PHP_URL_QUERY );
 	}
 	private function splitQueryString($query) {
-		$query = parse_url ( trim ( $query, '/' ), PHP_URL_PATH );
 		return $query ? explode ( '&', $query ) : array ();
 	}
-	public function redirect($url, $http_code = 303) {
-		// Turn relative URL into absolute URL
-		if (strpos ( $url, '://' ) === false) {
-			if ($url == '' || $url [0] != '/')
-				$url = dirname ( $_SERVER ['SCRIPT_NAME'] ) . '/' . $url;
-				// $url = rtrim ( $_SERVER ['REQUEST_URI'], '/' ) . '/' . $url;
-				// phpinfo();
-				// var_dump($url);exit;
-			
-			$url = (empty ( $_SERVER ['HTTPS'] ) ? 'http://' : 'https://') . $_SERVER ['HTTP_HOST'] . $url;
-		}
+	public function getRoute() {
+		if ($this->route)
+			return $this->route;
 		
-		if (ob_get_level () > 1)
-			ob_end_clean ();
-			
-			// var_dump($url);exit;
-		header ( "Location: $url", true, $http_code );
+		$query = $this->splitQueryString ( $this->getQueryString () );
+		$param = $this->param = array_slice ( $query, 1 );
+		// var_dump($param) ;exit;
+		$x = isset ( $query [0] ) ? $this->__URIPath ( $query [0] ) : array ();
 		
-		echo 'You are being redirected to <a href="' . $url . '">' . $url . '</a>';
-		exit ();
-	}
-	function getCurrentUrl() {
-		$protocol = ! empty ( $_SERVER ['HTTPS'] ) ? 'https://' : 'http://';
+		$this->route = new \stdClass ();
+		$this->route->path = if_empty ( $x, 'dirname', '' );
+		$this->route->controller = if_empty ( $x, 'filename', 'index' );
+		$this->route->action = if_empty ( $x, 'extension', 'execute' );
+		$this->route->file = rtrim ( $this->route->path, '/' ) . '/' . $this->route->controller . '.php';
+		$this->route->param = $param;
 		
-		$params = array ();
-		if (isset ( $_SERVER ['QUERY_STRING'] ) && ! empty ( $_SERVER ['QUERY_STRING'] )) {
-			parse_str ( $_SERVER ['QUERY_STRING'], $params );
-			$params ['lang'] = 'anything';
-			unset ( $params ['lang'] ); // This will clear it from the parameters
-		}
+		return $this->route;
+	}
+	public function getCurrentUrl() {
+		return Request::getInstance ()->url ();
+	}
+	public function getBaseUrl($atRoot = FALSE) {
+		$http = Request::getInstance ()->url ( PHP_URL_SCHEME );
+		$host = Request::getInstance ()->url ( PHP_URL_HOST );
+		$port = Request::getInstance ()->url ( PHP_URL_PORT );
+		$path = $atRoot ? '' : Request::getInstance ()->url ( PHP_URL_PATH );
 		
-		// Now rebuild the new URL
-		return $url = $protocol . $_SERVER ['SERVER_NAME'] . $_SERVER ['SCRIPT_NAME'] . (! empty ( $params ) ? ('?' . http_build_query ( $params )) : '');
-	}
-	function getBaseUrl($atRoot = FALSE, $atCore = FALSE, $parse = FALSE) {
-		if (isset ( $_SERVER ['HTTP_HOST'] )) {
-			$http = isset ( $_SERVER ['HTTPS'] ) && strtolower ( $_SERVER ['HTTPS'] ) !== 'off' ? 'https' : 'http';
-			$hostname = $_SERVER ['HTTP_HOST'];
-			$dir = str_replace ( basename ( $_SERVER ['SCRIPT_NAME'] ), '', $_SERVER ['SCRIPT_NAME'] );
-			
-			$core = preg_split ( '@/@', str_replace ( $_SERVER ['DOCUMENT_ROOT'], '', realpath ( dirname ( __FILE__ ) ) ), NULL, PREG_SPLIT_NO_EMPTY );
-			$core = $core [0];
-			
-			$tmplt = $atRoot ? ($atCore ? "%s://%s/%s/" : "%s://%s/") : ($atCore ? "%s://%s/%s/" : "%s://%s%s");
-			$end = $atRoot ? ($atCore ? $core : $hostname) : ($atCore ? $core : $dir);
-			
-			$base_url = sprintf ( $tmplt, $http, $hostname, $end );
-		} else
-			$base_url = 'http://localhost/';
+		$tmplt = $port ? ($path ? "%s://%s:%d%s" : "%s://%s:%d") : ($path ? "%s://%s/%s" : "%s://%s");
 		
-		if ($parse) {
-			$base_url = parse_url ( $base_url );
-			if (isset ( $base_url ['path'] ))
-				if ($base_url ['path'] == '/')
-					$base_url ['path'] = '';
-		}
-		
-		return $base_url;
+		return sprintf ( $tmplt, $http, $host, $port, $path );
 	}
-	public static function getLocalReferer() {
-		return ! empty ( $_SERVER ['HTTP_REFERER'] ) && parse_url ( $_SERVER ['HTTP_REFERER'], PHP_URL_HOST ) == $_SERVER ['HTTP_HOST'] ? $_SERVER ['HTTP_REFERER'] : null;
+	public static function baseUrl() {
 	}
-	public function urlFor($name, $params = array()) {
-	}
-	public function siteUrl() {
-	}
-	public function baseUrl() {
-	}
-	public function currentUrl() {
+	public static function currentUrl() {
 	}
 }

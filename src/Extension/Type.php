@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaiser\Manager\Extension;
+namespace Kaiser\Extension;
 
 /**
  * -------------------------------------------------------------------------------

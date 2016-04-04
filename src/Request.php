@@ -17,6 +17,10 @@ class Request extends Singleton {
 		
 		$this->request = $factory->newRequest ();
 	}
+	function url($component = null) {
+		// var_dump ( $this->request->url );
+		return $this->request->url->get ( $component );
+	}
 	function method() {
 		return $this->request->method->get ();
 	}

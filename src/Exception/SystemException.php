@@ -2,9 +2,6 @@
 
 namespace Kaiser\Exception;
 
-use App;
-use Log;
-
 /**
  * This class represents a critical system exception.
  * System exceptions are logged in the error log.

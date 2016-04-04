@@ -26,6 +26,11 @@ class Container extends PimpleContainer implements ContainerInterface {
 				return new Request ();
 			};
 		}
+		if (! isset ( $this ['response'] )) {
+			$this ['response'] = function ($c) {
+				return new Response ();
+			};
+		}		
 		if (! isset ( $this ['router'] )) {
 			$this ['router'] = function ($c) {
 				return new Router ();

@@ -5,6 +5,7 @@ namespace Kaiser;
 use \Kaiser\Exception\ApplicationException;
 use \Kaiser\Exception\AjaxException;
 use \Kaiser\Exception\SystemException;
+use \Kaiser\Exception\ValidationException;
 
 class App extends Controller {
 	const VERSION = '16.03.18';
@@ -35,7 +36,7 @@ class App extends Controller {
 		if (! $this->ajax () || $this->method () != 'POST') {
 			return null;
 		}
-
+		
 		if ($handler = $request->header ( 'X-October-Request-Handler' )) {
 			return trim ( $handler );
 		}
@@ -73,8 +74,8 @@ class App extends Controller {
 		 */
 		$this->container->get ( 'session' );
 		
-		if (! $this->getToken ()) {
-			$this->setToken ();
+		if (! $this->getCsrfToken ()) {
+			$this->setCsrfToken ();
 		}
 		
 		/**
@@ -82,7 +83,6 @@ class App extends Controller {
 		 */
 		if (! $this->verifyCsrfToken ()) {
 			throw new ApplicationException ( '잘못된 보안 토큰입니다.' );
-			return null;
 		}
 		
 		/**
@@ -119,8 +119,9 @@ class App extends Controller {
 				/**
 				 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
 				 */
-				$callable = $this->resolve ( $router );
-				
+				// $callable = $this->resolve ( $router );
+				$callable = $this->findController ( $router->controller, $router->action, $router->path, $this->getAppDir () );
+				$this->debug($callable);
 				/**
 				 * Execute the handler
 				 */
@@ -139,47 +140,13 @@ class App extends Controller {
 				} elseif (is_string ( $result )) {
 					$responseContents ['result'] = $result;
 				}
-// $this->debug($responseContents);				
-				// header ( 'HTTP/1.1 200 OK' );
-				// header ( 'Content-Type: application/json' );
-				// return json_encode ( $responseContents );
-				return Response::getInstance()->setContent($responseContents);
-			}
-            catch (ValidationException $ex) {
-                /*
-                 * Handle validation error gracefully
-                 */
-                Flash::error($ex->getMessage());
-                $responseContents = [];
-                $responseContents['#layout-flash-messages'] = $this->makeLayoutPartial('flash_messages');
-                $responseContents['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
-                throw new AjaxException($responseContents);
-            }
-            catch (MassAssignmentException $ex) {
-                throw new ApplicationException(Lang::get('backend::lang.model.mass_assignment_failed', ['attribute' => $ex->getMessage()]));
+				return Response::getInstance ()->setContent ( $responseContents );
 			} catch ( Exception $ex ) {
 				throw $ex;
 			}
 		}
 		
 		return null;
-	}
-	private function check($callable) {
-// 		$this->debug ( $callable );
-		$this->debug ( get_class($callable [0] ));
-		$this->debug ( $callable [0]->requireLogin () );
-		
-		if ($callable [0]->requireLogin ()) {
-				/**
-				 * Check supplied session/cookie is an array (username, persist code)
-				 */
-				if ($user = $callable [0]->getUser ()) {
-					$this->debug ( $user );
-					return true;
-				}
-				return false;
-		}
-		return true;
 	}
 	private function runAjaxHandler($callable) {
 		try {
@@ -188,12 +155,13 @@ class App extends Controller {
 			/**
 			 * Not logged in, redirect to login screen or show ajax error.
 			 * 로그인 여부를 체크 할 페이지 인지 확인한다.
+			 *
 			 * TODO::다른 방법이 있을 것 같은데~
 			 */
-			if (! $this->check ( $callable )) {
+			if (! $this->check ( $callable [0] )) {
 				$returnURI = $callable [0]->getParameter ( 'returnURI', $_SERVER ['REQUEST_URI'] );
 				$redirect = implode ( "/", array_map ( "rawurlencode", explode ( "/", $returnURI ) ) );
-				return $this->ajax () ? '액세스가 거부되었습니다' : $this->router ()->redirect ( $this->_loginPage . '&returnURI=' . $redirect );
+				return $this->ajax () ? '액세스가 거부되었습니다' : Response::getInstance ()->redirect ( $this->_loginPage . '&returnURI=' . $redirect );
 			}
 			
 			if (! method_exists ( $callable [0], $callable [1] )) {
@@ -205,11 +173,19 @@ class App extends Controller {
 			 */
 			$this->info ( sprintf ( 'The Class "%s" does "%s" method', get_class ( $callable [0] ), $callable [1] ) );
 			$result = call_user_func_array ( $callable, [ ] );
-			return ($result) ?  : true;
-		} catch ( \Exception $e ) {
-			$this->err ( $e );
-			// $e = new \Kaiser\Exception\DefaultException ( $e );
-			// $e->displayError ();
+			return ($result) ?: true;
+		} catch ( ValidationException $ex ) {
+			$responseContents ['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields ();
+			$responseContents ['X_OCTOBER_ERROR_MESSAGE'] = $ex->getMessage ();
+			throw new AjaxException ( $responseContents );
+		} catch ( AjaxException $ex ) {
+			// $responseContents = [];
+			// $responseContents['#layout-flash-messages'] = $ex->getMessage ();
+			// $responseContents['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
+			// $responseContents['X_OCTOBER_ERROR_MESSAGE'] = $ex->getMessage();
+			return Response::getInstance ()->setContent ( $ex->getMessage () );
+		} catch ( Exception $ex ) {
+			throw $ex;
 		}
 		
 		return false;
@@ -230,17 +206,19 @@ class App extends Controller {
 		/**
 		 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
 		 */
-		$callable = $this->resolve ( $router );
-		// $this->debug($callable);
+		// $callable = $this->resolve ( $router );
+		$callable = $this->findController ( $router->controller, $router->action, $router->path, $this->getAppDir () );
+		$this->debug($callable);
 		/**
 		 * 클래스 인스턴스를 실행한다.
 		 */
 		if (! $result = $this->runAjaxHandler ( $callable )) {
-			// throw new ApplicationException ( 'execPageAction' );
-			// return false;
+			throw new ApplicationException ( 'runAjaxHandler' );
 		}
-		// $this->debug($result);
-		return ($result) ?  : true;
+		
+		// $this->debug ( 'execPageAction' );
+		// $this->debug ( $result );
+		return ($result) ?: true;
 	}
 	function setAppDir($directory = []) {
 		self::$AppDirectory = $directory;
@@ -270,17 +248,9 @@ class App extends Controller {
 		];
 		
 		if (! is_callable ( $resolved )) {
-			// throw new RuntimeException ( sprintf ( '%s is not resolvable', $toResolve ) );
-			throw new \Kaiser\Exception\CallException ( sprintf ( 'The required method "%s" does not exist for %s', $method, $class ) );
+			throw new SystemException ( sprintf ( 'The required method "%s" does not exist for %s', $method, $class ) );
 		}
 		
 		return $resolved;
-	}
-	/**
-	 * 사용자 에러메시지
-	 */
-	private function error(\Exception $e) {
-		$this->err ( $e );
-		$e->displayError ();
 	}
 }

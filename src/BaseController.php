@@ -36,26 +36,26 @@ class BaseController extends Singleton {
 		return $this->container->get ( 'router' );
 	}
 	public static function normalizeClassName($name) {
+		$name = str_replace ( '/', '\\', $name );
+		
 		if (is_object ( $name ))
 			$name = get_class ( $name );
 		
 		$name = '\\' . ltrim ( $name, '\\' );
 		return $name;
 	}
-	protected function findController($controller, $action, $path, $inPath) {
+	protected function findController($controller, $action, $inPath) {
 		$directory = is_array ( $inPath ) ? $inPath : array (
 				$inPath 
 		);
+		
 		/**
 		 * Workaround: Composer does not support case insensitivity.
 		 */
 		if (! class_exists ( $controller )) {
-			$controller = self::normalizeClassName ( '\\' . $path . '\\' . $controller );
-			logger ( $controller );
+			$controller = self::normalizeClassName ( $controller );
 			foreach ( $directory as $inPath ) {
 				$controllerFile = $inPath . strtolower ( str_replace ( '\\', '/', $controller ) ) . '.php';
-				logger ( '===================' );
-				logger ( $controllerFile );
 				if (file_exists ( $controllerFile )) {
 					include_once ($controllerFile);
 					break;
@@ -66,12 +66,6 @@ class BaseController extends Singleton {
 		if (! class_exists ( $controller )) {
 			return false;
 		}
-		
-		// $controllerObj = App::getInstance ( $controller );
-		
-		// if ($controllerObj->actionExists ( $action )) {
-		// return $controllerObj;
-		// }
 		
 		$controllerObj = [ 
 				new $controller ( $this->container ),

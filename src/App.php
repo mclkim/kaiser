@@ -89,7 +89,7 @@ class App extends Controller {
 		 * Execute AJAX event
 		 */
 		if ($ajaxResponse = $this->execAjaxHandlers ()) {
-			$this->debug ( $ajaxResponse );
+			// $this->debug ( $ajaxResponse );
 			// echo $ajaxResponse;
 			return $ajaxResponse;
 		}
@@ -121,7 +121,7 @@ class App extends Controller {
 				 */
 				// $callable = $this->resolve ( $router );
 				$callable = $this->findController ( $router->controller, $router->action, $router->path, $this->getAppDir () );
-				$this->debug($callable);
+				$this->debug ( $callable );
 				/**
 				 * Execute the handler
 				 */
@@ -207,8 +207,8 @@ class App extends Controller {
 		 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
 		 */
 		// $callable = $this->resolve ( $router );
-		$callable = $this->findController ( $router->controller, $router->action, $router->path, $this->getAppDir () );
-		$this->debug($callable);
+		$callable = $this->findController ( $router->controller, $router->action, $this->getAppDir () );
+		// $this->debug($callable);
 		/**
 		 * 클래스 인스턴스를 실행한다.
 		 */

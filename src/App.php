@@ -8,7 +8,7 @@ use \Kaiser\Exception\SystemException;
 use \Kaiser\Exception\ValidationException;
 
 class App extends Controller {
-	const VERSION = '16.03.18';
+	const VERSION = '16.04.05';
 	// 타임 스템프
 	protected $timestamp = null;
 	static $AppDirectory;
@@ -119,9 +119,9 @@ class App extends Controller {
 				/**
 				 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
 				 */
-				// $callable = $this->resolve ( $router );
-				$callable = $this->findController ( $router->controller, $router->action, $router->path, $this->getAppDir () );
-				$this->debug ( $callable );
+				$callable = $this->findController ( $router->controller, $router->action, $this->getAppDir () );
+				// $this->debug ( $callable );
+				
 				/**
 				 * Execute the handler
 				 */
@@ -206,9 +206,9 @@ class App extends Controller {
 		/**
 		 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
 		 */
-		// $callable = $this->resolve ( $router );
 		$callable = $this->findController ( $router->controller, $router->action, $this->getAppDir () );
-		// $this->debug($callable);
+		// $this->debug ( $callable );
+		
 		/**
 		 * 클래스 인스턴스를 실행한다.
 		 */
@@ -231,26 +231,5 @@ class App extends Controller {
 	}
 	function getBasePath() {
 		return self::$basePath;
-	}
-	private function resolve($toResolve) {
-		$resolved = $toResolve;
-		
-		$path = $toResolve->path;
-		$class = $toResolve->controller;
-		$method = $toResolve->action;
-		
-		$common = new \Kaiser\Common ( $this->getAppDir () );
-		$common->load_class ( $class, $path );
-		
-		$resolved = [ 
-				new $class ( $this->container ),
-				$method 
-		];
-		
-		if (! is_callable ( $resolved )) {
-			throw new SystemException ( sprintf ( 'The required method "%s" does not exist for %s', $method, $class ) );
-		}
-		
-		return $resolved;
 	}
 }

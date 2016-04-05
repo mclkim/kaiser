@@ -57,9 +57,9 @@ class Router extends Singleton {
 		
 		$this->route = new \stdClass ();
 		$this->route->path = if_empty ( $x, 'dirname', '' );
-		$this->route->controller = if_empty ( $x, 'filename', 'index' );
+		$this->route->class = if_empty ( $x, 'filename', 'index' );
 		$this->route->action = if_empty ( $x, 'extension', 'execute' );
-		$this->route->file = rtrim ( $this->route->path, '/' ) . '/' . $this->route->controller . '.php';
+		$this->route->controller = rtrim ( $this->route->path, '/' ) . '/' . $this->route->class;
 		$this->route->param = $param;
 		
 		return $this->route;

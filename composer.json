@@ -20,9 +20,9 @@
     "require": {
      	"php": ">=5.4.0",
      	"pimple/pimple": "^3.0",
+        "aura/web": "^2.0",     	
      	"katzgrau/klogger": "^1.2",
-  		"lancerhe/php-crypt": "^1.0",
-        "aura/web": "^2.0"     	
+  		"lancerhe/php-crypt": "^1.0"
     },
     "require-dev": {
         "monolog/monolog": "~1.11"    

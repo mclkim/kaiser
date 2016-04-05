@@ -88,13 +88,13 @@ class Controller extends BaseController {
 	}
 	protected function check($callable) {
 		// $this->debug ( $callable );
-		$this->debug ( get_class($callable ));
+		// $this->debug ( get_class($callable ));
 		// $this->debug ( $callable ->requireLogin () );
 		if ($callable->requireLogin ()) {
 			/**
 			 * Check supplied session/cookie is an array (username, persist code)
 			 */
-			if ($user = $callable->getUser ()) {
+			if ($this->user = $callable->getUser ()) {
 				// $this->debug ( $user );
 				return true;
 			}

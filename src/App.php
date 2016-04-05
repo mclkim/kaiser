@@ -89,8 +89,7 @@ class App extends Controller {
 		 * Execute AJAX event
 		 */
 		if ($ajaxResponse = $this->execAjaxHandlers ()) {
-			// $this->debug ( $ajaxResponse );
-			// echo $ajaxResponse;
+			$this->debug ( $ajaxResponse );
 			return $ajaxResponse;
 		}
 		
@@ -163,16 +162,20 @@ class App extends Controller {
 				$redirect = implode ( "/", array_map ( "rawurlencode", explode ( "/", $returnURI ) ) );
 				return $this->ajax () ? '액세스가 거부되었습니다' : Response::getInstance ()->redirect ( $this->_loginPage . '&returnURI=' . $redirect );
 			}
+			// $this->debug ( 'hello' );
 			
 			if (! method_exists ( $callable [0], $callable [1] )) {
 				throw new SystemException ( sprintf ( "Action %s is not found in the controller %s", $callable [1], $callable [0] ) );
 			}
+			// $this->debug ( 'hello' );
 			
 			/**
 			 * Execute the handler
 			 */
 			$this->info ( sprintf ( 'The Class "%s" does "%s" method', get_class ( $callable [0] ), $callable [1] ) );
+			// $this->debug($callable);
 			$result = call_user_func_array ( $callable, [ ] );
+			$this->debug ( $result );
 			return ($result) ?: true;
 		} catch ( ValidationException $ex ) {
 			$responseContents ['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields ();

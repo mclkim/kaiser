@@ -27,7 +27,7 @@ class Controller extends BaseController {
 		// Response::getInstance ()->redirect ( $this->_defaultPage );
 	}
 	protected function ajax() {
-		return $this->request ()->isXmlHttpRequest ();
+		return $this->request ()->isXhr ();
 	}
 	protected function method() {
 		return $this->request ()->method ();

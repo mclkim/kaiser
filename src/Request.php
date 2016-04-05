@@ -17,8 +17,10 @@ class Request extends Singleton {
 		
 		$this->request = $factory->newRequest ();
 	}
+	function cookie($key = null, $alt = null) {
+		return $this->request->cookies->get ( $key, $alt );
+	}
 	function url($component = null) {
-		// var_dump ( $this->request->url );
 		return $this->request->url->get ( $component );
 	}
 	function method() {
@@ -31,15 +33,12 @@ class Request extends Singleton {
 		return $this->request->query->get ( $key, $alt );
 	}
 	function get_post($key = null, $alt = null) {
-		if ($this->request->post->count () > 0) {
-			return $this->post ( $key, $alt );
-		}
-		return $this->get ( $key, $alt );
+		return empty ( $this->post ( $key ) ) ? $this->get ( $key, $alt ) : $this->post ( $key, $alt );
 	}
 	function header($key = null, $alt = null) {
 		return $this->request->headers->get ( $key, $alt );
 	}
-	function isXmlHttpRequest() {
-		return 'XMLHttpRequest' == $this->header ( 'X-Requested-With' );
+	function isXhr() {
+		return $this->request->isXhr ();
 	}
 }

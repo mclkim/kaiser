@@ -11,78 +11,100 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler {
 		return $query->getRawSql ();
 	}
 	function executePreparedQueryToMapList($sql, $params = array()) {
-		$query = $this->query ( $sql, $params );
 		try {
-			$this->preparePdoStatement ();
-			$result = $this->pdoStatement->fetchAll ( \PDO::FETCH_CLASS );
-			$this->pdoStatement = null;
+			$query = $this->query ( $sql, $params );
+			$this->setFetchMode( \PDO::FETCH_CLASS );
+			$result = $query->get();
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
 	}
 	function executePreparedQueryOne($sql, $params = array()) {
-		$query = $this->query ( $sql, $params );
+		logger($this->executeEmulateQuery($sql, $params ));
 		try {
-			$this->preparePdoStatement ();
-			$result = $this->pdoStatement->fetch ( \PDO::FETCH_COLUMN );
-			$this->pdoStatement = null;
+			$query = $this->query ( $sql, $params );
+			$this->setFetchMode( \PDO::FETCH_OBJ );
+			$result = $query->first();
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
 	}
 	function executePreparedQueryToArrayList($sql, $params = array()) {
-		$query = $this->query ( $sql, $params );
+		logger($this->executeEmulateQuery($sql, $params ));
 		try {
-			$this->preparePdoStatement ();
-			$result = $this->pdoStatement->fetchAll ( \PDO::FETCH_NUM );
-			$this->pdoStatement = null;
+			$query = $this->query ( $sql, $params );
+			$this->setFetchMode( \PDO::FETCH_NUM );
+			$result = $query->get();
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
 	}
 	function executePreparedQueryToColList($sql, $params = array(), $col = 0) {
-		$query = $this->query ( $sql, $params );
+		logger($this->executeEmulateQuery($sql, $params ));
 		try {
-			$this->preparePdoStatement ();
-			$result = $this->pdoStatement->fetchAll ( \PDO::FETCH_COLUMN, $col );
-			$this->pdoStatement = null;
+			$query = $this->query ( $sql, $params );
+			$this->setFetchMode( \PDO::FETCH_COLUMN );
+			$result = $query->get();
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
 	}
 	function executePreparedQueryToMap($sql, $params = array()) {
-		$query = $this->query ( $sql, $params );
+		logger($this->executeEmulateQuery($sql, $params ));
 		try {
-			$this->preparePdoStatement ();
-			$result = $this->pdoStatement->fetch ( \PDO::FETCH_ASSOC );
-			$this->pdoStatement = null;
+			$query = $this->query ( $sql, $params );
+			$this->setFetchMode( \PDO::FETCH_ASSOC );
+			$result = $query->get();
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
 	}
 	function executePreparedQueryToObjList($sql, $params = array()) {
-		$query = $this->query ( $sql, $params );
+		logger($this->executeEmulateQuery($sql, $params ));
 		try {
-			$this->preparePdoStatement ();
-			$result = $this->pdoStatement->fetchAll ( \PDO::FETCH_OBJ );
-			$this->pdoStatement = null;
+			$query = $this->query ( $sql, $params );
+			$this->setFetchMode( \PDO::FETCH_OBJ );
+			$result = $query->get();
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
 	}
 	function executePreparedUpdate($sql, $params = array()) {
-		$query = $this->query ( $sql, $params );
+		logger($this->executeEmulateQuery($sql, $params ));
 		try {
-			$result = $this->pdoStatement->rowCount ();
+			$query = $this->query ( $sql, $params );
 		} catch ( PDOException $e ) {
 			throw new DBException ( $e->getMessage () );
+		} catch (\Exception $e) {
 		}
 		return $result;
+	}
+	function executeTransaction(){
+		try {
+			// Begin the PDO transaction
+			$this->pdo->beginTransaction();
+
+			// If no errors have been thrown or the transaction wasn't completed within
+			// the closure, commit the changes
+			$this->pdo->commit();
+
+			return $this;
+		} catch (\Exception $e) {
+			// something happened, rollback changes
+			$this->pdo->rollBack();
+			return $this;
+		}
 	}
 }

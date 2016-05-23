@@ -26,6 +26,9 @@ class Controller extends BaseController {
 		$this->response ()->redirect ( $this->_defaultPage );
 		// Response::getInstance ()->redirect ( $this->_defaultPage );
 	}
+	protected function execute() {
+		echo 'Hello Kaiser PHP framework~~';
+	}
 	protected function ajax() {
 		return $this->request ()->isXhr ();
 	}

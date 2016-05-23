@@ -21,6 +21,11 @@ class Container extends PimpleContainer implements ContainerInterface {
 		$this->registerDefaultServices ();
 	}
 	private function registerDefaultServices() {
+		if (! isset ( $this ['config'] )) {
+			$this ['config'] = function ($c) {
+				return new Config ();
+			};
+		}		
 		if (! isset ( $this ['request'] )) {
 			$this ['request'] = function ($c) {
 				return new Request ();

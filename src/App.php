@@ -8,7 +8,7 @@ use \Kaiser\Exception\SystemException;
 use \Kaiser\Exception\ValidationException;
 
 class App extends Controller {
-	const VERSION = '16.04.05';
+	const VERSION = '16.05.23';
 	// 타임 스템프
 	protected $timestamp = null;
 	static $AppDirectory;

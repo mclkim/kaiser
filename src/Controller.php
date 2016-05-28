@@ -65,7 +65,7 @@ class Controller extends BaseController {
 		return if_exists ( $_SESSION, 'csrf_token', null );
 	}
 	protected function verifyCsrfToken() {
-		if ($this->config ()->get ( 'enableCsrfProtection' )) {
+		if (!$this->config ()->get ( 'enableCsrfProtection' )) {
 			return true;
 		}
 		// $this->debug ( $this->container->get ( 'config' )->get ( 'enableCsrfProtection' ) );

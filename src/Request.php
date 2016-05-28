@@ -41,4 +41,7 @@ class Request extends Singleton {
 	function isXhr() {
 		return $this->request->isXhr ();
 	}
+	function getContent() {
+		return $this->request->content->getRaw ();
+	}
 }

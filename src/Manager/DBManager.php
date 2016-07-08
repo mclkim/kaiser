@@ -107,7 +107,7 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
         }
-        return $result;
+        // return $result;
     }
 
     function executeTransaction()

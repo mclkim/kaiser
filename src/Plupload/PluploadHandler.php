@@ -282,7 +282,7 @@ class PluploadHandler {
 	}
 
 
-	private static function cleanup() 
+	public static function cleanup()
 	{
 		// Remove old temp files	
 		if (file_exists(self::$conf['target_dir'])) {

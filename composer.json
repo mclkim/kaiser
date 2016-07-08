@@ -36,7 +36,8 @@
             "src/Helpers.php"
         ],        
         "psr-4": {
-            "Kaiser\\": "src"
+            "Kaiser\\": "src",
+            "Kaiser\\PluploadHandler\\": "src/Plupload/",
         }
     }  
 }

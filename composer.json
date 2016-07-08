@@ -37,7 +37,7 @@
         ],        
         "psr-4": {
             "Kaiser\\": "src",
-            "Kaiser\\PluploadHandler\\": "src/Plupload/",
+            "Kaiser\\PluploadHandler\\": "src/Plupload/"
         }
     }  
 }

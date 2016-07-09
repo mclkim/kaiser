@@ -7,7 +7,9 @@ class Controller extends BaseController
     protected $user;
     var $_defaultPage = '?';
     var $_loginPage = '?login';
-    var $_loginAdminPage = '?loginAdmin';
+    var $_loginAdminPage = '?login.admin';
+    var $_admin = 'admin';
+    var $_user = 'user';
 
     /**
      * 로그인 여부를 체크 할 페이지 인지에 대한 세팅을 한다.
@@ -17,6 +19,10 @@ class Controller extends BaseController
     protected function requireLogin()
     {
         return true;
+    }
+
+    protected function requireAdmin()
+    {
     }
 
     /**
@@ -74,22 +80,22 @@ class Controller extends BaseController
 
     protected function setUser($user)
     {
-        $_SESSION ['user'] = $user;
+        $_SESSION [$this->_user] = $user;
     }
 
     protected function getUser()
     {
-        return if_exists($_SESSION, 'user', false);
+        return if_exists($_SESSION, $this->_user, false);
     }
 
     protected function setAdmin($user)
     {
-        $_SESSION ['admin'] = $user;
+        $_SESSION [$this->_admin] = $user;
     }
 
     protected function getAdmin()
     {
-        return if_exists($_SESSION, 'user', false);
+        return if_exists($_SESSION, $this->_admin, false);
     }
 
     protected function setCsrfToken()
@@ -144,6 +150,24 @@ class Controller extends BaseController
              * Check supplied session/cookie is an array (username, persist code)
              */
             if ($this->user = $callable->getUser() || $this->user = $callable->getAdmin()) {
+                // $this->debug ( $this->user );
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    protected function checkAdmin($callable)
+    {
+        // $this->debug ( $callable );
+        // $this->debug ( get_class($callable ));
+        // $this->debug ( $callable ->requireLogin () );
+        if ($callable->requireAdmin()) {
+            /**
+             * Check supplied session/cookie is an array (username, persist code)
+             */
+            if ($this->user = $callable->getAdmin()) {
                 // $this->debug ( $this->user );
                 return true;
             }

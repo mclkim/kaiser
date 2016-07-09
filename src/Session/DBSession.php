@@ -36,125 +36,123 @@ namespace Kaiser\Session;
 
 use Kaiser\Manager\DBManager;
 
-final class DBSession extends DBManager {
-	var $key = 'nh9a6d2b6s6g9ynh';
-	var $iv = 'ddky2235gee1g3mr';
-	private static $sessionMicrotime;
-	private static $sess_expiration = 7200; // the number of SECONDS you want the session to last.
-	function __construct($connection) {
-		parent::__construct ( $connection );
-		
-		self::$sessionMicrotime = \Kaiser\Timer::getMicroTime ();
-		
-		// set our custom session functions.
-		session_set_save_handler ( array (
-				$this,
-				"open" 
-		), array (
-				$this,
-				"close" 
-		), array (
-				$this,
-				"read" 
-		), array (
-				$this,
-				"write" 
-		), array (
-				$this,
-				"destroy" 
-		), array (
-				$this,
-				"gc" 
-		) );
-		
-		// This line prevents unexpected effects when using objects as save handlers.
-		register_shutdown_function ( 'session_write_close' );
-		
-		// $this->debug ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
-	}
-	function __destruct() {
-	}
-	function start_session($sessionName = 'PHPSESSID', $secure = false) {
-		// Make sure the session cookie is not accessable via javascript.
-		$httponly = true;
-		// Hash algorithm to use for the sessionid. (use hash_algos() to get a list of available hashes.)
-		$session_hash = 'sha512';
-		// Check if hash is available
-		if (in_array ( $session_hash, hash_algos () )) {
-			// Set the has function.
-			ini_set ( 'session.hash_function', $session_hash );
-		}
-		// 많은 해시의 문자 비트.
-		// The possible values are '4' (0-9, a-f), '5' (0-9, a-v), and '6' (0-9, a-z, A-Z, "-", ",").
-		ini_set ( 'session.hash_bits_per_character', 5 );
-		// 쿠키 만이 아닌 URL 변수를 사용하여 세션을 강제로.
-		ini_set ( 'session.use_only_cookies', 1 );
-		// 세션 쿠키의 매개 변수를 가져옴
-		$cookieParams = session_get_cookie_params ();
-		// 매개 변수를 설정합니다
-		session_set_cookie_params ( $cookieParams ["lifetime"], $cookieParams ["path"], $cookieParams ["domain"], $secure, $httponly );
-		// 세션을 시작
-		session_name ( $sessionName );
-		// Now we cat start the session
-		session_start ();
-	/**
-	 * TODO::
-	 * 이 줄은 세션을 다시 생성하고 기존 하나를 삭제합니다.
-	 * 또한 데이터베이스에 새로운 암호화 키를 생성한다.
-	 */
-		// session_regenerate_id ( true );
-	}
-	function open($savePath, $sessionName) {
-		return true;
-	}
-	function close() {
-		return true;
-	}
-	function read($sessionId) {
-		$sql = "SELECT privilege FROM sessions 
+final class DBSession extends DBManager
+{
+    var $enableLogging = false;
+    var $key = 'nh9a6d2b6s6g9ynh';
+    var $iv = 'ddky2235gee1g3mr';
+    private static $sessionMicrotime;
+    private static $sess_expiration = 7200; // the number of SECONDS you want the session to last.
+
+    function __construct($connection)
+    {
+        parent::__construct($connection);
+
+        self::$sessionMicrotime = \Kaiser\Timer::getMicroTime();
+
+        // set our custom session functions.
+        session_set_save_handler(array($this, "open"), array($this, "close"), array($this, "read"), array($this, "write"), array($this, "destroy"), array($this, "gc"));
+
+        // This line prevents unexpected effects when using objects as save handlers.
+        register_shutdown_function('session_write_close');
+
+        // $this->debug ( sprintf ( 'The Class "%s" Initialized ', get_class ( $this ) ) );
+    }
+
+    function __destruct()
+    {
+    }
+
+    function start_session($sessionName = 'PHPSESSID', $secure = false)
+    {
+        // Make sure the session cookie is not accessable via javascript.
+        $httponly = true;
+        // Hash algorithm to use for the sessionid. (use hash_algos() to get a list of available hashes.)
+        $session_hash = 'sha512';
+        // Check if hash is available
+        if (in_array($session_hash, hash_algos())) {
+            // Set the has function.
+            ini_set('session.hash_function', $session_hash);
+        }
+        // 많은 해시의 문자 비트.
+        // The possible values are '4' (0-9, a-f), '5' (0-9, a-v), and '6' (0-9, a-z, A-Z, "-", ",").
+        ini_set('session.hash_bits_per_character', 5);
+        // 쿠키 만이 아닌 URL 변수를 사용하여 세션을 강제로.
+        ini_set('session.use_only_cookies', 1);
+        // 세션 쿠키의 매개 변수를 가져옴
+        $cookieParams = session_get_cookie_params();
+        // 매개 변수를 설정합니다
+        session_set_cookie_params($cookieParams ["lifetime"], $cookieParams ["path"], $cookieParams ["domain"], $secure, $httponly);
+        // 세션을 시작
+        session_name($sessionName);
+        // Now we cat start the session
+        session_start();
+        /**
+         * TODO::
+         * 이 줄은 세션을 다시 생성하고 기존 하나를 삭제합니다.
+         * 또한 데이터베이스에 새로운 암호화 키를 생성한다.
+         */
+        // session_regenerate_id ( true );
+    }
+
+    function open($savePath, $sessionName)
+    {
+        return true;
+    }
+
+    function close()
+    {
+        return true;
+    }
+
+    function read($sessionId)
+    {
+        $sql = "SELECT privilege FROM sessions 
 				WHERE id = ? AND updated >= ?";
-		
-		$data = $this->executePreparedQueryOne ( $sql, array (
-				$sessionId,
-				\Kaiser\Timestamp::getUNIXtime () - self::$sess_expiration 
-		) );
-		
-		$key = $this->getkey ( $sessionId );
-		
-		// TODO::sudo php5enmod mcrypt
-		// $crypt = new Crypt ();
-		// $crypt->setComplexTypes ( TRUE );
-		// $crypt->setKey ( $key );
-		// $crypt->setData ( $data );
-		// $decrypted = $crypt->decrypt ();
-		
-		$crypt = new \Crypt\AES ();
-		$decrypt = $crypt->decrypt ( $data, $this->key, $this->iv );
-		return $decrypt;
-	}
-	function write($sessionId, $data) {
-		$meet_again_baby = 900;
-		// $req = new Request ();
-		
-		$key = $this->getkey ( $sessionId );
-		
-		// TODO::sudo php5enmod mcrypt
-		// $crypt = new Crypt ();
-		// $crypt->setComplexTypes ( TRUE );
-		// $crypt->setKey ( $key );
-		// $crypt->setData ( $data );
-		// $encrypted = $crypt->encrypt ();
-		
-		$crypt = new \Crypt\AES ();
-		$encrypt = $crypt->encrypt ( $data, $this->key, $this->iv );
-		
-		$userid = isset ( $_SESSION ['email'] ) ? $_SESSION ['email'] : '';
-		$server = $_SERVER ['HTTP_HOST'];
-		$request = substr ( $_SERVER ['REQUEST_URI'], 0, 255 );
-		$referer = isset ( $_SERVER ['HTTP_REFERER'] ) ? substr ( $_SERVER ['HTTP_REFERER'], 0, 255 ) : '';
-		$timer = \Kaiser\Timer::getMicroTime () - self::$sessionMicrotime;
-		
-		$sql = "REPLACE INTO sessions
+
+        $data = $this->executePreparedQueryOne($sql, array(
+            $sessionId,
+            \Kaiser\Timestamp::getUNIXtime() - self::$sess_expiration
+        ));
+
+        $key = $this->getkey($sessionId);
+
+        // TODO::sudo php5enmod mcrypt
+        // $crypt = new Crypt ();
+        // $crypt->setComplexTypes ( TRUE );
+        // $crypt->setKey ( $key );
+        // $crypt->setData ( $data );
+        // $decrypted = $crypt->decrypt ();
+
+        $crypt = new \Crypt\AES ();
+        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+        return $decrypt;
+    }
+
+    function write($sessionId, $data)
+    {
+        $meet_again_baby = 900;
+        // $req = new Request ();
+
+        $key = $this->getkey($sessionId);
+
+        // TODO::sudo php5enmod mcrypt
+        // $crypt = new Crypt ();
+        // $crypt->setComplexTypes ( TRUE );
+        // $crypt->setKey ( $key );
+        // $crypt->setData ( $data );
+        // $encrypted = $crypt->encrypt ();
+
+        $crypt = new \Crypt\AES ();
+        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+
+        $userid = isset ($_SESSION ['email']) ? $_SESSION ['email'] : '';
+        $server = $_SERVER ['HTTP_HOST'];
+        $request = substr($_SERVER ['REQUEST_URI'], 0, 255);
+        $referer = isset ($_SERVER ['HTTP_REFERER']) ? substr($_SERVER ['HTTP_REFERER'], 0, 255) : '';
+        $timer = \Kaiser\Timer::getMicroTime() - self::$sessionMicrotime;
+
+        $sql = "REPLACE INTO sessions
 					(`id`,
 					`address`,
 					`agent`,
@@ -169,58 +167,64 @@ final class DBSession extends DBManager {
 					`updated`,
 					`session_key`)				
 				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		
-		$res = $this->executePreparedUpdate ( $sql, array (
-				$sessionId,
-				$_SERVER ['REMOTE_ADDR'],
-				$_SERVER ['HTTP_USER_AGENT'],
-				$userid,
-				null,
-				$encrypt,
-				$server,
-				$request,
-				$referer,
-				$timer,
-				\Kaiser\Timestamp::getUNIXtime (),
-				\Kaiser\Timestamp::getUNIXtime () - $meet_again_baby,
-				$key 
-		) );
-		
-		return $res;
-	}
-	function destroy($sessionId) {
-		$sql = "DELETE FROM sessions WHERE id = ?";
-		
-		$res = $this->executePreparedUpdate ( $sql, array (
-				$sessionId 
-		) );
-		
-		return $res;
-	}
-	/**
-	 * Garbage Collector
-	 */
-	function gc($maxLifeTime = false) {
-		$sql = "DELETE FROM sessions WHERE updated < ?";
-		
-		$res = $this->executePreparedUpdate ( $sql, array (
-				Timestamp::getUNIXtime () - $maxLifeTime 
-		) );
-		
-		return $res;
-	}
-	private function getkey($sessionId) {
-		$sql = "SELECT session_key FROM sessions WHERE id = ? LIMIT 1";
-		
-		$res = $this->executePreparedQueryOne ( $sql, array (
-				$sessionId 
-		) );
-		
-		if ($res) {
-			return $res;
-		} else {
-			// return hash ( 'sha512', uniqid ( mt_rand ( 1, mt_getrandmax () ), true ) );
-			return hash ( 'sha512', uniqid ( mt_rand ( 1, 32 ), true ) );
-		}
-	}
+
+        $res = $this->executePreparedUpdate($sql, array(
+            $sessionId,
+            $_SERVER ['REMOTE_ADDR'],
+            $_SERVER ['HTTP_USER_AGENT'],
+            $userid,
+            null,
+            $encrypt,
+            $server,
+            $request,
+            $referer,
+            $timer,
+            \Kaiser\Timestamp::getUNIXtime(),
+            \Kaiser\Timestamp::getUNIXtime() - $meet_again_baby,
+            $key
+        ));
+
+        return $res;
+    }
+
+    function destroy($sessionId)
+    {
+        $sql = "DELETE FROM sessions WHERE id = ?";
+
+        $res = $this->executePreparedUpdate($sql, array(
+            $sessionId
+        ));
+
+        return $res;
+    }
+
+    /**
+     * Garbage Collector
+     */
+    function gc($maxLifeTime = false)
+    {
+        $sql = "DELETE FROM sessions WHERE updated < ?";
+
+        $res = $this->executePreparedUpdate($sql, array(
+            Timestamp::getUNIXtime() - $maxLifeTime
+        ));
+
+        return $res;
+    }
+
+    private function getkey($sessionId)
+    {
+        $sql = "SELECT session_key FROM sessions WHERE id = ? LIMIT 1";
+
+        $res = $this->executePreparedQueryOne($sql, array(
+            $sessionId
+        ));
+
+        if ($res) {
+            return $res;
+        } else {
+            // return hash ( 'sha512', uniqid ( mt_rand ( 1, mt_getrandmax () ), true ) );
+            return hash('sha512', uniqid(mt_rand(1, 32), true));
+        }
+    }
 }

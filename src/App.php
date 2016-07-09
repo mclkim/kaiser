@@ -174,7 +174,13 @@ class App extends Controller
              *
              * TODO::다른 방법이 있을 것 같은데~
              */
-            if (!$this->check($callable [0])) {
+            if (!$this->checkAdmin($callable [0])) {
+                $this->debug ( 'hello' );
+                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
+                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
+                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
+            } else if (!$this->check($callable [0])) {
+                $this->debug ( 'hello1' );
                 $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
                 $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
                 return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);

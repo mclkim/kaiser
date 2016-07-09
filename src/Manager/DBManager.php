@@ -8,8 +8,17 @@ use Pixie\QueryBuilder\QueryObject;
 // https://github.com/usmanhalalit/pixie
 class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 {
-    protected function executeEmulateQuery($query, $params = array())
+    var $enableLogging = true;
+
+    protected function debug($message, array $context = array())
     {
+        if ($this->enableLogging)
+            logger($message, $context);
+    }
+
+    function executeEmulateQuery($query, $params = array())
+    {
+        if (!is_array($params)) $params = array();
         $query = new QueryObject ($query, $params, $this->pdo);
         return $query->getRawSql();
     }
@@ -18,8 +27,9 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
     {
         try {
             $query = $this->query($sql, $params);
-            $this->setFetchMode(\PDO::FETCH_CLASS);
-            $result = $query->get();
+            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->get();
+//            $this->setFetchMode(\PDO::FETCH_CLASS);
+//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -29,12 +39,10 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedQueryOne($sql, $params = array())
     {
-        logger($this->executeEmulateQuery($sql, $params));
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
             $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->first();
-//			$this->setFetchMode( \PDO::FETCH_OBJ );
-//			$result = $query->first();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -44,11 +52,12 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedQueryToArrayList($sql, $params = array())
     {
-        logger($this->executeEmulateQuery($sql, $params));
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
-            $this->setFetchMode(\PDO::FETCH_NUM);
-            $result = $query->get();
+            $result = $query->setFetchMode(\PDO::FETCH_NUM)->get();
+//            $this->setFetchMode(\PDO::FETCH_NUM);
+//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -58,11 +67,12 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedQueryToColList($sql, $params = array(), $col = 0)
     {
-        logger($this->executeEmulateQuery($sql, $params));
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
-            $this->setFetchMode(\PDO::FETCH_COLUMN);
-            $result = $query->get();
+            $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->get();
+//            $this->setFetchMode(\PDO::FETCH_COLUMN);
+//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -72,11 +82,12 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedQueryToMap($sql, $params = array())
     {
-        logger($this->executeEmulateQuery($sql, $params));
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
-            $this->setFetchMode(\PDO::FETCH_ASSOC);
-            $result = $query->get();
+            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->first();
+//            $this->setFetchMode(\PDO::FETCH_CLASS);
+//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -86,11 +97,12 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedQueryToObjList($sql, $params = array())
     {
-        logger($this->executeEmulateQuery($sql, $params));
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
-            $this->setFetchMode(\PDO::FETCH_OBJ);
-            $result = $query->get();
+            $result = $query->setFetchMode(\PDO::FETCH_OBJ)->get();
+//            $this->setFetchMode(\PDO::FETCH_OBJ);
+//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -100,7 +112,7 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedUpdate($sql, $params = array())
     {
-        logger($this->executeEmulateQuery($sql, $params));
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
         } catch (PDOException $e) {
@@ -126,5 +138,15 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
             $this->pdo->rollBack();
             return $this;
         }
+    }
+
+    function AutoExecuteInsert($table, $data)
+    {
+        return $this->table($table)->insert($data);
+    }
+
+    function AutoExecuteUpdate($table, $data, $key, $operator = '=', $value = null)
+    {
+        return $this->table($table)->where($key, $operator, $value)->update($data);
     }
 }

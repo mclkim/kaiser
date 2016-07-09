@@ -2,36 +2,36 @@
 
 namespace Kaiser\Manager;
 
-/**
- * Program Title : 데이타베이스 페이지 클래스(화면에 필요한 데이타만 리스트 할때 사용)
- * Author : 김명철
- * Create Date : 2014-02-18
- * Description :
- *
- * [1].사용법 정리 필요
- * [2].보다 쉬운 프로그램으로 리빌딩 필요
- * [3].https://github.com/stefangabos/Zebra_Pagination
- *
- * ---------------------------------------------------------------
- * Development / Modification History
- * ---------------------------------------------------------------
- * Date / Author / Desciption / Transport
- * ---------------------------------------------------------------
- * YYYY/MM/DD
- * ---------------------------------------------------------------
- */
-/**
- * (예시)
- * <code>
- * $page = $this->getParameter ( 'page', 1 );
- * $DB = new DBPageManager ( 'testboard' );
- * $query = "select * from board";
- * $DB->setLink ( '?link_url' );
- * $DB->setLimit ( 15 );
- * $DB->setPage ( $page );
- * $boardList = $DB->executePreparedQueryToPageMapList ( $query );
- * </code>
- */
+    /**
+     * Program Title : 데이타베이스 페이지 클래스(화면에 필요한 데이타만 리스트 할때 사용)
+     * Author : 김명철
+     * Create Date : 2014-02-18
+     * Description :
+     *
+     * [1].사용법 정리 필요
+     * [2].보다 쉬운 프로그램으로 리빌딩 필요
+     * [3].https://github.com/stefangabos/Zebra_Pagination
+     *
+     * ---------------------------------------------------------------
+     * Development / Modification History
+     * ---------------------------------------------------------------
+     * Date / Author / Desciption / Transport
+     * ---------------------------------------------------------------
+     * YYYY/MM/DD
+     * ---------------------------------------------------------------
+     */
+    /**
+     * (예시)
+     * <code>
+     * $page = $this->getParameter ( 'page', 1 );
+     * $DB = new DBPageManager ( 'testboard' );
+     * $query = "select * from board";
+     * $DB->setLink ( '?link_url' );
+     * $DB->setLimit ( 15 );
+     * $DB->setPage ( $page );
+     * $boardList = $DB->executePreparedQueryToPageMapList ( $query );
+     * </code>
+     */
 
 /**
  * $params 설명 (필수옵션)
@@ -53,139 +53,202 @@ namespace Kaiser\Manager;
  *
  * @author Administrator
  */
-class DBPageManager extends DBManager {
-	public static $conf;
-	// var $maxpages = 5; // 화면에 출력할 페이지 갯수
-	// var $limit = 5; // 페이지당 게시물의 갯수
-	// var $numrows = 0; // 쿼리한 갯수
-	var $page = 1; // 선택한 페이지 번호
-	var $prev_limit = 0; // 시작페이지의 시작게시물
-	var $next_limit = 1; // 다음페이지의 시작게시물
-	function __construct($pdo, $conf = array()) {
-		parent::__construct ( $pdo );
-		self::$conf = array_merge ( array (
-				'link_url' => null,
-				'perPage' => 5,
-				'perItem' => 5,
-				'page' => 1 
-		), $conf );
-	}
-	
-	// int $from 시작 페이지
-	// int $limit 페이지당 게시물의 갯수
-	// int $numrows 쿼리한 갯수
-	// int $maxpages 화면에 출력할 페이지 갯수 (생략하면 모든 페이지)
-	function executePreparedQueryToPage($sql, $params = null) {
-		// TODO::다른좋은방법으로
-		// 쿼리실행 후 데이타 갯수 확인
-// 		$numrows = $this->getNumRows ( $sql, $params );
-		$numrows = $this->getLastQueryRowCount ( $sql, $params );
-		
-		// 마지막페이지&&현재페이지
-		$numpages = max ( 1, ceil ( $numrows / self::$conf ['perItem'] ) );
-		$current = min ( max ( 1, self::$conf ['page'] ), $numpages );
-		
-		// 시작페이지&&다음페이지
-		$from = max ( 1, $current - 1 );
-		$to = min ( $current + 1, $numpages );
-		
-		// 시작페이지의 시작게시물&&다음페이지의 시작게시물
-		$prev = max ( 1, $current - (($current - 1) % self::$conf ['perPage']) );
-		$next = min ( $prev + self::$conf ['perPage'] - 1, $numpages );
-		
-		// 현재페이지기준으로 시작게시물&&종료게시물
-		$this->prev_limit = max ( ($current - 1) * self::$conf ['perItem'], 0 );
-		$this->next_limit = min ( $current * self::$conf ['perItem'], $numrows - 1 );
-		
-		// 하단 페이지 번호들
-		$pages = array ();
-		for($ii = $prev; $ii <= $next; $ii ++) {
-			$pages [$ii] = 'page=' . $ii;
-		} // end for
-		
-		return array (
-				'link_url' => self::$conf ['link_url'], // 페이지 이동 url
-				'max_line' => self::$conf ['perItem'], // 보여줄 데이터수
-				'max_page' => self::$conf ['perPage'], // 보여줄 페이지 수
-				'current' => $current, // 현제 페이지
-				'numrows' => $numrows, // 쿼리한 갯수
-				'prev' => max ( $prev - 1, 1 ), // 이전 페이지 값
-				'from' => $from, // 쿼리한 시작 페이지 값
-				'to' => $to, // 쿼리한 마지막 페이지 값
-				'next' => min ( $next + 1, $numpages ), // 다음 페이지 값
-				'remain' => 0, // 나머지 값
-				'numpages' => $numpages, // 전체 페이지 값
-				'firstpage' => 1, // 처음 페이지의 값
-				'lastpage' => $numpages, // 마지막 페이지의 값
-				'pages' => $pages 
-		); // 출력할 페이지
-	}
-	protected function getNumRows($sql, $params = null) {
-		$realquery = $this->executeEmulateQuery ( $sql, $params );
-		// TODO::다른좋은방법으로
-		$sql = 'select count(*)' . $this->stristr ( $this->stristr ( $realquery, ' from ' ), 'order by', true );
-		
-		return parent::executePreparedQueryOne ( $sql );
-	}
-	protected function getLastQueryRowCount($sql, $params = null) {
-// 		$lastQuery = $this->lastQuery;
-		$lastQuery = $this->executeEmulateQuery ( $sql, $params );
-		$commandBeforeTableName = null;
-		if (stripos ( $lastQuery, 'FROM' ) !== false)
-			$commandBeforeTableName = 'FROM';
-		if (stripos ( $lastQuery, 'UPDATE' ) !== false)
-			$commandBeforeTableName = 'UPDATE';
-		
-		$after = substr ( $lastQuery, stripos ( $lastQuery, $commandBeforeTableName ) + (strlen ( $commandBeforeTableName ) + 1) );
-		$table = substr ( $after, 0, stripos ( $after, ' ' ) );
-		
-		$wherePart = substr ( $lastQuery, stripos ( $lastQuery, 'WHERE' ) );
-// 		$result = parent::query ( "SELECT COUNT(*) FROM $table " . $wherePart );
+class DBPageManager extends DBManager
+{
+    public static $conf;
+    // var $maxpages = 5; // 화면에 출력할 페이지 갯수
+    // var $limit = 5; // 페이지당 게시물의 갯수
+    // var $numrows = 0; // 쿼리한 갯수
+    var $page = 1; // 선택한 페이지 번호
+    var $prev_limit = 0; // 시작페이지의 시작게시물
+    var $next_limit = 1; // 다음페이지의 시작게시물
 
-		return parent::executePreparedQueryOne ( "SELECT COUNT(*) FROM $table " . $wherePart );
+    function __construct($connection, $conf = array())
+    {
+        parent::__construct($connection);
+        self::$conf = array_merge(array(
+            'link_url' => null,
+            'perPage' => 5,
+            'perItem' => 5,
+            'page' => 1
+        ), $conf);
+    }
+
+    // int $from 시작 페이지
+    // int $limit 페이지당 게시물의 갯수
+    // int $numrows 쿼리한 갯수
+    // int $maxpages 화면에 출력할 페이지 갯수 (생략하면 모든 페이지)
+    function executePreparedQueryToPage($sql, $params = null)
+    {
+        // TODO::다른좋은방법으로
+        // 쿼리실행 후 데이타 갯수 확인
+// 		$numrows = $this->getNumRows ( $sql, $params );
+        $numrows = $this->getLastQueryRowCount($sql, $params);
+
+        // 마지막페이지&&현재페이지
+        $numpages = max(1, ceil($numrows / self::$conf ['perItem']));
+        $current = min(max(1, self::$conf ['page']), $numpages);
+
+        // 시작페이지&&다음페이지
+        $from = max(1, $current - 1);
+        $to = min($current + 1, $numpages);
+
+        // 시작페이지의 시작게시물&&다음페이지의 시작게시물
+        $prev = max(1, $current - (($current - 1) % self::$conf ['perPage']));
+        $next = min($prev + self::$conf ['perPage'] - 1, $numpages);
+
+        // 현재페이지기준으로 시작게시물&&종료게시물
+        $this->prev_limit = max(($current - 1) * self::$conf ['perItem'], 0)+ 1;
+        $this->next_limit = min($current * self::$conf ['perItem'], $numrows - 1);
+
+            $this->first_page = ($current === 1) ? FALSE : 1;
+            $this->last_page = ($current >= $numpages) ? FALSE : $numpages;
+            $this->offset = ( int ) (($current - 1) * self::$conf ['perItem']);
+        
+
+        // 하단 페이지 번호들
+        $pages = array();
+        for ($ii = $prev; $ii <= $next; $ii++) {
+            $pages [$ii] = 'page=' . $ii;
+        } // end for
+/*
+        return array(
+            'link_url' => self::$conf ['link_url'], // 페이지 이동 url
+            'max_line' => self::$conf ['perItem'], // 보여줄 데이터수
+            'max_page' => self::$conf ['perPage'], // 보여줄 페이지 수
+            'current' => $current, // 현제 페이지
+            'numrows' => $numrows, // 쿼리한 갯수
+            'prev' => max($prev - 1, 1), // 이전 페이지 값
+            'from' => $from, // 쿼리한 시작 페이지 값
+            'to' => $to, // 쿼리한 마지막 페이지 값
+            'next' => min($next + 1, $numpages), // 다음 페이지 값
+            'remain' => 0, // 나머지 값
+            'numpages' => $numpages, // 전체 페이지 값
+            'firstpage' => 1, // 처음 페이지의 값
+            'lastpage' => $numpages, // 마지막 페이지의 값
+            'pages' => $pages
+        ); // 출력할 페이지
+*/
+        return array (
+                'link_url' => self::$conf ['link_url'], // 페이지 이동 url
+                'total_items' => $numrows,
+                'items_per_page' => self::$conf ['perItem'], // 보여줄 데이터수
+                'total_pages' => $numpages,
+                'current_page' => $current,
+                'current_first_item' => $this->prev_limit,
+                'current_last_item' => $this->next_limit,
+                'previous_page' => $prev,
+                'next_page' => $next,
+                'first_page' => $this->first_page,
+                'last_page' => $this->last_page,
+                'offset' => $this->offset,
+                'pages' => $pages, // 출력할 페이지
+                );
+    }
+
+    protected function getNumRows($sql, $params = null)
+    {
+        $realquery = $this->executeEmulateQuery($sql, $params);
+        // TODO::다른좋은방법으로
+        $sql = 'select count(*)' . $this->stristr($this->stristr($realquery, ' from '), 'order by', true);
+        // TODO::mysql 5 이상이면 서브쿼리가 지원되는 가능할것 같기도 하고
+        $sql = 'select count(1) from (' . PHP_EOL . '!' . PHP_EOL . ') t1';
+        // Logger::info($sql);
+
+        /**
+         * TODO::다른좋은방법으로
+         * SELECT SQL_CALC_FOUND_ROWS * FROM host_tb LIMIT 1;
+         * SELECT FOUND_ROWS();
+         */
+        return parent::executePreparedQueryOne ( $sql, array (
+                $realquery
+        ) );
+    }
+
+    protected function getLastQueryRowCount($sql, $params = null)
+    {
+// 		$lastQuery = $this->lastQuery;
+        $lastQuery = strtoupper($this->executeEmulateQuery($sql, $params));
+
+        $commandBeforeTableName = null;
+        if (stripos($lastQuery, 'FROM') !== false)
+            $commandBeforeTableName = 'FROM';
+        if (stripos($lastQuery, 'UPDATE') !== false)
+            $commandBeforeTableName = 'UPDATE';
+
+        $after = substr($lastQuery, stripos($lastQuery, $commandBeforeTableName) + (strlen($commandBeforeTableName) + 1));
+        $table = substr($after, 0, stripos($after, ' '));
+
+        $wherePart = '';
+        if (stripos($lastQuery, 'WHERE') !== false)
+            $wherePart = substr($lastQuery, stripos($lastQuery, 'WHERE'));
+// 		$result = parent::query ( "SELECT COUNT(*) FROM $table " . $wherePart );
+//        var_dump($lastQuery);
+//        var_dump($after);
+//        var_dump($table);
+//        var_dump($wherePart);
+//        exit;
+
+        return parent::executePreparedQueryOne("SELECT COUNT(*) FROM $table " . $wherePart);
 
 // 		if ($result == null)
 // 			return 0;
 // 		return $result->fetchColumn ();
-	}
-	function executePreparedQueryToPageMapList($sql, $params = null) {
-		$page = self::executePreparedQueryToPage ( $sql, $params );
-		
-		$sql = $sql . ' limit ' . $this->prev_limit . ',' . self::$conf ['perItem'];
-		$list = self::executePreparedQueryToMapList ( $sql, $params );
-		return array (
-				'list' => $list,
-				'page' => $page 
-		);
-	}
-	private function stristr($haystack, $needle, $before_needle = FALSE) {
-		if (($pos = strpos ( strtolower ( $haystack ), strtolower ( $needle ) )) === FALSE)
-			return FALSE;
-		
-		if ($before_needle)
-			return substr ( $haystack, 0, $pos );
-		else
-			return substr ( $haystack, $pos );
-	}
-	function setBlockCount($value) {
-		self::$conf ['perPage'] = $value;
-	}
-	function setPage($page) {
-		self::$conf ['page'] = $page;
-	}
-	function setLimit($limit) {
-		self::$conf ['perItem'] = $limit;
-	}
-	function getLimit() {
-		return self::$conf ['perItem'];
-	}
-	function setLink($link) {
-		self::$conf ['link_url'] = $link;
-	}
-	function pageLayout($pages = null) {
-		ob_start ();
-		
-		echo <<<HEAD
+    }
+
+    function executePreparedQueryToPageMapList($sql, $params = null)
+    {
+        $page = self::executePreparedQueryToPage($sql, $params);
+
+        $sql = $sql . ' limit ' . $this->prev_limit . ',' . self::$conf ['perItem'];
+        $list = self::executePreparedQueryToMapList($sql, $params);
+        return array(
+            'list' => $list,
+            'page' => $page
+        );
+    }
+
+    private function stristr($haystack, $needle, $before_needle = FALSE)
+    {
+        if (($pos = strpos(strtolower($haystack), strtolower($needle))) === FALSE)
+            return FALSE;
+
+        if ($before_needle)
+            return substr($haystack, 0, $pos);
+        else
+            return substr($haystack, $pos);
+    }
+
+    function setBlockCount($value)
+    {
+        self::$conf ['perPage'] = $value;
+    }
+
+    function setPage($page)
+    {
+        self::$conf ['page'] = $page;
+    }
+
+    function setLimit($limit)
+    {
+        self::$conf ['perItem'] = $limit;
+    }
+
+    function getLimit()
+    {
+        return self::$conf ['perItem'];
+    }
+
+    function setLink($link)
+    {
+        self::$conf ['link_url'] = $link;
+    }
+
+    function pageLayout($pages = null)
+    {
+        ob_start();
+
+        echo <<<HEAD
 <div class="page_list_wrap">
 	<div class="page_list">
 
@@ -196,17 +259,17 @@ class DBPageManager extends DBManager {
 
 		<ul class="current-page">
 HEAD;
-		foreach ( $pages ['pages'] as $key => $value ) {
-			if ($pages ['current'] == $key) {
-				echo '<li><a href="' . $pages ['link_url'] . '&' . $value . '" page="' . $key . '" class="current_page_active">' . $key . '</a>' . PHP_EOL;
-				echo '<div style="display: block"></div></li>' . PHP_EOL;
-			} else {
-				echo '<li><a href="' . $pages ['link_url'] . '&' . $value . '" page="' . $key . '" >' . $key . '</a>' . PHP_EOL;
-				echo '<div></div></li>' . PHP_EOL;
-			}
-		}
-		
-		echo <<<END
+        foreach ($pages ['pages'] as $key => $value) {
+            if ($pages ['current'] == $key) {
+                echo '<li><a href="' . $pages ['link_url'] . '&' . $value . '" page="' . $key . '" class="current_page_active">' . $key . '</a>' . PHP_EOL;
+                echo '<div style="display: block"></div></li>' . PHP_EOL;
+            } else {
+                echo '<li><a href="' . $pages ['link_url'] . '&' . $value . '" page="' . $key . '" >' . $key . '</a>' . PHP_EOL;
+                echo '<div></div></li>' . PHP_EOL;
+            }
+        }
+
+        echo <<<END
 		</ul>
 
 		<div class="current_bt02">
@@ -217,9 +280,9 @@ HEAD;
 	</div>
 </div>
 END;
-		
-		$buffer = ob_get_contents ();
-		ob_end_clean ();
-		return $buffer;
-	}
+
+        $buffer = ob_get_contents();
+        ob_end_clean();
+        return $buffer;
+    }
 }

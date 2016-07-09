@@ -110,6 +110,7 @@ class App extends Controller
          * Execute page action
          */
         $result = $this->execPageAction();
+        $this->debug($result);
 
         if (!is_string($result)) {
             return $result;
@@ -174,15 +175,17 @@ class App extends Controller
              *
              * TODO::다른 방법이 있을 것 같은데~
              */
+            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+            $return_uri = $callable [0]->getParameter('returnURI', $request_uri);
+            $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+
             if (!$this->checkAdmin($callable [0])) {
-                $this->debug ( 'hello' );
-                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
-                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
+//                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
+//                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
                 return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
             } else if (!$this->check($callable [0])) {
-                $this->debug ( 'hello1' );
-                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
-                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
+//                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
+//                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
                 return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);
             }
             // $this->debug ( 'hello' );
@@ -241,6 +244,7 @@ class App extends Controller
          * 클래스 인스턴스를 실행한다.
          */
         if (!$result = $this->runAjaxHandler($callable)) {
+            $this->debug($callable);
             throw new ApplicationException ('runAjaxHandler');
         }
 

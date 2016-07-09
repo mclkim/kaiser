@@ -25,11 +25,10 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executePreparedQueryToMapList($sql, $params = array())
     {
+        $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
             $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->get();
-//            $this->setFetchMode(\PDO::FETCH_CLASS);
-//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -56,8 +55,6 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         try {
             $query = $this->query($sql, $params);
             $result = $query->setFetchMode(\PDO::FETCH_NUM)->get();
-//            $this->setFetchMode(\PDO::FETCH_NUM);
-//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -71,8 +68,6 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         try {
             $query = $this->query($sql, $params);
             $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->get();
-//            $this->setFetchMode(\PDO::FETCH_COLUMN);
-//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -86,8 +81,6 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         try {
             $query = $this->query($sql, $params);
             $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->first();
-//            $this->setFetchMode(\PDO::FETCH_CLASS);
-//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -101,8 +94,6 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         try {
             $query = $this->query($sql, $params);
             $result = $query->setFetchMode(\PDO::FETCH_OBJ)->get();
-//            $this->setFetchMode(\PDO::FETCH_OBJ);
-//            $result = $query->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -145,8 +136,16 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         return $this->table($table)->insert($data);
     }
 
-    function AutoExecuteUpdate($table, $data, $key, $operator = '=', $value = null)
+    function AutoExecuteUpdate($table, $data, $key1, $oper1 = null, $val1 = null, $key2 = null, $oper2 = null, $val2 = null)
     {
-        return $this->table($table)->where($key, $operator, $value)->update($data);
+        if (func_num_args() == 4) {
+            return $this->table($table)->where($key1, '=', $oper1)->update($data);
+        } else if (func_num_args() == 5) {
+            return $this->table($table)->where($key1, $oper1, $val1)->update($data);
+        } else if (func_num_args() == 6) {
+            return $this->table($table)->where($key1, '=', $oper1)->where($val1, '=', $key2)->update($data);
+        } else if (func_num_args() == 8) {
+            return $this->table($table)->where($key1, $oper1, $val1)->where($key2, $oper2, $val2)->update($data);
+        }
     }
 }

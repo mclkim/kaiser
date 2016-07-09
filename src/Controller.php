@@ -63,6 +63,12 @@ class Controller extends BaseController
         return $this->request()->get_post($index, $no_result);
     }
 
+    protected function redirect($redirect)
+    {
+        return $this->response()->redirect($redirect);
+//        Response::getInstance()->redirect($redirect);
+    }
+
     protected function info($message = null, array $context = array())
     {
         $this->logger()->info($message, $context);

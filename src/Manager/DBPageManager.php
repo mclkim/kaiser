@@ -83,7 +83,7 @@ class DBPageManager extends DBManager
         // TODO::다른좋은방법으로
         // 쿼리실행 후 데이타 갯수 확인
 // 		$numrows = $this->getNumRows ( $sql, $params );
-        $numrows = $this->getLastQueryRowCount($sql, $params);
+        $numrows = $this->getNumRowCount($sql, $params);
 
         // 마지막페이지&&현재페이지
         $numpages = max(1, ceil($numrows / self::$conf ['perItem']));
@@ -98,77 +98,79 @@ class DBPageManager extends DBManager
         $next = min($prev + self::$conf ['perPage'] - 1, $numpages);
 
         // 현재페이지기준으로 시작게시물&&종료게시물
-        $this->prev_limit = max(($current - 1) * self::$conf ['perItem'], 0)+ 1;
-        $this->next_limit = min($current * self::$conf ['perItem'], $numrows - 1);
+        $this->prev_limit = max(($current - 1) * self::$conf ['perItem'], 0);
+        $this->next_limit = min($current * self::$conf ['perItem'], $numrows);
 
-            $this->first_page = ($current === 1) ? FALSE : 1;
-            $this->last_page = ($current >= $numpages) ? FALSE : $numpages;
-            $this->offset = ( int ) (($current - 1) * self::$conf ['perItem']);
-        
+        $this->current_first_item = $this->prev_limit + 1;
+        $this->current_last_item = $this->next_limit;
+
+        $this->first_page = ($current === 1) ? FALSE : 1;
+        $this->last_page = ($current >= $numpages) ? FALSE : $numpages;
+        $this->offset = ( int )(($current - 1) * self::$conf ['perItem']);
 
         // 하단 페이지 번호들
         $pages = array();
+        $links = array();
         for ($ii = $prev; $ii <= $next; $ii++) {
             $pages [$ii] = 'page=' . $ii;
+            $links [$ii] = $ii;
         } // end for
-/*
+        /*
+                return array(
+                    'link_url' => self::$conf ['link_url'], // 페이지 이동 url
+                    'max_line' => self::$conf ['perItem'], // 보여줄 데이터수
+                    'max_page' => self::$conf ['perPage'], // 보여줄 페이지 수
+                    'current' => $current, // 현제 페이지
+                    'numrows' => $numrows, // 쿼리한 갯수
+                    'prev' => max($prev - 1, 1), // 이전 페이지 값
+                    'from' => $from, // 쿼리한 시작 페이지 값
+                    'to' => $to, // 쿼리한 마지막 페이지 값
+                    'next' => min($next + 1, $numpages), // 다음 페이지 값
+                    'remain' => 0, // 나머지 값
+                    'numpages' => $numpages, // 전체 페이지 값
+                    'firstpage' => 1, // 처음 페이지의 값
+                    'lastpage' => $numpages, // 마지막 페이지의 값
+                    'pages' => $pages
+                ); // 출력할 페이지
+        */
         return array(
             'link_url' => self::$conf ['link_url'], // 페이지 이동 url
-            'max_line' => self::$conf ['perItem'], // 보여줄 데이터수
-            'max_page' => self::$conf ['perPage'], // 보여줄 페이지 수
-            'current' => $current, // 현제 페이지
-            'numrows' => $numrows, // 쿼리한 갯수
-            'prev' => max($prev - 1, 1), // 이전 페이지 값
-            'from' => $from, // 쿼리한 시작 페이지 값
-            'to' => $to, // 쿼리한 마지막 페이지 값
-            'next' => min($next + 1, $numpages), // 다음 페이지 값
-            'remain' => 0, // 나머지 값
-            'numpages' => $numpages, // 전체 페이지 값
-            'firstpage' => 1, // 처음 페이지의 값
-            'lastpage' => $numpages, // 마지막 페이지의 값
-            'pages' => $pages
-        ); // 출력할 페이지
-*/
-        return array (
-                'link_url' => self::$conf ['link_url'], // 페이지 이동 url
-                'total_items' => $numrows,
-                'items_per_page' => self::$conf ['perItem'], // 보여줄 데이터수
-                'total_pages' => $numpages,
-                'current_page' => $current,
-                'current_first_item' => $this->prev_limit,
-                'current_last_item' => $this->next_limit,
-                'previous_page' => $prev,
-                'next_page' => $next,
-                'first_page' => $this->first_page,
-                'last_page' => $this->last_page,
-                'offset' => $this->offset,
-                'pages' => $pages, // 출력할 페이지
-                );
+            'total_items' => $numrows,
+            'items_per_page' => self::$conf ['perItem'], // 보여줄 데이터수
+            'total_pages' => $numpages,
+            'current_page' => $current,
+            'current_first_item' => $this->current_first_item,
+            'current_last_item' => $this->current_last_item,
+            'previous_page' => $prev,
+            'next_page' => $next,
+            'first_page' => $this->first_page,
+            'last_page' => $this->last_page,
+            'offset' => $this->offset,
+            'pages' => $pages, // 출력할 페이지
+            'links' => $links, // 출력할 페이지
+        );
     }
 
-    protected function getNumRows($sql, $params = null)
+    protected function getNumRowCount($sql, $params = null)
     {
         $realquery = $this->executeEmulateQuery($sql, $params);
         // TODO::다른좋은방법으로
         $sql = 'select count(*)' . $this->stristr($this->stristr($realquery, ' from '), 'order by', true);
         // TODO::mysql 5 이상이면 서브쿼리가 지원되는 가능할것 같기도 하고
-        $sql = 'select count(1) from (' . PHP_EOL . '!' . PHP_EOL . ') t1';
+        $sql = 'select count(1) from (' . PHP_EOL . $realquery . PHP_EOL . ') t1';
         // Logger::info($sql);
-
         /**
          * TODO::다른좋은방법으로
          * SELECT SQL_CALC_FOUND_ROWS * FROM host_tb LIMIT 1;
          * SELECT FOUND_ROWS();
          */
-        return parent::executePreparedQueryOne ( $sql, array (
-                $realquery
-        ) );
+        return parent::executePreparedQueryOne($sql);
     }
 
     protected function getLastQueryRowCount($sql, $params = null)
     {
 // 		$lastQuery = $this->lastQuery;
-        $lastQuery = strtoupper($this->executeEmulateQuery($sql, $params));
+        $lastQuery = $this->executeEmulateQuery($sql, $params);
 
         $commandBeforeTableName = null;
         if (stripos($lastQuery, 'FROM') !== false)
@@ -182,6 +184,7 @@ class DBPageManager extends DBManager
         $wherePart = '';
         if (stripos($lastQuery, 'WHERE') !== false)
             $wherePart = substr($lastQuery, stripos($lastQuery, 'WHERE'));
+
 // 		$result = parent::query ( "SELECT COUNT(*) FROM $table " . $wherePart );
 //        var_dump($lastQuery);
 //        var_dump($after);

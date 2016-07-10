@@ -101,7 +101,7 @@ class DBPageManager extends DBManager
         $this->prev_limit = max(($current - 1) * self::$conf ['perItem'], 0);
         $this->next_limit = min($current * self::$conf ['perItem'], $numrows);
 
-        $this->current_first_item = $this->prev_limit + 1;
+        $this->current_first_item = min($this->prev_limit + 1, $this->next_limit);
         $this->current_last_item = $this->next_limit;
 
         $this->first_page = ($current === 1) ? FALSE : 1;
@@ -158,7 +158,7 @@ class DBPageManager extends DBManager
         $sql = 'select count(*)' . $this->stristr($this->stristr($realquery, ' from '), 'order by', true);
         // TODO::mysql 5 이상이면 서브쿼리가 지원되는 가능할것 같기도 하고
         $sql = 'select count(1) from (' . PHP_EOL . $realquery . PHP_EOL . ') t1';
-        // Logger::info($sql);
+        // $this->info($sql);
         /**
          * TODO::다른좋은방법으로
          * SELECT SQL_CALC_FOUND_ROWS * FROM host_tb LIMIT 1;

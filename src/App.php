@@ -166,6 +166,7 @@ class App extends Controller
 
     private function runAjaxHandler($callable)
     {
+        $this->debug($callable);
         try {
             $result = null;
 
@@ -244,7 +245,6 @@ class App extends Controller
          * 클래스 인스턴스를 실행한다.
          */
         if (!$result = $this->runAjaxHandler($callable)) {
-            $this->debug($callable);
             throw new ApplicationException ('runAjaxHandler');
         }
 

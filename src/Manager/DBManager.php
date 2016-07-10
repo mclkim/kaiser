@@ -23,12 +23,12 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         return $query->getRawSql();
     }
 
-    function executePreparedQueryToMapList($sql, $params = array())
+    function executePreparedQueryOne($sql, $params = array())
     {
         $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->get();
+            $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->first();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -36,12 +36,25 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         return $result;
     }
 
-    function executePreparedQueryOne($sql, $params = array())
+    function executePreparedQueryToMap($sql, $params = array())
     {
         $this->debug($this->executeEmulateQuery($sql, $params));
         try {
             $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->first();
+            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->first();
+        } catch (PDOException $e) {
+            throw new DBException ($e->getMessage());
+        } catch (\Exception $e) {
+        }
+        return $result;
+    }
+
+    function executePreparedQueryToMapList($sql, $params = array())
+    {
+        $this->debug($this->executeEmulateQuery($sql, $params));
+        try {
+            $query = $this->query($sql, $params);
+            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->get();
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
@@ -62,31 +75,6 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         return $result;
     }
 
-    function executePreparedQueryToColList($sql, $params = array(), $col = 0)
-    {
-        $this->debug($this->executeEmulateQuery($sql, $params));
-        try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->get();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
-        }
-        return $result;
-    }
-
-    function executePreparedQueryToMap($sql, $params = array())
-    {
-        $this->debug($this->executeEmulateQuery($sql, $params));
-        try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->first();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
-        }
-        return $result;
-    }
 
     function executePreparedQueryToObjList($sql, $params = array())
     {

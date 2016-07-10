@@ -33,9 +33,7 @@ class Controller extends BaseController
         session_unset();
         session_destroy();
         unset ($_SESSION);
-        // $this->setRedirect ( $this->_defaultPage );
-        $this->response()->redirect($this->_defaultPage);
-        // Response::getInstance ()->redirect ( $this->_defaultPage );
+        $this->redirect($this->_defaultPage);
     }
 
     protected function execute()
@@ -66,7 +64,6 @@ class Controller extends BaseController
     protected function redirect($redirect)
     {
         return $this->response()->redirect($redirect);
-//        Response::getInstance()->redirect($redirect);
     }
 
     protected function info($message = null, array $context = array())
@@ -180,5 +177,26 @@ class Controller extends BaseController
             return false;
         }
         return true;
+    }
+
+    protected function alertRedirect($msg, $redirect, $charset = 'utf-8')
+    {
+        if (!$redirect) {
+            echo <<<END
+            <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
+            <script type="text/javascript">
+            </script>
+END;
+            exit ();
+        } else {
+            echo <<<END
+            <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
+            <script type="text/javascript">
+            alert("$msg");
+            location.href = "$redirect";
+            </script>
+END;
+            exit ();
+        }
     }
 }

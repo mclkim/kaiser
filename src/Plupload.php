@@ -58,13 +58,13 @@ class Plupload extends \PluploadHandler
                     throw new \Exception ('', PLUPLOAD_INPUT_ERR);
                 }
             }
-/*
+
             if (is_callable($conf ['cb_sanitize_file_name'])) {
                 $file_name = call_user_func($conf ['cb_sanitize_file_name'], $conf ['file_name']);
             } else {
                 $file_name = $conf ['file_name'];
             }
-*/
+
             $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
             // Check if file type is allowed
@@ -84,7 +84,8 @@ class Plupload extends \PluploadHandler
             }
 
             return array(
-                'name' => $file_name,
+                'name' => $conf ['file_name'],
+                'real' => $file_name,
                 'form_name' => $conf ['file_data_name'],
                 'ext' => $file_ext,
                 'tmp_name' => $tmp_name,
@@ -99,7 +100,7 @@ class Plupload extends \PluploadHandler
 
     /**
      */
-    function upload()
+    function upload($file_name)
     {
         // 5 minutes execution time
         @set_time_limit(5 * 60);
@@ -126,7 +127,7 @@ class Plupload extends \PluploadHandler
             /**
              * TODO:: 한글변환을 해야 한다.
              */
-            $file_name = iconv("utf-8", "euc-kr", $file ['name']);
+            // $file_name = iconv("utf-8", "euc-kr", $file ['name']);
             $file_path = rtrim($conf ['target_dir'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file_name;
             $tmp_path = $file_path . ".part";
 
@@ -152,7 +153,7 @@ class Plupload extends \PluploadHandler
                 rename($tmp_path, $file_path);
 
                 return array(
-                    'name' => $file_name,
+                    'real' => $file_name,
                     'path' => $file_path,
                     'size' => filesize($file_path)
                 );
@@ -205,6 +206,25 @@ class Plupload extends \PluploadHandler
             }
         }
         return true;
+    }
+
+    /**
+     * Sanitizes a filename replacing whitespace with dashes
+     *
+     * Removes special characters that are illegal in filenames on certain
+     * operating systems and special characters requiring special escaping
+     * to manipulate at the command line. Replaces spaces and consecutive
+     * dashes with a single dash. Trim period, dash and underscore from beginning
+     * and end of filename.
+     */
+    private static function sanitize_file_name($filename)
+    {
+        /**
+         * TODO:: 한글변환을 해야 한다.
+         */
+        $filename = iconv("utf-8", "euc-kr", $filename);
+
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)) . '_' . $filename;
     }
 }
 

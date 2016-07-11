@@ -74,12 +74,12 @@ class App extends Controller
     public function run()
     {
         // phpinfo();exit;
-        // $this->debug('------------------');
-        // $this->debug($_SERVER);
-        // $this->debug($_POST);
-        // $this->debug($_REQUEST);
-        // $this->debug($_FILES);
-        // $this->debug('------------------');
+        //$this->debug('------------------');
+        //$this->debug($_SERVER);
+        //$this->debug($_POST);
+        //$this->debug($_REQUEST);
+        //$this->debug($_FILES);
+        //$this->debug('------------------');
 
         /**
          * TODO::
@@ -102,7 +102,7 @@ class App extends Controller
          * Execute AJAX event
          */
         if ($ajaxResponse = $this->execAjaxHandlers()) {
-            $this->debug($ajaxResponse);
+            //$this->debug($ajaxResponse);
             return $ajaxResponse;
         }
 
@@ -110,7 +110,7 @@ class App extends Controller
          * Execute page action
          */
         $result = $this->execPageAction();
-        $this->debug($result);
+        //$this->debug($result);
 
         if (!is_string($result)) {
             return $result;
@@ -166,7 +166,7 @@ class App extends Controller
 
     private function runAjaxHandler($callable)
     {
-        $this->debug($callable);
+        //$this->debug($callable);
         try {
             $result = null;
 
@@ -200,7 +200,7 @@ class App extends Controller
              * Execute the handler
              */
             $this->info(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-            // $this->debug($callable);
+            //$this->debug($callable);
             $result = call_user_func_array($callable, []);
 //			$this->debug ( $result );
             return ($result) ?: true;

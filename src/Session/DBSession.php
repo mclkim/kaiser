@@ -35,6 +35,7 @@
 namespace Kaiser\Session;
 
 use Kaiser\Manager\DBManager;
+use Kaiser\Timestamp;
 
 final class DBSession extends DBManager
 {

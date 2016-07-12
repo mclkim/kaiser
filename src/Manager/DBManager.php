@@ -18,7 +18,6 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 
     function executeEmulateQuery($query, $params = array())
     {
-        if (!is_array($params)) $params = array();
         $query = new QueryObject ($query, $params, $this->pdo);
         return $query->getRawSql();
     }
@@ -98,7 +97,8 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
         }
-        // return $result;
+        // return $query;
+//        $return = $this->rowCount() === 1 ? $this->pdo->lastInsertId() : null;
     }
 
     function executeTransaction()

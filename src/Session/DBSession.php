@@ -35,6 +35,7 @@
 namespace Kaiser\Session;
 
 use Kaiser\Manager\DBManager;
+use Kaiser\Timestamp;
 
 final class DBSession extends DBManager
 {
@@ -112,7 +113,7 @@ final class DBSession extends DBManager
 
         $data = $this->executePreparedQueryOne($sql, array(
             $sessionId,
-            \Kaiser\Timestamp::getUNIXtime() - self::$sess_expiration
+            Timestamp::getUNIXtime() - self::$sess_expiration
         ));
 
         $key = $this->getkey($sessionId);
@@ -179,8 +180,8 @@ final class DBSession extends DBManager
             $request,
             $referer,
             $timer,
-            \Kaiser\Timestamp::getUNIXtime(),
-            \Kaiser\Timestamp::getUNIXtime() - $meet_again_baby,
+            Timestamp::getUNIXtime(),
+            Timestamp::getUNIXtime() - $meet_again_baby,
             $key
         ));
 

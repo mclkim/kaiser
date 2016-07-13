@@ -222,7 +222,9 @@ class Plupload extends \PluploadHandler
         /**
          * TODO:: 한글변환을 해야 한다.
          */
-        $filename = iconv("utf-8", "euc-kr", $filename);
+        //$filename = iconv("utf-8", "euc-kr", $filename);
+        $file_ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        $filename = 'x.' . $file_ext;
 
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)) . '_' . $filename;
     }

@@ -135,12 +135,13 @@ class App extends Controller
                  * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
                  */
                 $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
-                // $this->debug ( $callable );
+                //$this->debug ( $callable );
 
                 /**
                  * Execute the handler
                  */
                 if (!$result = $this->runAjaxHandler($callable)) {
+                    $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
                     throw new ApplicationException ('execAjaxHandlers');
                 }
 
@@ -166,10 +167,11 @@ class App extends Controller
 
     private function runAjaxHandler($callable)
     {
+        //$this->debug('hello');
         //$this->debug($callable);
         try {
             $result = null;
-
+            //$this->debug('hello');
             /**
              * Not logged in, redirect to login screen or show ajax error.
              * 로그인 여부를 체크 할 페이지 인지 확인한다.
@@ -179,22 +181,40 @@ class App extends Controller
             $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
             $return_uri = $callable [0]->getParameter('returnURI', $request_uri);
             $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-
+            //$this->debug(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
+            //$this->debug($this->checkAdmin($callable [0]));
+            //$this->debug($this->check($callable [0]));
+            //$this->debug($redirect);
             if (!$this->checkAdmin($callable [0])) {
 //                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
 //                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
-                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
+                //$this->debug($this->_loginAdminPage . '&returnURI=' . $redirect);
+                //$this->debug(Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect));
+                if ($this->ajax()) {
+                    return 'Access denied!';
+                } else {
+                    Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
+                    return true;
+                }
+//                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
             } else if (!$this->check($callable [0])) {
 //                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
 //                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
-                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);
+                //$this->debug($this->_loginPage . '&returnURI=' . $redirect);
+//                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);
+                if ($this->ajax()) {
+                    return 'Access denied!';
+                } else {
+                    Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);
+                    return true;
+                }
             }
-            // $this->debug ( 'hello' );
+            //$this->debug ( 'hello' );
 
             if (!method_exists($callable [0], $callable [1])) {
                 throw new SystemException (sprintf("Action %s is not found in the controller %s", $callable [1], $callable [0]));
             }
-            // $this->debug ( 'hello' );
+            //$this->debug ( 'hello' );
 
             /**
              * Execute the handler
@@ -202,7 +222,7 @@ class App extends Controller
             $this->info(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
             //$this->debug($callable);
             $result = call_user_func_array($callable, []);
-//			$this->debug ( $result );
+//			//$this->debug ( $result );
             return ($result) ?: true;
         } catch (ValidationException $ex) {
             $responseContents ['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
@@ -239,17 +259,18 @@ class App extends Controller
          * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
          */
         $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
-        // $this->debug ( $callable );
+        //$this->debug ( $callable );
 
         /**
          * 클래스 인스턴스를 실행한다.
          */
         if (!$result = $this->runAjaxHandler($callable)) {
+            $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
             throw new ApplicationException ('runAjaxHandler');
         }
 
-        // $this->debug ( 'execPageAction' );
-        // $this->debug ( $result );
+        //$this->debug ( 'execPageAction' );
+        //$this->debug($result);
         return ($result) ?: true;
     }
 

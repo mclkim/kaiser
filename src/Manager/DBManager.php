@@ -92,7 +92,8 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
     {
         $this->debug($this->executeEmulateQuery($sql, $params));
         try {
-            $query = $this->query($sql, $params);
+            return $this->query($sql, $params);
+//            $query = $this->query($sql, $params);
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {

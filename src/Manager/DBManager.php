@@ -92,14 +92,14 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
     {
         $this->debug($this->executeEmulateQuery($sql, $params));
         try {
-            return $this->query($sql, $params);
-//            $query = $this->query($sql, $params);
+            list($result) = $this->statement($sql, $params);
+            $res = $this->pdo->lastInsertId();
+            return $res === '0' ? $result->rowCount() : $res;
         } catch (PDOException $e) {
             throw new DBException ($e->getMessage());
         } catch (\Exception $e) {
         }
-        // return $query;
-//        $return = $this->rowCount() === 1 ? $this->pdo->lastInsertId() : null;
+        return false;
     }
 
     function executeTransaction()
@@ -120,9 +120,20 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         }
     }
 
+    /**
+     * return $this->table($table)->insert($data);
+     */
     function AutoExecuteInsert($table, $data)
     {
-        return $this->table($table)->insert($data);
+        $instance = $this->table($table);
+        $queryObject = $instance->getQuery('insert', $data);
+        $sql = $queryObject->getSql();
+        $params = $queryObject->getBindings();
+        list($result) = $this->statement($sql, $params);
+        $this->debug($this->executeEmulateQuery($sql, $params));
+        $res = $this->pdo->lastInsertId();
+        return $res === '0' ? $result->rowCount() : $res;
+
     }
 
     function AutoExecuteUpdate($table, $data, $key1, $oper1 = null, $val1 = null, $key2 = null, $oper2 = null, $val2 = null)

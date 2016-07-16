@@ -91,9 +91,9 @@ class Controller extends BaseController
         return if_exists($_SESSION, $this->_user, false);
     }
 
-    protected function setAdmin($user)
+    protected function setAdmin($admin)
     {
-        $_SESSION [$this->_admin] = $user;
+        $_SESSION [$this->_admin] = $admin;
     }
 
     protected function getAdmin()
@@ -185,6 +185,7 @@ class Controller extends BaseController
             echo <<<END
             <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
             <script type="text/javascript">
+            alert("$msg");
             </script>
 END;
             exit ();

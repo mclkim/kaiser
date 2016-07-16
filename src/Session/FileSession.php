@@ -8,9 +8,13 @@ final class FileSession
     var $iv = 'ddky2235gee1g3mr';
     private $savePath;
 
-    public function __construct($savePath)
+    public function __construct($savePath = null)
     {
-        $this->savePath = $savePath;
+        // $temp_file = tempnam(sys_get_temp_dir(), 'Tux');
+        if (isset($savePath))
+            $this->savePath = $savePath;
+        else
+            $this->savePath = session_save_path();//sys_get_temp_dir();
 
         // set our custom session functions.
         session_set_save_handler(array($this, "open"), array($this, "close"), array($this, "read"), array($this, "write"), array($this, "destroy"), array($this, "gc"));

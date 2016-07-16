@@ -6,11 +6,13 @@ use Pixie\QueryBuilder\QueryBuilderHandler;
 use Pixie\QueryBuilder\QueryObject;
 
 // https://github.com/usmanhalalit/pixie
-define ( 'DB_AUTO_INSERT', 1 );
-define ( 'DB_AUTO_UPDATE', 2 );
 class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 {
     var $enableLogging = true;
+
+    const DB_AUTO_INSERT = 1;
+    const DB_AUTO_UPDATE = 2;
+    const DB_AUTO_REPLACE = 3;
 
     protected function debug($message, array $context = array())
     {
@@ -152,13 +154,19 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
     // }
     function AutoExecuteInsert($table_name, $fields_values, $where = false)
     {
-        $ret = $this->_buildManipSQL($table_name, $fields_values, DB_AUTO_INSERT, $where);
+        $ret = $this->_buildManipSQL($table_name, $fields_values, self::DB_AUTO_INSERT, $where);
         return $this->executePreparedUpdate($ret ['query'], $ret ['params']);
     }
 
     function AutoExecuteUpdate($table_name, $fields_values, $where = false)
     {
-        $ret = $this->_buildManipSQL($table_name, $fields_values, DB_AUTO_UPDATE, $where);
+        $ret = $this->_buildManipSQL($table_name, $fields_values, self::DB_AUTO_UPDATE, $where);
+        return $this->executePreparedUpdate($ret ['query'], $ret ['params']);
+    }
+
+    function AutoExecuteReplace($table_name, $fields_values, $where = false)
+    {
+        $ret = $this->_buildManipSQL($table_name, $fields_values, self::DB_AUTO_REPLACE, $where);
         return $this->executePreparedUpdate($ret ['query'], $ret ['params']);
     }
 
@@ -170,7 +178,7 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
         $first = true;
         $params = array();
         switch ($mode) {
-            case DB_AUTO_INSERT :
+            case self::DB_AUTO_INSERT :
                 $values = '';
                 $fields = '';
                 foreach ($table_fields as $field => $value) {
@@ -189,7 +197,7 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
                     'query' => $sql,
                     'params' => $params
                 );
-            case DB_AUTO_UPDATE :
+            case self::DB_AUTO_UPDATE :
                 $set = '';
                 foreach ($table_fields as $field => $value) {
                     $params [] = $value;
@@ -204,6 +212,25 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
                 if ($where) {
                     $sql .= " WHERE $where";
                 }
+                return array(
+                    'query' => $sql,
+                    'params' => $params
+                );
+            case self::DB_AUTO_REPLACE :
+                $values = '';
+                $fields = '';
+                foreach ($table_fields as $field => $value) {
+                    $params [] = $value;
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        $fields .= ',';
+                        $values .= ',';
+                    }
+                    $fields .= $field;
+                    $values .= '?';
+                }
+                $sql = "REPLACE INTO $table ($fields) VALUES ($values)";
                 return array(
                     'query' => $sql,
                     'params' => $params

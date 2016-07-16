@@ -1,8 +1,7 @@
 <?php
-
 /**
  * http://www.wikihow.com/Create-a-Secure-Login-Script-in-PHP-and-MySQL
- * http://www.wikihow.com/Create-a-Secure-Session-Managment-System-in-PHP-and-MySQL
+ * http://www.wikihow.com/Create-a-Secure-Session-Management-System-in-PHP-and-MySQL
  * ---------------------------------------------------------------
  * CREATE DATABASE `sessionsDB` ;
  * CREATE USER 'sec_user'@'localhost' IDENTIFIED BY 'eKcGZr59zAa2BEWU';
@@ -36,6 +35,7 @@ namespace Kaiser\Session;
 
 use Kaiser\Manager\DBManager;
 use Kaiser\Timestamp;
+use Kaiser\Timer;
 
 final class DBSession extends DBManager
 {
@@ -49,7 +49,7 @@ final class DBSession extends DBManager
     {
         parent::__construct($connection);
 
-        self::$sessionMicrotime = \Kaiser\Timer::getMicroTime();
+        self::$sessionMicrotime = Timer::getMicroTime();
 
         // set our custom session functions.
         session_set_save_handler(array($this, "open"), array($this, "close"), array($this, "read"), array($this, "write"), array($this, "destroy"), array($this, "gc"));
@@ -133,7 +133,6 @@ final class DBSession extends DBManager
     function write($sessionId, $data)
     {
         $meet_again_baby = 900;
-        // $req = new Request ();
 
         $key = $this->getkey($sessionId);
 
@@ -146,45 +145,24 @@ final class DBSession extends DBManager
 
         $crypt = new \Crypt\AES ();
         $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+        $userid = if_empty($_SESSION, 'userid', null);
 
-        $userid = isset ($_SESSION ['email']) ? $_SESSION ['email'] : '';
-        $server = $_SERVER ['HTTP_HOST'];
-        $request = substr($_SERVER ['REQUEST_URI'], 0, 255);
-        $referer = isset ($_SERVER ['HTTP_REFERER']) ? substr($_SERVER ['HTTP_REFERER'], 0, 255) : '';
-        $timer = \Kaiser\Timer::getMicroTime() - self::$sessionMicrotime;
+        $data = array(
+            'id' => $sessionId,
+            'address' => $_SERVER ['REMOTE_ADDR'],
+            'agent' => $_SERVER ['HTTP_USER_AGENT'],
+            'userid' => $userid,
+            'privilege' => $encrypt,
+            'server' => $_SERVER ['HTTP_HOST'],
+            'request' => substr($_SERVER ['REQUEST_URI'], 0, 255),
+            'referer' => isset ($_SERVER ['HTTP_REFERER']) ? substr($_SERVER ['HTTP_REFERER'], 0, 255) : '',
+            'timer' => Timer::getMicroTime() - self::$sessionMicrotime,
+            'created' => Timestamp::getUNIXtime(),
+            'updated' => Timestamp::getUNIXtime() - $meet_again_baby,
+            'session_key' => $key
+        );
 
-        $sql = "REPLACE INTO sessions
-					(`id`,
-					`address`,
-					`agent`,
-					`userid`,
-					`preexistence`,
-					`privilege`,
-					`server`,
-					`request`,
-					`referer`,
-					`timer`,
-					`created`,
-					`updated`,
-					`session_key`)				
-				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-        $res = $this->executePreparedUpdate($sql, array(
-            $sessionId,
-            $_SERVER ['REMOTE_ADDR'],
-            $_SERVER ['HTTP_USER_AGENT'],
-            $userid,
-            null,
-            $encrypt,
-            $server,
-            $request,
-            $referer,
-            $timer,
-            Timestamp::getUNIXtime(),
-            Timestamp::getUNIXtime() - $meet_again_baby,
-            $key
-        ));
-
+        $res = $this->AutoExecuteReplace('sessions', $data);
         return $res;
     }
 

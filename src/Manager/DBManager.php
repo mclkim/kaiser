@@ -6,6 +6,8 @@ use Pixie\QueryBuilder\QueryBuilderHandler;
 use Pixie\QueryBuilder\QueryObject;
 
 // https://github.com/usmanhalalit/pixie
+define ( 'DB_AUTO_INSERT', 1 );
+define ( 'DB_AUTO_UPDATE', 2 );
 class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
 {
     var $enableLogging = true;

@@ -2,17 +2,36 @@
 
 namespace Kaiser\Manager;
 
-use Pixie\QueryBuilder\QueryBuilderHandler;
-use Pixie\QueryBuilder\QueryObject;
-
-// https://github.com/usmanhalalit/pixie
-class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
+class DBManager
 {
     var $enableLogging = true;
+
+    const DB_PARAM_SCALAR = 1;
+    const DB_PARAM_OPAQUE = 2;
+    const DB_PARAM_MISC = 3;
 
     const DB_AUTO_INSERT = 1;
     const DB_AUTO_UPDATE = 2;
     const DB_AUTO_REPLACE = 3;
+
+    private $pdo = null;
+    private $last_query = null;
+
+    function __construct($pdo = null)
+    {
+        $this->pdo = $pdo;
+        $this->debug(sprintf('DBManager Class "%s" Initialized ', get_class($this)));
+    }
+
+    function __destruct()
+    {
+        // parent::__destruct ();
+    }
+
+    public function getPdo()
+    {
+        return $this->pdo;
+    }
 
     protected function debug($message, array $context = array())
     {
@@ -20,88 +39,166 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
             logger($message, $context);
     }
 
-    function executeEmulateQuery($query, $params = array())
+    protected function err($message, array $context = array())
     {
-        $query = new QueryObject ($query, $params, $this->pdo);
-        return $query->getRawSql();
+        logger($message, $context);
     }
 
-    function executePreparedQueryOne($sql, $params = array())
+    protected function executeEmulateQuery($query, $data = array())
     {
-        $this->debug($this->executeEmulateQuery($sql, $params));
-        try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_COLUMN)->first();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
+        $this->_prepareEmulateQuery($query);
+
+        // $stmt = ( int ) $stmt;
+        $data = ( array )$data;
+        $this->last_parameters = $data;
+
+        if (count($this->prepare_types) != count($data)) {
+            // throw new DBException ( $e->getMessage () );
+            return false;
         }
-        return $result;
-    }
 
-    function executePreparedQueryToMap($sql, $params = array())
-    {
-        $this->debug($this->executeEmulateQuery($sql, $params));
-        try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->first();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
+        $realquery = $this->prepare_tokens [0];
+
+        $i = 0;
+        foreach ($data as $value) {
+            if ($this->prepare_types [$i] == self::DB_PARAM_SCALAR) {
+                $realquery .= $this->quote($value);
+            } elseif ($this->prepare_types [$i] == self::DB_PARAM_OPAQUE) {
+                $fp = @fopen($value, 'rb');
+                if (!$fp) {
+                    // return $this->raiseError ( DB_ERROR_ACCESS_VIOLATION );
+                    // throw new DBException ( $e->getMessage () );
+                    return false;
+                }
+                $realquery .= $this->quote(fread($fp, filesize($value)));
+                fclose($fp);
+            } else {
+                $realquery .= $value;
+            }
+
+            $realquery .= $this->prepare_tokens [++$i];
         }
-        return $result;
+
+        return $realquery;
     }
 
-    function executePreparedQueryToMapList($sql, $params = array())
+    private function _prepareEmulateQuery($query)
     {
-        $this->debug($this->executeEmulateQuery($sql, $params));
-        try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_ASSOC)->get();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
+        $tokens = preg_split('/((?<!\\\)[&?!])/', $query, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $token = 0;
+        $types = array();
+        $newtokens = array();
+
+        foreach ($tokens as $val) {
+            switch ($val) {
+                case '?' :
+                    $types [$token++] = self::DB_PARAM_SCALAR;
+                    break;
+                case '&' :
+                    $types [$token++] = self::DB_PARAM_OPAQUE;
+                    break;
+                case '!' :
+                    $types [$token++] = self::DB_PARAM_MISC;
+                    break;
+                default :
+                    $newtokens [] = preg_replace('/\\\([&?!])/', "\\1", $val);
+            }
         }
-        return $result;
+
+        $this->prepare_tokens = &$newtokens;
+        $this->prepare_types = $types;
+        $this->prepared_queries = implode(' ', $newtokens);
+
+        return $tokens;
     }
 
-    function executePreparedQueryToArrayList($sql, $params = array())
+    function executePreparedQueryOne($statement, $params = array())
     {
-        $this->debug($this->executeEmulateQuery($sql, $params));
+        $sql = $this->executeEmulateQuery($statement, $params);
+        $this->debug($sql);
         try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_NUM)->get();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $result = $stmt->fetch(\PDO::FETCH_COLUMN);
+        } catch (\PDOException $e) {
+            // $this->err ( $this->last_query );
+            $this->err($e->getMessage());
         }
-        return $result;
+        return false;
     }
 
-
-    function executePreparedQueryToObjList($sql, $params = array())
+    function executePreparedQueryToMap($statement, $params = array())
     {
-        $this->debug($this->executeEmulateQuery($sql, $params));
+        $sql = $this->executeEmulateQuery($statement, $params);
+        $this->debug($sql);
         try {
-            $query = $this->query($sql, $params);
-            $result = $query->setFetchMode(\PDO::FETCH_OBJ)->get();
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            // $this->err ( $this->last_query );
+            $this->err($e->getMessage());
         }
-        return $result;
+        return false;
     }
 
-    function executePreparedUpdate($sql, $params = array())
+    function executePreparedQueryToMapList($statement, $params = array())
     {
-        $this->debug($this->executeEmulateQuery($sql, $params));
+        $sql = $this->executeEmulateQuery($statement, $params);
+        $this->debug($sql);
         try {
-            list($result) = $this->statement($sql, $params);
-            $res = $this->pdo->lastInsertId();
-            return $res === '0' ? $result->rowCount() : $res;
-        } catch (PDOException $e) {
-            throw new DBException ($e->getMessage());
-        } catch (\Exception $e) {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            // $this->err ( $this->last_query );
+            $this->err($e->getMessage());
+        }
+        return false;
+    }
+
+    function executePreparedQueryToArrayList($statement, $params = array())
+    {
+        $sql = $this->executeEmulateQuery($statement, $params);
+        $this->debug($sql);
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $result = $stmt->fetchAll(\PDO::FETCH_NUM);
+        } catch (\PDOException $e) {
+            // $this->err ( $this->last_query );
+            $this->err($e->getMessage());
+        }
+        return false;
+    }
+
+    function executePreparedQueryToObjList($statement, $params = array())
+    {
+        $sql = $this->executeEmulateQuery($statement, $params);
+        $this->debug($sql);
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $result = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        } catch (\PDOException $e) {
+            // $this->err ( $this->last_query );
+            $this->err($e->getMessage());
+        }
+        return false;
+    }
+
+    function executePreparedUpdate($statement, $params = array())
+    {
+        $sql = $this->executeEmulateQuery($statement, $params);
+        $this->debug($sql);
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            $result = $this->pdo->lastInsertId();
+            return $result === '0' ? $stmt->rowCount() : $result;
+        } catch (\PDOException $e) {
+            // $this->err ( $this->last_query );
+            $this->err($e->getMessage());
         }
         return false;
     }
@@ -117,41 +214,13 @@ class DBManager extends \Pixie\QueryBuilder\QueryBuilderHandler
             $this->pdo->commit();
 
             return $this;
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             // something happened, rollback changes
             $this->pdo->rollBack();
             return $this;
         }
     }
 
-    /**
-     * return $this->table($table)->insert($data);
-     */
-    // function AutoExecuteInsert($table, $data)
-    // {
-    //     $instance = $this->table($table);
-    //     $queryObject = $instance->getQuery('insert', $data);
-    //     $sql = $queryObject->getSql();
-    //     $params = $queryObject->getBindings();
-    //     list($result) = $this->statement($sql, $params);
-    //     $this->debug($this->executeEmulateQuery($sql, $params));
-    //     $res = $this->pdo->lastInsertId();
-    //     return $res === '0' ? $result->rowCount() : $res;
-
-    // }
-
-    // function AutoExecuteUpdate($table, $data, $key1, $oper1 = null, $val1 = null, $key2 = null, $oper2 = null, $val2 = null)
-    // {
-    //     if (func_num_args() == 4) {
-    //         return $this->table($table)->where($key1, '=', $oper1)->update($data);
-    //     } else if (func_num_args() == 5) {
-    //         return $this->table($table)->where($key1, $oper1, $val1)->update($data);
-    //     } else if (func_num_args() == 6) {
-    //         return $this->table($table)->where($key1, '=', $oper1)->where($val1, '=', $key2)->update($data);
-    //     } else if (func_num_args() == 8) {
-    //         return $this->table($table)->where($key1, $oper1, $val1)->where($key2, $oper2, $val2)->update($data);
-    //     }
-    // }
     function AutoExecuteInsert($table_name, $fields_values, $where = false)
     {
         $ret = $this->_buildManipSQL($table_name, $fields_values, self::DB_AUTO_INSERT, $where);

@@ -22,7 +22,6 @@
      	"pimple/pimple": "^3.0",
         "aura/web": "^2.0",     	
      	"katzgrau/klogger": "^1.2",
-        "usmanhalalit/pixie": "2.*@dev",
   		"lancerhe/php-crypt": "^1.0"
     },
     "require-dev": {

@@ -9,7 +9,7 @@ use \Kaiser\Exception\ValidationException;
 
 class App extends Controller
 {
-    const VERSION = '16.05.23';
+    const VERSION = '16.07.20';
     // 타임 스템프
     protected $timestamp = null;
     static $AppDirectory;
@@ -30,7 +30,7 @@ class App extends Controller
         /**
          * 타임스템프를 기록한 시간 차이를 계산하여 출력한다.
          */
-        $this->info("The Class total memory used: " . number_format(memory_get_peak_usage()));
+//        $this->info("The Class total memory used: " . number_format(memory_get_peak_usage()));
         $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch());
     }
 

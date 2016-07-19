@@ -15,12 +15,11 @@ class DBManager
     const DB_AUTO_REPLACE = 3;
 
     private $pdo = null;
-    private $last_query = null;
 
     function __construct($pdo = null)
     {
         $this->pdo = $pdo;
-        $this->debug(sprintf('DBManager Class "%s" Initialized ', get_class($this)));
+//        $this->debug(sprintf('DBManager Class "%s" Initialized ', get_class($this)));
     }
 
     function __destruct()
@@ -36,12 +35,12 @@ class DBManager
     protected function debug($message, array $context = array())
     {
         if ($this->enableLogging)
-            logger($message, $context);
+            logger()->debug($message, $context);
     }
 
     protected function err($message, array $context = array())
     {
-        logger($message, $context);
+        logger()->error($message, $context);
     }
 
     public function quote($string, $type = \PDO::PARAM_STR)
@@ -96,11 +95,11 @@ class DBManager
 
         foreach ($tokens as $val) {
             switch ($val) {
-                case '?' :
-                    $types [$token++] = self::DB_PARAM_SCALAR;
-                    break;
                 case '&' :
                     $types [$token++] = self::DB_PARAM_OPAQUE;
+                    break;
+                case '?' :
+                    $types [$token++] = self::DB_PARAM_SCALAR;
                     break;
                 case '!' :
                     $types [$token++] = self::DB_PARAM_MISC;
@@ -126,7 +125,6 @@ class DBManager
             $stmt->execute();
             return $result = $stmt->fetch(\PDO::FETCH_COLUMN);
         } catch (\PDOException $e) {
-            // $this->err ( $this->last_query );
             $this->err($e->getMessage());
         }
         return false;
@@ -141,7 +139,6 @@ class DBManager
             $stmt->execute();
             return $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            // $this->err ( $this->last_query );
             $this->err($e->getMessage());
         }
         return false;
@@ -156,7 +153,6 @@ class DBManager
             $stmt->execute();
             return $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            // $this->err ( $this->last_query );
             $this->err($e->getMessage());
         }
         return false;
@@ -171,7 +167,6 @@ class DBManager
             $stmt->execute();
             return $result = $stmt->fetchAll(\PDO::FETCH_NUM);
         } catch (\PDOException $e) {
-            // $this->err ( $this->last_query );
             $this->err($e->getMessage());
         }
         return false;
@@ -186,7 +181,6 @@ class DBManager
             $stmt->execute();
             return $result = $stmt->fetchAll(\PDO::FETCH_OBJ);
         } catch (\PDOException $e) {
-            // $this->err ( $this->last_query );
             $this->err($e->getMessage());
         }
         return false;
@@ -202,7 +196,6 @@ class DBManager
             $result = $this->pdo->lastInsertId();
             return $result === '0' ? $stmt->rowCount() : $result;
         } catch (\PDOException $e) {
-            // $this->err ( $this->last_query );
             $this->err($e->getMessage());
         }
         return false;

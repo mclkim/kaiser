@@ -3,7 +3,7 @@
 /**
  * Step 1: Require the Kaiser Framework using Composer's autoloader
  */
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 /**
  * Step 2: Instantiate a Kaiser application

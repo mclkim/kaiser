@@ -44,6 +44,11 @@ class DBManager
         logger($message, $context);
     }
 
+    public function quote($string, $type = \PDO::PARAM_STR)
+    {
+        return $this->pdo->quote($string, $type);
+    }
+
     protected function executeEmulateQuery($query, $data = array())
     {
         $this->_prepareEmulateQuery($query);

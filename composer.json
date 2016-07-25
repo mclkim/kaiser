@@ -29,14 +29,14 @@
     },    
     "autoload": {
         "classmap": [
-        	"src/Template_/Template_.class.php"
+        	"src/Template_/Template_.class.php",
+            "src/Plupload/PluploadHandler.php"
         ],
        "files": [
             "src/Helpers.php"
         ],        
         "psr-4": {
-            "Kaiser\\": "src",
-            "Kaiser\\PluploadHandler\\": "src/Plupload/"
+            "Kaiser\\": "src"
         }
     }  
 }

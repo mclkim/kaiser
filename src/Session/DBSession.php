@@ -40,8 +40,8 @@ use Kaiser\Timer;
 final class DBSession extends DBManager
 {
     var $enableLogging = false;
-    var $key = 'nh9a6d2b6s6g9ynh';
-    var $iv = 'ddky2235gee1g3mr';
+    var $key = 'nh9a6d2b6s6g9ynh';// but size 16 is required
+    var $iv = 'ddky2235gee1g3mr';// but size 16 is required
     private static $sessionMicrotime;
     private static $sess_expiration = 7200; // the number of SECONDS you want the session to last.
 

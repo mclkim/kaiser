@@ -71,12 +71,12 @@ class Controller extends BaseController
         $this->logger()->info($message, $context);
     }
 
-    protected function debug($message = null, array $context = array())
+    function debug($message = null, array $context = array())
     {
         $this->logger()->debug($message, $context);
     }
 
-    protected function err($message = null, array $context = array())
+    function err($message = null, array $context = array())
     {
         $this->logger()->error($message, $context);
     }

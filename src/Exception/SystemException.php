@@ -9,8 +9,10 @@ namespace Kaiser\Exception;
  * @package october\exception
  * @author Alexey Bobkov, Samuel Georges
  */
-class SystemException extends ExceptionBase {
-	public function __construct($message = "", $code = 0, \Exception $previous = null) {
-		parent::__construct ( $message, $code, $previous );
-	}
+class SystemException extends ExceptionBase
+{
+    public function __construct($message = "", $code = 0, \Exception $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

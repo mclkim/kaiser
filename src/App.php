@@ -4,8 +4,6 @@ namespace Kaiser;
 
 use \Kaiser\Exception\ApplicationException;
 use \Kaiser\Exception\AjaxException;
-use \Kaiser\Exception\SystemException;
-use \Kaiser\Exception\ValidationException;
 
 class App extends Controller
 {
@@ -36,7 +34,7 @@ class App extends Controller
 
     public function version()
     {
-        return static::VERSION;
+        return self::VERSION;
     }
 
     protected function getAjaxHandler()
@@ -48,6 +46,10 @@ class App extends Controller
         }
 
         if ($handler = $request->header('X-October-Request-Handler')) {
+            return trim($handler);
+        }
+
+        if ($handler = $request->header('X-Request-Handler')) {
             return trim($handler);
         }
 
@@ -63,6 +65,10 @@ class App extends Controller
         }
 
         if ($handler = $request->post('X-October-Request-Handler')) {
+            return trim($handler);
+        }
+
+        if ($handler = $request->header('X-Request-Handler')) {
             return trim($handler);
         }
 
@@ -98,81 +104,102 @@ class App extends Controller
         if (!$this->verifyCsrfToken()) {
             throw new ApplicationException ('Invalid security token.');
         }
-
+        //$this->debug('hello #1');
         /**
          * Execute AJAX event
          */
-        if ($ajaxResponse = $this->execAjaxHandlers()) {
+        if (($ajaxResponse = $this->execAjaxHandler()) != null) {
             //$this->debug($ajaxResponse);
             return $ajaxResponse;
         }
-
+        //$this->debug('hello #2');
         /**
          * Execute page action
          */
         $result = $this->execPageAction();
-        //$this->debug($result);
-
+        //$this->debug('hello #3');
         if (!is_string($result)) {
             return $result;
         }
     }
 
-    protected function execAjaxHandlers()
+    protected
+    function execAjaxHandler()
     {
-        if ($handler = $this->getAjaxHandler()) {
-            try {
-
-                $rout = $this->router();
-                $rout->setQuery($handler);
-
-                /**
-                 * URL의 라우팅 설정
-                 * 실행파일의 클래스명과 실행메소드를 분리하여 구한다.
-                 */
-                $router = $rout->getRoute();
-
-                /**
-                 * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
-                 */
-                $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
-                //$this->debug ( $callable );
-
-                /**
-                 * Execute the handler
-                 */
-                if (!$result = $this->runAjaxHandler($callable)) {
-                    $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-                    throw new ApplicationException ('execAjaxHandlers');
-                }
-
-                $responseContents = [];
-
-                /**
-                 * If the handler returned an array, we should add it to output for rendering.
-                 * If it is a string, add it to the array with the key "result".
-                 */
-                if (is_array($result)) {
-                    $responseContents = array_merge($responseContents, $result);
-                } elseif (is_string($result)) {
-                    $responseContents ['result'] = $result;
-                }
-                return Response::getInstance()->setContent($responseContents);
-            } catch (Exception $ex) {
-                throw $ex;
-            }
+        if (($handler = $this->getAjaxHandler()) == null) {
+            //$this->debug('hello #00');
+            return null;
         }
 
-        return null;
+        try {
+            //$this->debug('hello #11');
+            $rout = $this->router();
+            $rout->setQuery($handler);
+
+            /**
+             * URL의 라우팅 설정
+             * 실행파일의 클래스명과 실행메소드를 분리하여 구한다.
+             */
+            $router = $rout->getRoute();
+
+            /**
+             * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
+             */
+            $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
+
+            /**
+             * 클래스 인스턴스를 실행한다.
+             */
+            if (!$result = $this->runAjaxHandler($callable)) {
+//                $this->err($result);
+//                return $result;
+                $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
+                throw new ApplicationException ('runAjaxHandler');
+            }
+
+            //$this->debug($result);
+            //$this->debug('hello #12');
+            $responseContents = [];
+
+            /**
+             * If the handler returned an array, we should add it to output for rendering.
+             * If it is a string, add it to the array with the key "result".
+             */
+            if (is_array($result)) {
+                $responseContents = array_merge($responseContents, $result);
+            } elseif (is_string($result)) {
+                $responseContents ['result'] = $result;
+            }
+
+            //$this->debug('hello #13');
+            $this->response()->setContent($responseContents);
+            //$this->debug($result);
+            return ($result) ?: true;
+//        } catch (AjaxException $ex) {
+//            $this->err($ex->getMessage());
+//            $this->response()->setContent($ex->getMessage());
+//        } catch (ApplicationException $ex) {
+//            $this->err($ex->getMessage());
+        } catch (Exception $ex) {
+            $this->err($ex->getMessage());
+            throw $ex;
+        }
+
+        return -1;
     }
 
-    private function runAjaxHandler($callable)
+    private
+    function runAjaxHandler($callable)
     {
-        //$this->debug('hello');
-        //$this->debug($callable);
         try {
             $result = null;
-            //$this->debug('hello');
+
+//            if (!method_exists($callable [0], $callable [1])) {
+//                $this->err($callable);
+//                $this->err(sprintf('Action "%s" is not found in the controller "%s"', $callable [1], $callable [0]));
+//                throw new SystemException (sprintf("Action %s is not found in the controller %s", $callable [1], $callable [0]));
+//            }
+
             /**
              * Not logged in, redirect to login screen or show ajax error.
              * 로그인 여부를 체크 할 페이지 인지 확인한다.
@@ -182,97 +209,84 @@ class App extends Controller
             $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
             $return_uri = $callable [0]->getParameter('returnURI', $request_uri);
             $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-            //$this->debug(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-            //$this->debug($this->checkAdmin($callable [0]));
-            //$this->debug($this->check($callable [0]));
-            //$this->debug($redirect);
-            if (!$this->checkAdmin($callable [0])) {
-//                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
-//                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
-                //$this->debug($this->_loginAdminPage . '&returnURI=' . $redirect);
-                //$this->debug(Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect));
-                if ($this->ajax()) {
-                    return 'Access denied!';
-                } else {
-                    Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
-                    return true;
-                }
-//                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
-            } else if (!$this->check($callable [0])) {
-//                $returnURI = $callable [0]->getParameter('returnURI', $_SERVER ['REQUEST_URI']);
-//                $redirect = implode("/", array_map("rawurlencode", explode("/", $returnURI)));
-                //$this->debug($this->_loginPage . '&returnURI=' . $redirect);
-//                return $this->ajax() ? 'Access denied!' : Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);
-                if ($this->ajax()) {
-                    return 'Access denied!';
-                } else {
-                    Response::getInstance()->redirect($this->_loginPage . '&returnURI=' . $redirect);
-                    return true;
-                }
-            }
-            //$this->debug ( 'hello' );
 
-            if (!method_exists($callable [0], $callable [1])) {
-                throw new SystemException (sprintf("Action %s is not found in the controller %s", $callable [1], $callable [0]));
+            if (!$this->checkAdmin($callable [0])) {
+                if ($this->ajax()) {
+                    return 'Access denied!';
+                } else {
+                    $this->response()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
+                    return true;
+                }
+            } else if (!$this->check($callable [0])) {
+                if ($this->ajax()) {
+                    return 'Access denied!';
+                } else {
+                    $this->response()->redirect($this->_loginPage . '&returnURI=' . $redirect);
+                    return true;
+                }
             }
-            //$this->debug ( 'hello' );
 
             /**
              * Execute the handler
              */
             $this->info(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-            //$this->debug($callable);
             $result = call_user_func_array($callable, []);
-//			//$this->debug ( $result );
+            //$this->debug($result);
             return ($result) ?: true;
-        } catch (ValidationException $ex) {
-            $responseContents ['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
-            $responseContents ['X_OCTOBER_ERROR_MESSAGE'] = $ex->getMessage();
-            throw new AjaxException ($responseContents);
         } catch (AjaxException $ex) {
-            // $responseContents = [];
-            // $responseContents['#layout-flash-messages'] = $ex->getMessage ();
-            // $responseContents['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
-            // $responseContents['X_OCTOBER_ERROR_MESSAGE'] = $ex->getMessage();
-            return Response::getInstance()->setContent($ex->getMessage());
+            $this->err($ex->getMessage());
+            $this->response()->setContent($ex->getMessage());
         } catch (Exception $ex) {
+            $this->err($ex->getMessage());
+            throw $ex;
+        }
+        //$this->debug($result);
+        return $result;
+    }
+
+    protected
+    function execPageAction()
+    {
+        try {
+            $rout = $this->router();
+
+            if ($handler = $this->getPostHandler()) {
+                $rout->setQuery($handler);
+            }
+
+            /**
+             * URL의 라우팅 설정
+             * 실행파일의 클래스명과 실행메소드를 분리하여 구한다.
+             */
+            $router = $rout->getRoute();
+
+            /**
+             * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
+             */
+            $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
+
+            /**
+             * 클래스 인스턴스를 실행한다.
+             */
+            if (!$result = $this->runAjaxHandler($callable)) {
+//                $this->err($result);
+//                return $result;
+                $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
+                throw new ApplicationException ('runAjaxHandler');
+            }
+
+            return ($result) ?: true;
+//        } catch (AjaxException $ex) {
+//            $this->err($ex->getMessage());
+//            $this->response()->setContent($ex->getMessage());
+//        } catch (ApplicationException $ex) {
+//            $this->err($ex->getMessage());
+        } catch (Exception $ex) {
+            $this->err($ex->getMessage());
             throw $ex;
         }
 
-        return false;
-    }
-
-    protected function execPageAction()
-    {
-        $rout = $this->router();
-
-        if ($handler = $this->getPostHandler()) {
-            $rout->setQuery($handler);
-        }
-
-        /**
-         * URL의 라우팅 설정
-         * 실행파일의 클래스명과 실행메소드를 분리하여 구한다.
-         */
-        $router = $rout->getRoute();
-
-        /**
-         * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
-         */
-        $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
-        //$this->debug ( $callable );
-
-        /**
-         * 클래스 인스턴스를 실행한다.
-         */
-        if (!$result = $this->runAjaxHandler($callable)) {
-            $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-            throw new ApplicationException ('runAjaxHandler');
-        }
-
-        //$this->debug ( 'execPageAction' );
-        //$this->debug($result);
-        return ($result) ?: true;
+        return -1;
     }
 
     function setAppDir($directory = [])

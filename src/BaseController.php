@@ -2,7 +2,7 @@
 
 namespace Kaiser;
 
-use \Kaiser\Exception\ApplicationException;
+// use \Kaiser\Exception\ApplicationException;
 
 class BaseController extends Singleton
 {
@@ -55,52 +55,4 @@ class BaseController extends Singleton
         return $this->container->get('router');
     }
 
-    public static function normalizeClassName($name)
-    {
-        $name = str_replace('/', '\\', $name);
-
-        if (is_object($name))
-            $name = get_class($name);
-
-        $name = '\\' . ltrim($name, '\\');
-        return $name;
-    }
-
-    protected function findController($controller, $action, $inPath)
-    {
-        $directory = is_array($inPath) ? $inPath : array(
-            $inPath
-        );
-
-        /**
-         * Workaround: Composer does not support case insensitivity.
-         */
-        if (!class_exists($controller)) {
-            $controller = self::normalizeClassName($controller);
-            foreach ($directory as $inPath) {
-                $controllerFile = $inPath . strtolower(str_replace('\\', '/', $controller)) . '.php';
-                if (file_exists($controllerFile)) {
-                    include_once($controllerFile);
-                    break;
-                }
-            }
-        }
-
-        if (!class_exists($controller)) {
-//			return false;
-            throw new ApplicationException (sprintf('The Class "%s" does not found', $controller));
-        }
-
-        $controllerObj = [
-            new $controller ($this->container),
-            $action
-        ];
-
-        if (is_callable($controllerObj)) {
-            return $controllerObj;
-        }
-
-//		return false;
-        throw new ApplicationException (sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
-    }
 }

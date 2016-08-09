@@ -23,6 +23,7 @@ class Controller extends BaseController
 
     protected function requireAdmin()
     {
+        return false;
     }
 
     /**

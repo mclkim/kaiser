@@ -7,7 +7,7 @@ use \Kaiser\Exception\AjaxException;
 
 class App extends Controller
 {
-    const VERSION = '16.07.20';
+    const VERSION = '2016-08-08';
     // 타임 스템프
     protected $timestamp = null;
     static $AppDirectory;
@@ -29,7 +29,8 @@ class App extends Controller
          * 타임스템프를 기록한 시간 차이를 계산하여 출력한다.
          */
 //        $this->info("The Class total memory used: " . number_format(memory_get_peak_usage()));
-        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch());
+        // $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch());
+        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch().", Memory used: " . bytesize(memory_get_peak_usage()));
     }
 
     public function version()
@@ -288,6 +289,55 @@ class App extends Controller
 
         return -1;
     }
+
+    public static function normalizeClassName($name)
+    {
+        $name = str_replace('/', '\\', $name);
+
+        if (is_object($name))
+            $name = get_class($name);
+
+        $name = '\\' . ltrim($name, '\\');
+        return $name;
+    }
+
+    protected function findController($controller, $action, $inPath)
+    {
+        $directory = is_array($inPath) ? $inPath : array(
+            $inPath
+        );
+
+        /**
+         * Workaround: Composer does not support case insensitivity.
+         */
+        if (!class_exists($controller)) {
+            $controller = self::normalizeClassName($controller);
+            foreach ($directory as $inPath) {
+                $controllerFile = $inPath . strtolower(str_replace('\\', '/', $controller)) . '.php';
+                if (file_exists($controllerFile)) {
+                    include_once($controllerFile);
+                    break;
+                }
+            }
+        }
+
+        if (!class_exists($controller)) {
+//          return false;
+            throw new ApplicationException (sprintf('The Class "%s" does not found', $controller));
+        }
+
+        $controllerObj = [
+            new $controller ($this->container),
+            $action
+        ];
+
+        if (is_callable($controllerObj)) {
+            return $controllerObj;
+        }
+
+//      return false;
+        throw new ApplicationException (sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
+    }    
 
     function setAppDir($directory = [])
     {

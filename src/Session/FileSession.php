@@ -85,9 +85,15 @@ final class FileSession
 //        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
 
         $security = new Security();
-        $decrypt = $security->decrypt($data);
-
+        $decrypt = $security->decrypt($data, $key);
+        $this->err($data);
+        $this->err($decrypt);
         return $decrypt;
+    }
+
+    protected function err($message, array $context = array())
+    {
+        logger()->error($message, $context);
     }
 
     function write($sessionId, $data)
@@ -106,8 +112,9 @@ final class FileSession
 //        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
 
         $security = new Security();
-        $encrypt = $security->encrypt($data);
-
+        $encrypt = $security->encrypt($data, $key);
+        $this->err($data);
+        $this->err($encrypt);
         return file_put_contents("$this->savePath/sess_$sessionId", $encrypt) === false ? false : true;
     }
 

@@ -39,7 +39,7 @@ use Kaiser\Timer;
 
 final class DBSession extends DBManager
 {
-    var $enableLogging = false;
+//    var $enableLogging = false;
 //    var $key = 'nh9a6d2b6s6g9ynh';// but size 16 is required
 //    var $iv = 'ddky2235gee1g3mr';// but size 16 is required
     private static $sessionMicrotime;
@@ -127,10 +127,15 @@ final class DBSession extends DBManager
 
 //        $crypt = new \Crypt\AES ();
 //        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+//        $security = new AES();
+//        $decrypt = $security->decrypt($data, $this->key, $this->iv);
 
         $security = new Security();
-        $decrypt = $security->decrypt($data);
+        $data = base64_decode($data);//TODO::특수값이 처리를 위해서
+        $decrypt = $security->decrypt($data, $key);
 
+//        $this->err($data);
+//        $this->err($decrypt);
         return $decrypt;
     }
 
@@ -149,8 +154,13 @@ final class DBSession extends DBManager
 
 //        $crypt = new \Crypt\AES ();
 //        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+//        $security = new AES();
+//        $encrypt = $security->encrypt($data, $this->key, $this->iv);
+
         $security = new Security();
-        $encrypt = $security->encrypt($data);
+        $encrypt = $security->encrypt($data, $key);
+//        $this->err($data);
+//        $this->err($encrypt);
         $userid = if_empty($_SESSION, 'userid', null);
 
         $data = array(
@@ -158,7 +168,7 @@ final class DBSession extends DBManager
             'address' => $_SERVER ['REMOTE_ADDR'],
             'agent' => $_SERVER ['HTTP_USER_AGENT'],
             'userid' => $userid,
-            'privilege' => $encrypt,
+            'privilege' => base64_encode($encrypt),
             'server' => $_SERVER ['HTTP_HOST'],
             'request' => substr($_SERVER ['REQUEST_URI'], 0, 255),
             'referer' => isset ($_SERVER ['HTTP_REFERER']) ? substr($_SERVER ['HTTP_REFERER'], 0, 255) : '',

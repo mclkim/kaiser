@@ -93,7 +93,7 @@ final class FileSession
 
     protected function err($message, array $context = array())
     {
-        logger()->error($message, $context);
+//        logger()->error($message, $context);
     }
 
     function write($sessionId, $data)

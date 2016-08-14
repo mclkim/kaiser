@@ -39,7 +39,7 @@ use Kaiser\Timer;
 
 final class DBSession extends DBManager
 {
-//    var $enableLogging = false;
+    var $enableLogging = false;
 //    var $key = 'nh9a6d2b6s6g9ynh';// but size 16 is required
 //    var $iv = 'ddky2235gee1g3mr';// but size 16 is required
     private static $sessionMicrotime;

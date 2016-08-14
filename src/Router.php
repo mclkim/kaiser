@@ -10,10 +10,6 @@ class Router extends Singleton
     protected $route;
     protected $param;
 
-    function __construct()
-    {
-    }
-
     /**
      * 클래스명 앞에 경로(/)가 있을경우를
      * 경로명과 클래스명을 분리하여 처리 한다.(2014.02.28)

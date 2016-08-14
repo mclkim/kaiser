@@ -30,7 +30,7 @@ class App extends Controller
          */
 //        $this->info("The Class total memory used: " . number_format(memory_get_peak_usage()));
         // $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch());
-        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch().", Memory used: " . bytesize(memory_get_peak_usage()));
+        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
     }
 
     public function version()
@@ -337,7 +337,7 @@ class App extends Controller
 
 //      return false;
         throw new ApplicationException (sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
-    }    
+    }
 
     function setAppDir($directory = [])
     {

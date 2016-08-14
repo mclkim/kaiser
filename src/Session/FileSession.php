@@ -4,8 +4,8 @@ namespace Kaiser\Session;
 
 final class FileSession
 {
-    var $key = 'nh9a6d2b6s6g9ynh';
-    var $iv = 'ddky2235gee1g3mr';
+//    var $key = 'nh9a6d2b6s6g9ynh';
+//    var $iv = 'ddky2235gee1g3mr';
     private $savePath;
 
     public function __construct($savePath = null)
@@ -16,11 +16,17 @@ final class FileSession
         else
             $this->savePath = session_save_path();//sys_get_temp_dir();
 
+//var_dump($this->savePath);exit;
+
         // set our custom session functions.
         session_set_save_handler(array($this, "open"), array($this, "close"), array($this, "read"), array($this, "write"), array($this, "destroy"), array($this, "gc"));
 
         // This line prevents unexpected effects when using objects as save handlers.
         register_shutdown_function('session_write_close');
+    }
+
+    function __destruct()
+    {
     }
 
     function start_session($sessionName = 'PHPSESSID', $secure = false)
@@ -63,10 +69,10 @@ final class FileSession
         return true;
     }
 
-    function read($id)
+    function read($sessionId)
     {
-        $data = ( string )@file_get_contents("$this->savePath/sess_$id");
-        $key = $this->getkey($id);
+        $data = ( string )@file_get_contents("$this->savePath/sess_$sessionId");
+        $key = $this->getkey($sessionId);
 
         // TODO::sudo php5enmod mcrypt
         // $crypt = new Crypt ();
@@ -75,15 +81,19 @@ final class FileSession
         // $crypt->setData ( $data );
         // $decrypted = $crypt->decrypt ();
 
-        $crypt = new \Crypt\AES ();
-        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+//        $crypt = new \Crypt\AES ();
+//        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+
+        $security = new Security();
+        $decrypt = $security->decrypt($data);
+
         return $decrypt;
     }
 
-    function write($id, $data)
+    function write($sessionId, $data)
     {
         // Get unique key
-        $key = $this->getkey($id);
+        $key = $this->getkey($sessionId);
 
         // TODO::sudo php5enmod mcrypt
         // $crypt = new Crypt ();
@@ -92,15 +102,18 @@ final class FileSession
         // $crypt->setData ( $data );
         // $encrypted = $crypt->encrypt ();
 
-        $crypt = new \Crypt\AES ();
-        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+//        $crypt = new \Crypt\AES ();
+//        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
 
-        return file_put_contents("$this->savePath/sess_$id", $encrypt) === false ? false : true;
+        $security = new Security();
+        $encrypt = $security->encrypt($data);
+
+        return file_put_contents("$this->savePath/sess_$sessionId", $encrypt) === false ? false : true;
     }
 
-    function destroy($id)
+    function destroy($sessionId)
     {
-        $file = "$this->savePath/sess_$id";
+        $file = "$this->savePath/sess_$sessionId";
         if (file_exists($file)) {
             unlink($file);
         }
@@ -111,18 +124,18 @@ final class FileSession
     /**
      * Garbage Collector
      */
-    function gc($lifetime)
+    function gc($maxLifeTime = false)
     {
         foreach (glob("$this->savePath/sess_*") as $file) {
-            if (filemtime($file) + $lifetime < time() && file_exists($file)) {
+            if (filemtime($file) + $maxLifeTime < time() && file_exists($file)) {
                 unlink($file);
             }
         }
         return true;
     }
 
-    private function getkey($id)
+    private function getkey($sessionId)
     {
-        return $id;
+        return $sessionId;
     }
 }

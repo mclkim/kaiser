@@ -68,6 +68,7 @@ class Response extends Singleton
         $this->response->content->set($content);
         return $this->response_sender->__invoke();
     }
+
     function getTEXT($content)
     {
         $this->response->headers->set('Content-Type', 'text/plain; charset=ISO-8859-1');

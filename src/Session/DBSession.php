@@ -40,8 +40,8 @@ use Kaiser\Timer;
 final class DBSession extends DBManager
 {
     var $enableLogging = false;
-    var $key = 'nh9a6d2b6s6g9ynh';// but size 16 is required
-    var $iv = 'ddky2235gee1g3mr';// but size 16 is required
+//    var $key = 'nh9a6d2b6s6g9ynh';// but size 16 is required
+//    var $iv = 'ddky2235gee1g3mr';// but size 16 is required
     private static $sessionMicrotime;
     private static $sess_expiration = 7200; // the number of SECONDS you want the session to last.
 
@@ -125,8 +125,12 @@ final class DBSession extends DBManager
         // $crypt->setData ( $data );
         // $decrypted = $crypt->decrypt ();
 
-        $crypt = new \Crypt\AES ();
-        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+//        $crypt = new \Crypt\AES ();
+//        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
+
+        $security = new Security();
+        $decrypt = $security->decrypt($data);
+
         return $decrypt;
     }
 
@@ -143,8 +147,10 @@ final class DBSession extends DBManager
         // $crypt->setData ( $data );
         // $encrypted = $crypt->encrypt ();
 
-        $crypt = new \Crypt\AES ();
-        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+//        $crypt = new \Crypt\AES ();
+//        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
+        $security = new Security();
+        $encrypt = $security->encrypt($data);
         $userid = if_empty($_SESSION, 'userid', null);
 
         $data = array(

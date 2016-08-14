@@ -60,23 +60,24 @@ if (!function_exists('if_empty')) {
  * 기타함수
  * ---------------------------------------------------------------
  */
-if (! function_exists ( 'bytesize' )) {
-    function bytesize($bytes, $decimals = 0) {
-        if (empty ( $bytes ) || $bytes < 0)
+if (!function_exists('bytesize')) {
+    function bytesize($bytes, $decimals = 0)
+    {
+        if (empty ($bytes) || $bytes < 0)
             return 0;
-        
-        $units = array (
-                'B',
-                'KB',
-                'MB',
-                'GB',
-                'TB',
-                'PB' 
+
+        $units = array(
+            'B',
+            'KB',
+            'MB',
+            'GB',
+            'TB',
+            'PB'
         );
-        
-        $unit = floor ( log ( $bytes, 2 ) / 10 );
+
+        $unit = floor(log($bytes, 2) / 10);
         if ($unit == 0)
             $decimals = 0;
-        return number_format ( $bytes / pow ( 1024, $unit ), $decimals ) . ' ' . $units [$unit];
+        return number_format($bytes / pow(1024, $unit), $decimals) . ' ' . $units [$unit];
     }
 }

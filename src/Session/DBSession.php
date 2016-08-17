@@ -130,9 +130,12 @@ final class DBSession extends DBManager
 //        $security = new AES();
 //        $decrypt = $security->decrypt($data, $this->key, $this->iv);
 
-        $security = new Security();
-        $data = base64_decode($data);//TODO::특수값이 처리를 위해서
-        $decrypt = $security->decrypt($data, $key);
+//        $security = new Security();
+//        $data = base64_decode($data);//TODO::특수값이 처리를 위해서
+//        $decrypt = $security->decrypt($data, $key);
+
+        $crypt = new Crypt();
+        $decrypt = $crypt->decrypt($data, $key);
 
 //        $this->err($data);
 //        $this->err($decrypt);
@@ -157,8 +160,12 @@ final class DBSession extends DBManager
 //        $security = new AES();
 //        $encrypt = $security->encrypt($data, $this->key, $this->iv);
 
-        $security = new Security();
-        $encrypt = $security->encrypt($data, $key);
+//        $security = new Security();
+//        $encrypt = $security->encrypt($data, $key);
+
+        $crypt = new Crypt();
+        $encrypt = $crypt->encrypt($data, $key);
+
 //        $this->err($data);
 //        $this->err($encrypt);
         $userid = if_empty($_SESSION, 'userid', null);
@@ -168,7 +175,8 @@ final class DBSession extends DBManager
             'address' => $_SERVER ['REMOTE_ADDR'],
             'agent' => $_SERVER ['HTTP_USER_AGENT'],
             'userid' => $userid,
-            'privilege' => base64_encode($encrypt),
+//            'privilege' => base64_encode($encrypt),
+            'privilege' => $encrypt,
             'server' => $_SERVER ['HTTP_HOST'],
             'request' => substr($_SERVER ['REQUEST_URI'], 0, 255),
             'referer' => isset ($_SERVER ['HTTP_REFERER']) ? substr($_SERVER ['HTTP_REFERER'], 0, 255) : '',

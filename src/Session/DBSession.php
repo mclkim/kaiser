@@ -119,11 +119,11 @@ final class DBSession extends DBManager
         $key = $this->getkey($sessionId);
 
         // TODO::sudo php5enmod mcrypt
-        // $crypt = new Crypt ();
-        // $crypt->setComplexTypes ( TRUE );
-        // $crypt->setKey ( $key );
-        // $crypt->setData ( $data );
-        // $decrypted = $crypt->decrypt ();
+        $crypt = new Crypt ();
+        $crypt->setComplexTypes(TRUE);
+        $crypt->setKey($key);
+        $crypt->setData($data);
+        $decrypt = $crypt->decrypt();
 
 //        $crypt = new \Crypt\AES ();
 //        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
@@ -134,8 +134,8 @@ final class DBSession extends DBManager
 //        $data = base64_decode($data);//TODO::특수값이 처리를 위해서
 //        $decrypt = $security->decrypt($data, $key);
 
-        $crypt = new Crypt();
-        $decrypt = $crypt->decrypt($data, $key);
+//        $crypt = new Crypt();
+//        $decrypt = $crypt->decrypt($data, $key);
 
 //        $this->err($data);
 //        $this->err($decrypt);
@@ -149,11 +149,11 @@ final class DBSession extends DBManager
         $key = $this->getkey($sessionId);
 
         // TODO::sudo php5enmod mcrypt
-        // $crypt = new Crypt ();
-        // $crypt->setComplexTypes ( TRUE );
-        // $crypt->setKey ( $key );
-        // $crypt->setData ( $data );
-        // $encrypted = $crypt->encrypt ();
+        $crypt = new Crypt ();
+        $crypt->setComplexTypes(TRUE);
+        $crypt->setKey($key);
+        $crypt->setData($data);
+        $encrypt = $crypt->encrypt();
 
 //        $crypt = new \Crypt\AES ();
 //        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
@@ -163,8 +163,8 @@ final class DBSession extends DBManager
 //        $security = new Security();
 //        $encrypt = $security->encrypt($data, $key);
 
-        $crypt = new Crypt();
-        $encrypt = $crypt->encrypt($data, $key);
+//        $crypt = new Crypt();
+//        $encrypt = $crypt->encrypt($data, $key);
 
 //        $this->err($data);
 //        $this->err($encrypt);

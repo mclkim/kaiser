@@ -1,62 +1,210 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: losys99
- * Date: 2016-08-17
- * Time: 오후 6:07
+ * Crypt PHP
+ *
+ * Provides cryptography functionality, including hashing and symmetric-key encryption
+ *
+ * @package    Crypt
+ * @author       Osman Üngür <osmanungur@gmail.com>
+ * @copyright  2010-2011 Osman Üngür
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version    Version @package_version@
+ * @since      Class available since Version 1.0.0
+ * @link       http://github.com/osmanungur/crypt-php
  */
-
 namespace Kaiser\Session;
-// Define a 32-byte (64 character) hexadecimal encryption key
-// Note: The same encryption key used to encrypt the data must be used to decrypt the data
+
+class Exception extends \Exception
+{
+}
+
 class Crypt
 {
-    private $key = 'd0a7e7997b6d5fcd55f4b5c32611b87cd923e88837b63bf2941ef819dc8ca282';
 
-    function __construct($key)
+    private $data;
+    private $key;
+    private $module;
+    private $complexTypes = false;
+    const HMAC_ALGORITHM = 'sha1';
+    const DELIMITER = '#';
+    const MCRYPT_MODULE = 'rijndael-192';
+    const MCRYPT_MOD = 'cfb';
+    const PREFIX = 'Crypt';
+    const MINIMUM_KEY_LENGTH = 8;
+
+    function __construct()
     {
-        if (!empty($key)) {
-            $this->setKey($key);
+        $this->checkEnvironment();
+        $this->setModule(mcrypt_module_open(self::MCRYPT_MODULE, '', self::MCRYPT_MOD, ''));
+    }
+
+    /**
+     * Checks the environment for mcrypt and mcrypt module
+     *
+     * @return void
+     * @author Osman Üngür
+     */
+    private function checkEnvironment()
+    {
+        if ((!extension_loaded('mcrypt')) || (!function_exists('mcrypt_module_open'))) {
+            throw new Exception('The PHP mcrypt extension must be installed for encryption', 1);
+        }
+        if (!in_array(self::MCRYPT_MODULE, mcrypt_list_algorithms())) {
+            throw new Exception("The cipher used self::MCRYPT_MODULE does not appear to be supported by the installed version of libmcrypt", 1);
         }
     }
 
-    public function encrypt($encrypt)
+    /**
+     * Sets the data for encryption or decryption
+     *
+     * @param mixed $data
+     * @return void
+     * @author Osman Üngür
+     */
+    public function setData($data)
     {
-        $encrypt = serialize($encrypt);
-        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
-        $key = pack('H*', $this->key);
-        $mac = hash_hmac('sha256', $encrypt, substr($this->key, -32));
-        $passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $encrypt . $mac, MCRYPT_MODE_CBC, $iv);
-        $encoded = base64_encode($passcrypt) . '|' . base64_encode($iv);
-        return $encoded;
+        $this->data = $data;
     }
 
-    public function decrypt($decrypt)
-    {
-        $decrypt = explode('|', $decrypt . '|');
-        $decoded = base64_decode($decrypt[0]);
-        $iv = base64_decode($decrypt[1]);
-        if (strlen($iv) !== mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC)) {
-            return false;
-        }
-        $key = pack('H*', $this->key);
-        $decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_CBC, $iv));
-        $mac = substr($decrypted, -64);
-        $decrypted = substr($decrypted, 0, -64);
-        $calcmac = hash_hmac('sha256', $decrypted, substr($this->key, -32));
-        if ($calcmac !== $mac) {
-            return false;
-        }
-        $decrypted = unserialize($decrypted);
-        return $decrypted;
-    }
-
+    /**
+     * Sets the secret key for encryption or decryption, at least 8 character long
+     *
+     * @param string $key
+     * @return void
+     * @author Osman Üngür
+     */
     public function setKey($key)
     {
-        if (ctype_xdigit($key) && strlen($key) === 64) {
-            $this->key = $key;
-        } else {
-            trigger_error('Invalid key. Key must be a 32-byte (64 character) hexadecimal string.', E_USER_ERROR);
+        if (strlen($key) < self::MINIMUM_KEY_LENGTH) {
+            $message = sprintf('The secret key must be a minimum %s character long', self::MINIMUM_KEY_LENGTH);
+            throw new Exception($message, 1);
         }
+        $this->key = $key;
     }
+
+    /**
+     * Sets the mcrypt module
+     *
+     * @param resource $module
+     * @return void
+     * @author Osman Üngür
+     */
+    private function setModule($module)
+    {
+        $this->module = $module;
+    }
+
+    /**
+     * Sets using complex data types like arrays and objects for serialization
+     *
+     * @param bool $complexTypes
+     * @return void
+     * @author Osman Üngür
+     */
+    public function setComplexTypes($complexTypes)
+    {
+        $this->complexTypes = $complexTypes;
+    }
+
+    /**
+     * Returns the encrypted or decrypted data
+     *
+     * @return mixed
+     * @author Osman Üngür
+     */
+    private function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Returns the secret key for encryption
+     *
+     * @return string
+     * @author Osman Üngür
+     */
+    private function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * Returns the mcrypt module resource
+     *
+     * @return resource
+     * @author Osman Üngür
+     */
+    private function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * Returns true if using complex data types like arrays and objects declared
+     *
+     * @return bool
+     * @author Osman Üngür
+     */
+    private function getComplexTypes()
+    {
+        return $this->complexTypes;
+    }
+
+    /**
+     * Encrypts the given data using symmetric-key encryption
+     *
+     * @return string
+     * @author Osman Üngür
+     */
+    public function encrypt()
+    {
+        mt_srand();
+        $init_vector = mcrypt_create_iv(mcrypt_enc_get_iv_size($this->getModule()), MCRYPT_RAND);
+        $key = substr(sha1($this->getKey()), 0, mcrypt_enc_get_key_size($this->getModule()));
+        mcrypt_generic_init($this->getModule(), $key, $init_vector);
+        if ($this->getComplexTypes()) {
+            $this->setData(serialize($this->getData()));
+        }
+        $cipher = mcrypt_generic($this->getModule(), $this->getData());
+        $hmac = hash_hmac(self::HMAC_ALGORITHM, $init_vector . self::DELIMITER . $cipher, $this->getKey());
+        $encoded_init_vector = base64_encode($init_vector);
+        $encoded_cipher = base64_encode($cipher);
+        return self::PREFIX . self::DELIMITER . $encoded_init_vector . self::DELIMITER . $encoded_cipher . self::DELIMITER . $hmac;
+    }
+
+    /**
+     * Decrypts encrypted cipher using symmetric-key encryption
+     *
+     * @return mixed
+     * @author Osman Üngür
+     */
+    public function decrypt()
+    {
+        $elements = explode(self::DELIMITER, $this->getData());
+        if (count($elements) != 4 || $elements[0] != self::PREFIX) {
+            $message = sprintf('The given data does not appear to be encrypted with %s', __CLASS__);
+            throw new Exception($message, 1);
+        }
+        $init_vector = base64_decode($elements[1]);
+        $cipher = base64_decode($elements[2]);
+        $given_hmac = $elements[3];
+        $hmac = hash_hmac(self::HMAC_ALGORITHM, $init_vector . self::DELIMITER . $cipher, $this->getKey());
+        if ($given_hmac != $hmac) {
+            throw new Exception('The given data appears tampered or corrupted', 1);
+        }
+        $key = substr(sha1($this->getKey()), 0, mcrypt_enc_get_key_size($this->getModule()));
+        mcrypt_generic_init($this->getModule(), $key, $init_vector);
+        $result = mdecrypt_generic($this->getModule(), $cipher);
+        if ($this->getComplexTypes()) {
+            return unserialize($result);
+        }
+        return $result;
+    }
+
+    public function __destruct()
+    {
+        @mcrypt_generic_deinit($this->getModule());
+        mcrypt_module_close($this->getModule());
+    }
+
 }

@@ -73,6 +73,7 @@ final class FileSession
     {
         $data = ( string )@file_get_contents("$this->savePath/sess_$sessionId");
         $key = $this->getkey($sessionId);
+        $this->err($key);
 
         // TODO::sudo php5enmod mcrypt
 //        $crypt = new Crypt ();
@@ -97,13 +98,14 @@ final class FileSession
 
     protected function err($message, array $context = array())
     {
-//        logger()->error($message, $context);
+        logger()->error($message, $context);
     }
 
     function write($sessionId, $data)
     {
         // Get unique key
         $key = $this->getkey($sessionId);
+        $this->err($key);
 
         // TODO::sudo php5enmod mcrypt
 //        $crypt = new Crypt ();
@@ -151,6 +153,6 @@ final class FileSession
 
     private function getkey($sessionId)
     {
-        return substr($sessionId, 64);
+        return substr(hash('sha512', $sessionId), 0, 64);
     }
 }

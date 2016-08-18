@@ -118,7 +118,7 @@ final class DBSession extends DBManager
 
         $key = $this->getkey($sessionId);
 //        $this->err($key);
-        
+
         // TODO::sudo php5enmod mcrypt
 //        $crypt = new Crypt ();
 //        $crypt->setComplexTypes(TRUE);
@@ -229,7 +229,7 @@ final class DBSession extends DBManager
         } else {
             // return hash ( 'sha512', uniqid ( mt_rand ( 1, mt_getrandmax () ), true ) );
 //            return hash('sha512', uniqid(mt_rand(1, 32), true));
-            return substr(hash('sha512', uniqid(mt_rand(1, 32), true)), 64);
+            return substr(hash('sha512', uniqid(mt_rand(1, 32), true)), 0, 64);
         }
     }
 }

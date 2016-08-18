@@ -75,11 +75,11 @@ final class FileSession
         $key = $this->getkey($sessionId);
 
         // TODO::sudo php5enmod mcrypt
-        $crypt = new Crypt ();
-        $crypt->setComplexTypes(TRUE);
-        $crypt->setKey($key);
-        $crypt->setData($data);
-        $decrypt = $crypt->decrypt();
+//        $crypt = new Crypt ();
+//        $crypt->setComplexTypes(TRUE);
+//        $crypt->setKey($key);
+//        $crypt->setData($data);
+//        $decrypt = $crypt->decrypt();
 
 //        $crypt = new \Crypt\AES ();
 //        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
@@ -87,8 +87,8 @@ final class FileSession
 //        $security = new Security();
 //        $decrypt = $security->decrypt($data, $key);
 
-//        $crypt = new Crypt();
-//        $decrypt = $crypt->decrypt($data, $key);
+        $crypt = new MCrypt($key);
+        $decrypt = $crypt->decrypt($data);
 
         $this->err($data);
         $this->err($decrypt);
@@ -106,11 +106,11 @@ final class FileSession
         $key = $this->getkey($sessionId);
 
         // TODO::sudo php5enmod mcrypt
-        $crypt = new Crypt ();
-        $crypt->setComplexTypes(TRUE);
-        $crypt->setKey($key);
-        $crypt->setData($data);
-        $encrypt = $crypt->encrypt();
+//        $crypt = new Crypt ();
+//        $crypt->setComplexTypes(TRUE);
+//        $crypt->setKey($key);
+//        $crypt->setData($data);
+//        $encrypt = $crypt->encrypt();
 
 //        $crypt = new \Crypt\AES ();
 //        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
@@ -118,8 +118,8 @@ final class FileSession
 //        $security = new Security();
 //        $encrypt = $security->encrypt($data, $key);
 
-//        $crypt = new Crypt();
-//        $encrypt = $crypt->encrypt($data, $key);
+        $crypt = new MCrypt($key);
+        $encrypt = $crypt->encrypt($data);
 
         $this->err($data);
         $this->err($encrypt);
@@ -151,6 +151,6 @@ final class FileSession
 
     private function getkey($sessionId)
     {
-        return $sessionId;
+        return substr($sessionId, 64);
     }
 }

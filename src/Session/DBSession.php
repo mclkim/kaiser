@@ -117,13 +117,14 @@ final class DBSession extends DBManager
         ));
 
         $key = $this->getkey($sessionId);
-
+//        $this->err($key);
+        
         // TODO::sudo php5enmod mcrypt
-        $crypt = new Crypt ();
-        $crypt->setComplexTypes(TRUE);
-        $crypt->setKey($key);
-        $crypt->setData($data);
-        $decrypt = $crypt->decrypt();
+//        $crypt = new Crypt ();
+//        $crypt->setComplexTypes(TRUE);
+//        $crypt->setKey($key);
+//        $crypt->setData($data);
+//        $decrypt = $crypt->decrypt();
 
 //        $crypt = new \Crypt\AES ();
 //        $decrypt = $crypt->decrypt($data, $this->key, $this->iv);
@@ -134,8 +135,8 @@ final class DBSession extends DBManager
 //        $data = base64_decode($data);//TODO::특수값이 처리를 위해서
 //        $decrypt = $security->decrypt($data, $key);
 
-//        $crypt = new Crypt();
-//        $decrypt = $crypt->decrypt($data, $key);
+        $crypt = new MCrypt($key);
+        $decrypt = $crypt->decrypt($data);
 
 //        $this->err($data);
 //        $this->err($decrypt);
@@ -147,13 +148,14 @@ final class DBSession extends DBManager
         $meet_again_baby = 900;
 
         $key = $this->getkey($sessionId);
+//        $this->err($key);
 
         // TODO::sudo php5enmod mcrypt
-        $crypt = new Crypt ();
-        $crypt->setComplexTypes(TRUE);
-        $crypt->setKey($key);
-        $crypt->setData($data);
-        $encrypt = $crypt->encrypt();
+//        $crypt = new Crypt ();
+//        $crypt->setComplexTypes(TRUE);
+//        $crypt->setKey($key);
+//        $crypt->setData($data);
+//        $encrypt = $crypt->encrypt();
 
 //        $crypt = new \Crypt\AES ();
 //        $encrypt = $crypt->encrypt($data, $this->key, $this->iv);
@@ -163,8 +165,8 @@ final class DBSession extends DBManager
 //        $security = new Security();
 //        $encrypt = $security->encrypt($data, $key);
 
-//        $crypt = new Crypt();
-//        $encrypt = $crypt->encrypt($data, $key);
+        $crypt = new MCrypt($key);
+        $encrypt = $crypt->encrypt($data);
 
 //        $this->err($data);
 //        $this->err($encrypt);
@@ -175,7 +177,6 @@ final class DBSession extends DBManager
             'address' => $_SERVER ['REMOTE_ADDR'],
             'agent' => $_SERVER ['HTTP_USER_AGENT'],
             'userid' => $userid,
-//            'privilege' => base64_encode($encrypt),
             'privilege' => $encrypt,
             'server' => $_SERVER ['HTTP_HOST'],
             'request' => substr($_SERVER ['REQUEST_URI'], 0, 255),
@@ -227,7 +228,9 @@ final class DBSession extends DBManager
             return $res;
         } else {
             // return hash ( 'sha512', uniqid ( mt_rand ( 1, mt_getrandmax () ), true ) );
-            return hash('sha512', uniqid(mt_rand(1, 32), true));
+//            return hash('sha512', uniqid(mt_rand(1, 32), true));
+            return substr(hash('sha512', uniqid(mt_rand(1, 32), true)), 64);
         }
     }
 }
+

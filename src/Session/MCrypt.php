@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: losys99
- * Date: 2016-08-18
- * Time: 오전 10:18
+ * http://stackoverflow.com/questions/26030613/mcrypt-encryption-using-php
+ * https://gist.github.com/joshhartman/5383582
+ * https://gist.github.com/joshhartman/10342187
  */
 
 namespace Kaiser\Session;

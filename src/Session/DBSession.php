@@ -227,10 +227,7 @@ final class DBSession extends DBManager
         if ($res) {
             return $res;
         } else {
-            // return hash ( 'sha512', uniqid ( mt_rand ( 1, mt_getrandmax () ), true ) );
-//            return hash('sha512', uniqid(mt_rand(1, 32), true));
             return substr(hash('sha512', uniqid(mt_rand(1, 32), true)), 0, 64);
         }
     }
 }
-

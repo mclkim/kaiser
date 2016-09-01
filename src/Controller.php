@@ -7,7 +7,7 @@ class Controller extends BaseController
     protected $user;
     var $_defaultPage = '?';
     var $_loginPage = '?login';
-    var $_loginAdminPage = '?login.admin';
+    var $_loginAdminPage = '?signin';
     var $_admin = 'admin';
     var $_user = 'user';
 

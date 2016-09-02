@@ -7,7 +7,7 @@ class Controller extends BaseController
     protected $user;
     var $_defaultPage = '?';
     var $_loginPage = '?login';
-    var $_loginAdminPage = '?signin';
+    var $_loginAdminPage = '?login.admin';
     var $_admin = 'admin';
     var $_user = 'user';
 
@@ -180,7 +180,7 @@ class Controller extends BaseController
         return true;
     }
 
-    protected function alertRedirect($msg, $redirect, $charset = 'utf-8')
+    protected function alertRedirect($msg, $redirect = null, $charset = 'utf-8')
     {
         if (!$redirect) {
             echo <<<END

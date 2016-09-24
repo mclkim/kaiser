@@ -43,6 +43,11 @@ class DBManager
         logger()->error($message, $context);
     }
 
+    function version()
+    {
+        return $this->executePreparedQueryToMapList('select version()');
+    }
+
     public function quote($string, $type = \PDO::PARAM_STR)
     {
         return $this->pdo->quote($string, $type);

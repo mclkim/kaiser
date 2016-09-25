@@ -73,7 +73,7 @@ final class FileSession
     {
         $data = ( string )@file_get_contents("$this->savePath/sess_$sessionId");
         $key = $this->getkey($sessionId);
-        $this->err($key);
+//        $this->err($key);
 
         // TODO::sudo php5enmod mcrypt
 //        $crypt = new Crypt ();
@@ -91,8 +91,8 @@ final class FileSession
         $crypt = new MCrypt($key);
         $decrypt = $crypt->decrypt($data);
 
-        $this->err($data);
-        $this->err($decrypt);
+//        $this->err($data);
+//        $this->err($decrypt);
         return $decrypt;
     }
 
@@ -105,7 +105,7 @@ final class FileSession
     {
         // Get unique key
         $key = $this->getkey($sessionId);
-        $this->err($key);
+//        $this->err($key);
 
         // TODO::sudo php5enmod mcrypt
 //        $crypt = new Crypt ();
@@ -123,8 +123,8 @@ final class FileSession
         $crypt = new MCrypt($key);
         $encrypt = $crypt->encrypt($data);
 
-        $this->err($data);
-        $this->err($encrypt);
+//        $this->err($data);
+//        $this->err($encrypt);
         return file_put_contents("$this->savePath/sess_$sessionId", $encrypt) === false ? false : true;
     }
 

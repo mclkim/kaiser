@@ -2,7 +2,7 @@
 
 namespace Kaiser;
 
-// use \Kaiser\Exception\ApplicationException;
+// use Kaiser\Exception\ApplicationException;
 
 class BaseController extends Singleton
 {

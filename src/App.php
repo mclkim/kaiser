@@ -2,8 +2,8 @@
 
 namespace Kaiser;
 
-use \Kaiser\Exception\ApplicationException;
-use \Kaiser\Exception\AjaxException;
+use Kaiser\Exception\ApplicationException;
+use Kaiser\Exception\AjaxException;
 
 class App extends Controller
 {

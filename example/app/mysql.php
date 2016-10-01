@@ -1,5 +1,5 @@
 <?php
-use \Kaiser\Controller;
+use Kaiser\Controller;
 
 /**
  * http://localhost/test/public/?mysql

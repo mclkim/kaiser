@@ -29,7 +29,7 @@ $app->run ();
 <Application Folder>/public/app/index.php
 ``` public/app/index.php
 <?php
-use \Kaiser\Controller;
+use Kaiser\Controller;
 /**
  * http://localhost/<Application Folder>/public/?index
  */
@@ -46,7 +46,7 @@ class index extends Controller {
 <Application Folder>/public/app/hello.php
 ``` public/app/hello.php
 <?php
-use \Kaiser\Controller;
+use Kaiser\Controller;
 /**
  * http://localhost/<Application Folder>/public/?hello.world
  */

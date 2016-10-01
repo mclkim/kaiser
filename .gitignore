@@ -6,4 +6,4 @@ composer.lock
 log/**
 logs/**
 tmp/**
-vendor
+vendor/**

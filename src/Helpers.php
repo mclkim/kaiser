@@ -81,3 +81,12 @@ if (!function_exists('bytesize')) {
         return number_format($bytes / pow(1024, $unit), $decimals) . ' ' . $units [$unit];
     }
 }
+if (!function_exists('get_class_name')) {
+    function get_class_name($classname)
+    {
+//        if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
+//        return $pos;
+        $path = explode('\\', $classname);
+        return array_pop($path);
+    }
+}

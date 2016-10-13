@@ -11,7 +11,7 @@ class Singleton
 
     public function __construct()
     {
-        $c = get_class($this);
+        $c = get_class_name(__CLASS__);
         if (isset (self::$instances [$c])) {
             throw new \Exception ('You can not create more than one copy of a singleton.');
         } else {

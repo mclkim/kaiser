@@ -16,7 +16,7 @@ class App extends Controller
     function __construct($container = [])
     {
         parent::__construct($container);
-        $this->info(sprintf('The Class "%s" Initialized ', get_class_name(__CLASS__)));
+        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
          */
@@ -29,8 +29,8 @@ class App extends Controller
          * 타임스템프를 기록한 시간 차이를 계산하여 출력한다.
          */
 //        $this->info("The Class total memory used: " . number_format(memory_get_peak_usage()));
-        // $this->info(sprintf('The Class "%s" total execution time: ', get_class_name(__CLASS__)) . $this->timestamp->fetch());
-        $this->info(sprintf('The Class "%s" total execution time: ', get_class_name(__CLASS__)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
+        // $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch());
+        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
     }
 
     public function version()

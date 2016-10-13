@@ -19,7 +19,7 @@ class DBManager
     function __construct($pdo = null)
     {
         $this->pdo = $pdo;
-//        $this->debug(sprintf('DBManager Class "%s" Initialized ', get_class_name(__CLASS__)));
+//        $this->debug(sprintf('DBManager Class "%s" Initialized ', get_class($this)));
     }
 
     function __destruct()

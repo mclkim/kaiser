@@ -73,10 +73,15 @@ class DBPageManager extends DBManager
     {
         $realquery = $this->executeEmulateQuery($sql, $params);
         // TODO::다른좋은방법으로
-        $sql = 'select count(*)' . $this->stristr($this->stristr($realquery, ' from '), 'order by', true);
+        // $sql = 'select count(*)' . $this->stristr($this->stristr($realquery, ' from '), 'order by', true);
+
         // TODO::mysql 5 이상이면 서브쿼리가 지원되는 가능할것 같기도 하고
-        $sql = 'select count(1) from (' . PHP_EOL . $realquery . PHP_EOL . ') t1';
-        // $this->info($sql);
+        // $sql = 'select count(1) from (' . PHP_EOL . $realquery . PHP_EOL . ') t1';
+
+        // TODO:: 위 방법으로 하면 아래와 같은 에러가 발생함.
+        // SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'created_on'
+        $sql = 'select count(1) from (select 1 ' . PHP_EOL . $this->stristr($realquery, ' from ') . PHP_EOL . ') T1';
+
         /**
          * TODO::다른좋은방법으로
          * SELECT SQL_CALC_FOUND_ROWS * FROM host_tb LIMIT 1;

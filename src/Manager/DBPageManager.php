@@ -72,6 +72,7 @@ class DBPageManager extends DBManager
     protected function getNumRowCount($sql, $params = array())
     {
         $realquery = $this->executeEmulateQuery($sql, $params);
+
         // TODO::다른좋은방법으로
         // $sql = 'select count(*)' . $this->stristr($this->stristr($realquery, ' from '), 'order by', true);
 
@@ -80,7 +81,8 @@ class DBPageManager extends DBManager
 
         // TODO:: 위 방법으로 하면 아래와 같은 에러가 발생함.
         // SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'created_on'
-        $sql = 'select count(1) from (select 1 ' . PHP_EOL . $this->stristr($realquery, ' from ') . PHP_EOL . ') T1';
+        // SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'speci_no' in order clause is ambiguous
+        $sql = 'select count(1) from (select 1 ' . PHP_EOL . $this->stristr($this->stristr($realquery, ' from '), 'order by', true) . PHP_EOL . ') T1';
 
         /**
          * TODO::다른좋은방법으로

@@ -82,7 +82,7 @@ class DBPageManager extends DBManager
         // TODO:: 위 방법으로 하면 아래와 같은 에러가 발생함.
         // SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'created_on'
         // SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'speci_no' in order clause is ambiguous
-        $sql = 'select count(1) from (select 1 ' . PHP_EOL . $this->stristr($this->stristr($realquery, ' from '), 'order by', true) . PHP_EOL . ') T1';
+        $sql = 'select count(1) from (select 1 ' . PHP_EOL . $this->stristr($this->stristr($realquery, 'from '), 'order by ', true) . PHP_EOL . ') T1';
 
         /**
          * TODO::다른좋은방법으로
@@ -95,7 +95,7 @@ class DBPageManager extends DBManager
     private function stristr($haystack, $needle, $before_needle = FALSE)
     {
         if (($pos = strpos(strtolower($haystack), strtolower($needle))) === FALSE)
-            return FALSE;
+            return $haystack;
 
         if ($before_needle)
             return substr($haystack, 0, $pos);

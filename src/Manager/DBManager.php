@@ -247,6 +247,54 @@ class DBManager
         if (count($table_fields) == 0) {
             return false;
         }
+
+        $fields = [];
+        $values = [];
+        $qs  = [];
+        
+        foreach ($table_fields as $field => $value) {
+            $qs[] = '?';
+            $fields [] = $field;
+            $values [] = $value;
+        }
+
+        switch ($mode) {
+            case self::DB_AUTO_INSERT :
+                $fields = implode(',', $fields);
+                $qs = implode(',', $qs);
+                $query = "INSERT INTO $table ($fields) VALUES ($qs)";
+                return array(
+                    'query' => $query,
+                    'params' => $values
+                );
+            case self::DB_AUTO_UPDATE :
+                $set = implode('=?,', $fields) . '=?';
+                $query = "UPDATE $table SET $set";
+                if ($where) {
+                    $query .= " WHERE $where";
+                }
+                return array(
+                    'query' => $query,
+                    'params' => $values
+                );
+            case self::DB_AUTO_REPLACE :
+                $fields = implode(',', $fields);
+                $qs = implode(',', $qs);
+                $query = "REPLACE INTO $table ($fields) VALUES ($qs)";
+                return array(
+                    'query' => $query,
+                    'params' => $values
+                );
+            default :
+                return false;
+        }
+    }
+
+    private function _buildManipSQL_($table, $table_fields, $mode, $where = false)
+    {
+        if (count($table_fields) == 0) {
+            return false;
+        }
         $first = true;
         $params = array();
         switch ($mode) {

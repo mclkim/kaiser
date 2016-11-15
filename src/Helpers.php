@@ -90,3 +90,10 @@ if (!function_exists('get_class_name')) {
         return array_pop($path);
     }
 }
+if (!function_exists('get_digit')) {
+    function get_digit($str)
+    {
+        return $num = preg_replace("/[^0-9]*/s", "", $str);
+    }
+}
+

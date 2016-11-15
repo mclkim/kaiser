@@ -30,6 +30,32 @@ final class hashPassword
         }
     }
 
+    function create_password($password, $salt)
+    {
+        return base64_encode($this->pbkdf2(
+            PBKDF2_HASH_ALGORITHM,
+            $password,
+            $salt,
+            PBKDF2_ITERATIONS,
+            PBKDF2_HASH_BYTES
+        ));
+    }
+
+    function validate_password($password, $hash, $salt)
+    {
+        $pbkdf2 = base64_decode($hash);
+        return $this->slow_equals(
+            $pbkdf2,
+            $this->pbkdf2(
+                PBKDF2_HASH_ALGORITHM,
+                $password,
+                $salt,
+                PBKDF2_ITERATIONS,
+                PBKDF2_HASH_BYTES
+            )
+        );
+    }
+
     function create_hash($password, $salt)
     {
         // format: algorithm:iterations:salt:hash
@@ -44,7 +70,7 @@ final class hashPassword
         ));
     }
 
-    function validate_password($password, $good_hash)
+    function validate_hash($password, $good_hash)
     {
         $params = explode(":", $good_hash);
         if (count($params) < HASH_SECTIONS)
@@ -121,7 +147,11 @@ final class hashPassword
 
 //test sample
 //$hp = new hashPassword();
-//$salt = $hp->create_salt();
+//var_dump($salt = $hp->create_salt());
 //var_dump($good_hash = $hp->create_hash('hello world', $salt));
-//var_dump($res = $hp->validate_password('hello world!', $good_hash));
+//var_dump($res = $hp->validate_hash('hello world!', $good_hash));
+
+//var_dump($salt = $hp->create_salt());
+//var_dump($good_hash = $hp->create_password('hello world', $salt));
+//var_dump($res = $hp->validate_password('hello world', $good_hash, $salt));
 ?>

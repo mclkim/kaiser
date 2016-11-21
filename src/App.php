@@ -207,9 +207,15 @@ class App extends Controller
              *
              * TODO::다른 방법이 있을 것 같은데~
              */
-            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+            $request_query = $this->router()->getQueryString();
+//            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $request_query);
             $return_uri = $callable [0]->getParameter('returnURI', $request_uri);
-            $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+            $redirect = '?' . implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+//            logger($request_query);
+//            logger($request_uri);
+//            logger($return_uri);
+//            logger($redirect);
 
             if (!$this->checkAdmin($callable [0])) {
                 if ($this->ajax()) {

@@ -170,8 +170,10 @@ final class DBSession extends DBManager
 
 //        $this->err($data);
 //        $this->err($encrypt);
-        $userid = if_empty($_SESSION, 'userid', null);
-//        $userid = if_exists($_SESSION['admin'], 'id', if_exists($_SESSION['user'], 'id', null));
+//        $userid = if_empty($_SESSION, 'userid', null);
+        $admin = if_exists($_SESSION, 'admin', null);
+        $user = if_exists($_SESSION, 'user', null);
+        $userid = if_exists($admin, 'login', if_exists($user, 'login', null));
 
         $data = array(
             'id' => $sessionId,

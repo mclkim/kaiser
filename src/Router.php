@@ -41,7 +41,7 @@ class Router extends Singleton
         $this->query = $query;
     }
 
-    protected function getQueryString()
+    public function getQueryString()
     {
         if ($this->query)
             return $this->query;

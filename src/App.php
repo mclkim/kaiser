@@ -7,15 +7,17 @@ use Kaiser\Exception\AjaxException;
 
 class App extends Controller
 {
-    const VERSION = '2016-08-08';
-    // 타임 스템프
-    protected $timestamp = null;
+    const VERSION = '2016-11-30';
+    var $timestamp = null;
     static $AppDirectory;
     static $basePath;
 
     function __construct($container = [])
     {
         parent::__construct($container);
+        /**
+         * 시작을 로그파일에 기록한다.
+         */
         $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
@@ -26,10 +28,9 @@ class App extends Controller
     function __destruct()
     {
         /**
-         * 타임스템프를 기록한 시간 차이를 계산하여 출력한다.
+         * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
+         * 사용한 메모리를 기록한다.
          */
-//        $this->info("The Class total memory used: " . number_format(memory_get_peak_usage()));
-        // $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch());
         $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
     }
 
@@ -110,18 +111,20 @@ class App extends Controller
          * Execute AJAX event
          */
         if (($ajaxResponse = $this->execAjaxHandler()) != null) {
+            //$this->debug('hello #2');
             //$this->debug($ajaxResponse);
             return $ajaxResponse;
         }
-        //$this->debug('hello #2');
+        //$this->debug('hello #3');
         /**
          * Execute page action
          */
         $result = $this->execPageAction();
-        //$this->debug('hello #3');
+        //$this->debug('hello #4');
         if (!is_string($result)) {
             return $result;
         }
+        //$this->debug('hello #5');
     }
 
     protected
@@ -163,8 +166,8 @@ class App extends Controller
             $responseContents = [];
 
             /**
-             * If the handler returned an array, we should add it to output for rendering.
-             * If it is a string, add it to the array with the key "result".
+             * 핸들러가 배열을 반환 한 경우 렌더링을 위해 출력에 추가해야 합니다.
+             * 문자열 인 경우 키 "result"를 사용하여 배열에 추가합니다.
              */
             if (is_array($result)) {
                 $responseContents = array_merge($responseContents, $result);
@@ -204,8 +207,7 @@ class App extends Controller
             /**
              * Not logged in, redirect to login screen or show ajax error.
              * 로그인 여부를 체크 할 페이지 인지 확인한다.
-             *
-             * TODO::다른 방법이 있을 것 같은데~
+             * TODO::다른 좋은 방법이 있을 것 같은데~
              */
             $request_query = $this->router()->getQueryString();
 //            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
@@ -258,6 +260,7 @@ class App extends Controller
             $rout = $this->router();
 
             if ($handler = $this->getPostHandler()) {
+                //$this->debug('hello #10');
                 $rout->setQuery($handler);
             }
 
@@ -315,11 +318,13 @@ class App extends Controller
 
         /**
          * Workaround: Composer does not support case insensitivity.
+         * TODO::2016-12-02 unix 시스템에서 파일이름의 대소문자 구별한다.
          */
         if (!class_exists($controller)) {
             $controller = self::normalizeClassName($controller);
             foreach ($directory as $inPath) {
-                $controllerFile = $inPath . strtolower(str_replace('\\', '/', $controller)) . '.php';
+//                $controllerFile = $inPath . strtolower(str_replace('\\', '/', $controller)) . '.php';
+                $controllerFile = $inPath . str_replace('\\', '/', $controller) . '.php';
                 if (file_exists($controllerFile)) {
                     include_once($controllerFile);
                     break;

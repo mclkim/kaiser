@@ -61,12 +61,12 @@ class DBPageManager extends DBManager
 
     public function setPage($page)
     {
-        $this->current_page = $page;
+        $this->current_page = ($page > 0) ? $page : 1;
     }
 
     public function setLimit($limit)
     {
-        $this->items_per_page = $limit;
+        $this->items_per_page = ($limit > 0) ? $limit : 10;
     }
 
     protected function getNumRowCount($sql, $params = array())

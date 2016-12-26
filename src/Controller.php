@@ -68,7 +68,7 @@ class Controller extends BaseController
         return $this->response()->redirect($redirect);
     }
 
-    protected function info($message = null, array $context = array())
+    function info($message = null, array $context = array())
     {
         $this->logger()->info($message, $context);
     }

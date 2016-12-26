@@ -7,7 +7,7 @@ use Kaiser\Exception\AjaxException;
 
 class App extends Controller
 {
-    const VERSION = '2016-11-30';
+    const VERSION = '2016-12-26';
     var $timestamp = null;
     static $AppDirectory;
     static $basePath;
@@ -18,6 +18,27 @@ class App extends Controller
         /**
          * 시작을 로그파일에 기록한다.
          */
+//        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
+        /**
+         * 타임스템프를 기록..
+         */
+//        $this->timestamp = new \Kaiser\Timer ();
+    }
+
+    function __destruct()
+    {
+        /**
+         * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
+         * 사용한 메모리를 기록한다.
+         */
+//        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
+    }
+
+    public function start()
+    {
+        /**
+         * 시작을 로그파일에 기록한다.
+         */
         $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
@@ -25,7 +46,7 @@ class App extends Controller
         $this->timestamp = new \Kaiser\Timer ();
     }
 
-    function __destruct()
+    public function end()
     {
         /**
          * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.

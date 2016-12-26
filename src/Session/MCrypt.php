@@ -7,6 +7,7 @@
 
 namespace Kaiser\Session;
 
+
 class MCrypt
 {
     private $key = 'd0a7e7997b6d5fcd55f4b5c32611b87cd923e88837b63bf2941ef819dc8ca282';
@@ -16,6 +17,17 @@ class MCrypt
         if (!empty($key)) {
             $this->setKey($key);
         }
+    }
+
+    public function getKey($length = 32)
+    {
+        if (function_exists('mcrypt_create_iv')) {
+            return bin2hex(mcrypt_create_iv($length, MCRYPT_DEV_URANDOM));
+        } else {
+            return bin2hex(openssl_random_pseudo_bytes($length));
+        }
+
+//        return $randkey = substr(str_shuffle(md5(time())), 0, $bit_length);
     }
 
     public function encrypt($encrypt)

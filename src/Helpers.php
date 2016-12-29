@@ -60,6 +60,13 @@ if (!function_exists('if_empty')) {
  * 기타함수
  * ---------------------------------------------------------------
  */
+if (!function_exists('file_size')) {
+    function file_size($size)
+    {
+        $filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
+        return $size ? round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
+    }
+}
 if (!function_exists('bytesize')) {
     function bytesize($bytes, $decimals = 0)
     {

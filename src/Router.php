@@ -109,16 +109,19 @@ class Router extends Singleton
             'SSL' => 'ON'
         );
 
-        $protocol = 'https://';
+//        $protocol = 'https://';
+        $protocol = false;
+//        $protocol = 'https://';
         foreach ($https as $q => $w) {
             if (strtoupper($_SERVER[$q]) === $w) {
-                $protocol = false;
+                $protocol = 'https://';
                 break;
             }
         }
-
+//        var_dump($protocol);
+//        exit;
         if ($ssl === true) {
-            $protocol = (false === $protocol) ? 'http://' : false;
+            $protocol = (false === $protocol) ? 'https://' : false;
         }
 
         if (false !== $protocol) {

@@ -97,8 +97,19 @@ class Router extends Singleton
         return sprintf($tmplt, $http, $host, $port, $path);
     }
 
+    function getRequestProtocol()
+    {
+        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']))
+            return $_SERVER['HTTP_X_FORWARDED_PROTO'];
+        else
+            return !empty($_SERVER['HTTPS']) ? "https" : "http";
+    }
+
     /**
-     * HTTP 로 접속한 사용자를 HTTPS 로 redirect 시키거나 HTTPS 로 접속한 사용자를 HTTP 로 redirect 처리하는 함수입니다.
+     * HTTP 로 접속한 사용자를 HTTPS 로 redirect 시키거나
+     * https_redirect();
+     * HTTPS 로 접속한 사용자를 HTTP 로 redirect 처리하는 함수입니다.
+     * https_redirect(true);
      */
     function https_redirect($ssl = false)
     {
@@ -109,25 +120,21 @@ class Router extends Singleton
             'SSL' => 'ON'
         );
 
-//        $protocol = 'https://';
-        $protocol = false;
-//        $protocol = 'https://';
+        $protocol = 'https://';
         foreach ($https as $q => $w) {
             if (strtoupper($_SERVER[$q]) === $w) {
-                $protocol = 'https://';
+                $protocol = false;
                 break;
             }
         }
-//        var_dump($protocol);
-//        exit;
+
         if ($ssl === true) {
-            $protocol = (false === $protocol) ? 'https://' : false;
+            $protocol = (false === $protocol) ? 'http://' : false;
         }
 
         if (false !== $protocol) {
             header('HTTP/1.0 301 Moved Permanently');
-            header('Location: ' . $protocol .
-                $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+            header('Location: ' . $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
             die();
         }
     }

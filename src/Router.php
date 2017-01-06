@@ -97,6 +97,38 @@ class Router extends Singleton
         return sprintf($tmplt, $http, $host, $port, $path);
     }
 
+    /**
+     * HTTP 로 접속한 사용자를 HTTPS 로 redirect 시키거나 HTTPS 로 접속한 사용자를 HTTP 로 redirect 처리하는 함수입니다.
+     */
+    function https_redirect($ssl = false)
+    {
+        $https = array(
+            'HTTP_X_FORWARDED_PROTO' => 'HTTPS',
+            'HTTP_X_SSL' => 'ON',
+            'HTTPS' => 'ON',
+            'SSL' => 'ON'
+        );
+
+        $protocol = 'https://';
+        foreach ($https as $q => $w) {
+            if (strtoupper($_SERVER[$q]) === $w) {
+                $protocol = false;
+                break;
+            }
+        }
+
+        if ($ssl === true) {
+            $protocol = (false === $protocol) ? 'http://' : false;
+        }
+
+        if (false !== $protocol) {
+            header('HTTP/1.0 301 Moved Permanently');
+            header('Location: ' . $protocol .
+                $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+            die();
+        }
+    }
+
     public static function baseUrl()
     {
     }

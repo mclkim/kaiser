@@ -44,10 +44,13 @@ class App extends Controller
          * 타임스템프를 기록..
          */
         $this->timestamp = new \Kaiser\Timer ();
+
+        //$this->debug('start');
     }
 
     public function end()
     {
+        //$this->debug('end');
         /**
          * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
          * 사용한 메모리를 기록한다.
@@ -111,6 +114,8 @@ class App extends Controller
         //$this->debug($_FILES);
         //$this->debug('------------------');
 
+        $this->start();
+
         /**
          * TODO::
          * 세션스타트..
@@ -142,10 +147,13 @@ class App extends Controller
          */
         $result = $this->execPageAction();
         //$this->debug('hello #4');
-        if (!is_string($result)) {
+        //$this->debug($result);
+        if (is_string($result)) {
             return $result;
         }
         //$this->debug('hello #5');
+
+        $this->end();
     }
 
     protected

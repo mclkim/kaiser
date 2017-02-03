@@ -122,7 +122,7 @@ class Router extends Singleton
 
         $protocol = 'https://';
         foreach ($https as $q => $w) {
-            if (strtoupper($_SERVER[$q]) === $w) {
+            if (isset($_SERVER[$q]) && strtoupper($_SERVER[$q]) === $w) {
                 $protocol = false;
                 break;
             }

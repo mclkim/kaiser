@@ -88,13 +88,16 @@ class Router extends Singleton
     {
         $http = Request::getInstance()->url(PHP_URL_SCHEME);
         $host = Request::getInstance()->url(PHP_URL_HOST);
-        //TODO::AWS SSL 설정으로 포트 사용 금지(2017.01.06)
-//        $port = Request::getInstance()->url(PHP_URL_PORT);
-        $path = $atRoot ? '' : Request::getInstance()->url(PHP_URL_PATH);
-
+        /**
+         * TODO::AWS SSL 설정으로 포트 사용 금지(2017.01.06)
+         * $port = Request::getInstance()->url(PHP_URL_PORT);
+         */
+        $port = false;
+        $path = Request::getInstance()->url(PHP_URL_PATH);
+        $path = $atRoot ? '' : trim($path, '/');
         $tmplt = $port ? ($path ? "%s://%s:%d%s" : "%s://%s:%d") : ($path ? "%s://%s/%s" : "%s://%s");
 
-        return sprintf($tmplt, $http, $host, $port, $path);
+        return $port ? sprintf($tmplt, $http, $host, $port, $path) : sprintf($tmplt, $http, $host, $path);
     }
 
     function getRequestProtocol()

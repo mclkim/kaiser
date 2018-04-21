@@ -1,61 +1,25 @@
-# kaiser
+#kaiser
 Kaiser PHP framework
 
-Installation
-------------
+##Description
 
+##Prerequisites
+1.Composer
+
+##Install
 ```
-composer require mclkim/kaiser=dev-master
-```
-
-Testing
--------
-
-<Application Folder>/public/index.php
-
-``` public/index.php
-<?php
-require __DIR__ . '/../vendor/autoload.php';
-
-$app = new Kaiser\App ();
-
-$app->setAppDir ( [ 
-		__DIR__ . '/../app' 
-] );
-
-$app->run ();
+mkdir homepage
+cd homepage
+composer require mclkim/kaiser
 ```
 
-<Application Folder>/public/app/index.php
-``` public/app/index.php
-<?php
-use Kaiser\Controller;
-/**
- * http://localhost/<Application Folder>/public/?index
- */
-class index extends Controller {
-	protected function requireLogin() {
-		return false;
-	}
-	function execute() {
-		echo 'Kaiser PHP framework~~~';
-	}
-}
+##Installing & Local Development
+```
+cp vendor/mclkim/kaiser/example .
+php -S localhost:8000 -t public/
 ```
 
-<Application Folder>/public/app/hello.php
-``` public/app/hello.php
-<?php
-use Kaiser\Controller;
-/**
- * http://localhost/<Application Folder>/public/?hello.world
- */
-class hello extends Controller {
-	protected function requireLogin() {
-		return false;
-	}
-	function world() {
-		echo 'hello world~~~';
-	}
-}
+##Web brower
+```
+http://localhost:8000/?hello
 ```

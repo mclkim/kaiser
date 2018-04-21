@@ -1,25 +1,31 @@
-#kaiser
+kaiser
+=======
 Kaiser PHP framework
 
-##Description
+Description
+-------
 
-##Prerequisites
+Prerequisites
+-------
 1.Composer
 
-##Install
+Install
+-------
 ```
 mkdir homepage
 cd homepage
 composer require mclkim/kaiser
 ```
 
-##Installing & Local Development
+Installing & Local Development
+-------
 ```
 cp vendor/mclkim/kaiser/example .
 php -S localhost:8000 -t public/
 ```
 
-##Web brower
+Web brower
+-------
 ```
 http://localhost:8000/?hello
 ```

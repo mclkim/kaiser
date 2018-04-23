@@ -7,32 +7,11 @@ use Kaiser\Exception\AjaxException;
 
 class App extends Controller
 {
-    const VERSION = '2016-12-26';
+    const VERSION = '2018-04-22';
     var $timestamp = null;
+
     static $AppDirectory;
     static $basePath;
-
-    function __construct($container = [])
-    {
-        parent::__construct($container);
-        /**
-         * 시작을 로그파일에 기록한다.
-         */
-//        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
-        /**
-         * 타임스템프를 기록..
-         */
-//        $this->timestamp = new \Kaiser\Timer ();
-    }
-
-    function __destruct()
-    {
-        /**
-         * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
-         * 사용한 메모리를 기록한다.
-         */
-//        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
-    }
 
     public function start()
     {
@@ -44,13 +23,10 @@ class App extends Controller
          * 타임스템프를 기록..
          */
         $this->timestamp = new \Kaiser\Timer ();
-
-        //$this->debug('start');
     }
 
     public function end()
     {
-        //$this->debug('end');
         /**
          * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
          * 사용한 메모리를 기록한다.

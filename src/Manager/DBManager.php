@@ -19,7 +19,6 @@ class DBManager
     function __construct($pdo = null)
     {
         $this->pdo = $pdo;
-//        $this->debug(sprintf('DBManager Class "%s" Initialized ', get_class($this)));
     }
 
     function __destruct()
@@ -45,7 +44,7 @@ class DBManager
 
     function version()
     {
-        return $this->executePreparedQueryToMapList('select version()');
+        return $this->executePreparedQueryToMap('select version()');
     }
 
     public function quote($string, $type = \PDO::PARAM_STR)

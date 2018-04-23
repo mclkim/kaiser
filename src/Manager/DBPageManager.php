@@ -21,18 +21,18 @@
  * (예시)
  * <code>
  * $page = $this->getParameter ( 'page', 1 );
- * $DB = new DBPageManager ( 'testboard' );
+ * $DBPM = new DBPageManager ( 'testboard' );
  * $query = "select * from board";
- * $DB->setLink ( '?link_url' );
- * $DB->setLimit ( 15 );
- * $DB->setPage ( $page );
- * $boardList = $DB->executePreparedQueryToPageMapList ( $query );
+ * $DBPM->setLink ( '?link_url' );
+ * $DBPM->setLimit ( 15 );
+ * $DBPM->setPage ( $page );
+ * $pageMapList = $DBPM->executePreparedQueryToPageMapList ( $query );
+ *
+ * var_dump($pageMapList)
  * </code>
  */
 namespace Kaiser\Manager;
 
-// require_once 'DBManager.php';
-// require_once 'Pagination.php';
 class DBPageManager extends DBManager
 {
     private $page_in_url; // 페이지 URL

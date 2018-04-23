@@ -3,6 +3,7 @@
 namespace Kaiser;
 
 // use Kaiser\Exception\ApplicationException;
+use Pimple\Container as PimpleContainer;
 
 class BaseController extends Singleton
 {
@@ -11,12 +12,13 @@ class BaseController extends Singleton
     function __construct($container = [])
     {
         if (is_array($container)) {
-            $container = new Container ($container);
+            $container = new PimpleContainer ($container);
         }
+        /*
         if (!$container instanceof ContainerInterface) {
             // exit ( 'Expected a ContainerInterface' );
             throw new \RuntimeException ('Expected a ContainerInterface');
-        }
+        }*/
         $this->container = $container;
     }
 

@@ -2,8 +2,8 @@
 .idea
 .project
 .settings
+phpunit.xml
 composer.lock
-log/**
-logs/**
-tmp/**
-vendor/**
+/vendor/
+/log/
+/tmp/

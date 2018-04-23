@@ -11,7 +11,7 @@ class Router extends Singleton
     protected $param;
 
     /**
-     * 클래스명 앞에 경로(/)가 있을경우를
+     * 클래스명 앞에 경로(/)가 있을 경우
      * 경로명과 클래스명을 분리하여 처리 한다.(2014.02.28)
      * C:\>php -r "print_r(__URIPath('/mnt/files/한글.mp3'));"
      * Array

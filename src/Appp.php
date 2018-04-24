@@ -8,7 +8,6 @@
 
 namespace Kaiser;
 
-
 class Appp extends Controller
 {
     public function run()
@@ -26,11 +25,9 @@ class Appp extends Controller
 //        $tpl->define(array('index' => "qr_event.tpl.html"));
 //        $tpl->print_('index');
 //        flush();
-
         $pdo = $this->container->get('DB');
         $dbm = new  \Kaiser\Manager\DBManager ($pdo);
         var_dump($dbm->executePreparedQueryOne('select version()'));
-
         $this->end();
     }
 

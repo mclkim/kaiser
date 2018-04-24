@@ -4,7 +4,7 @@ namespace Kaiser;
 
 use Aura\Web\WebFactory;
 
-class Request extends Singleton
+class Request //extends Singleton
 {
     protected $request;
 

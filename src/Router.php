@@ -4,7 +4,7 @@ namespace Kaiser;
 
 use Kaiser\Request;
 
-class Router extends Singleton
+class Router //extends Singleton
 {
     protected $query;
     protected $route;

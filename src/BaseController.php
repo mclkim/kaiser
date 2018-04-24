@@ -2,21 +2,22 @@
 
 namespace Kaiser;
 
-// use Kaiser\Exception\ApplicationException;
-//use Pimple\Container as PimpleContainer;
+//use Psr\Container\ContainerInterface;
 
 class BaseController extends Singleton
 {
     protected $container;
 
-    function __construct($container)
+    function __construct($container = [])
     {
         if (is_array($container)) {
             $container = new Container ($container);
         }
-
+//        if (!$container instanceof ContainerInterface) {
+//            exit ('Expected a ContainerInterface');
+//            throw new \RuntimeException ('Expected a ContainerInterface');
+//        }
         $this->container = $container;
-//        $this->registerServices($container);
     }
 
     public function getContainer()

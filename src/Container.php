@@ -1,19 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2018-04-23
- * Time: 오후 1:46
- */
 
 namespace Kaiser;
 
 use Pimple\Container as PimpleContainer;
 use Psr\Container\ContainerInterface;
 
-final class Container extends PimpleContainer implements ContainerInterface
+class Container extends PimpleContainer implements ContainerInterface
 {
-    function __construct($values = array())
+    /**
+     * The current globally available container (if any).
+     *
+     * @var static
+     */
+    function __construct(array $values = [])
     {
         parent::__construct($values);
 
@@ -51,10 +50,6 @@ final class Container extends PimpleContainer implements ContainerInterface
          * KLogger: Simple Logging for PHP
          * https://github.com/katzgrau/KLogger
          */
-        $container->set('logger',
-            $container->factory(function ($c) {
-                return new Manager\LogManager (__DIR__ . '/../log');
-            })
-        );
+        $container->set('logger', new  Manager\LogManager (__DIR__ . '/../log'));
     }
 }

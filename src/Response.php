@@ -5,7 +5,7 @@ namespace Kaiser;
 use Aura\Web\WebFactory;
 use Aura\Web\ResponseSender;
 
-class Response extends Singleton
+class Response //extends Singleton
 {
     protected $response;
     protected $response_sender;

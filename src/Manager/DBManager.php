@@ -1,7 +1,8 @@
 <?php
 
 namespace Kaiser\Manager;
-
+//use kaiser\Hep
+//use Psr\Container\ContainerInterface;
 class DBManager
 {
     var $enableLogging = true;

@@ -3,33 +3,25 @@
 namespace Kaiser;
 
 // use Kaiser\Exception\ApplicationException;
-use Pimple\Container as PimpleContainer;
+//use Pimple\Container as PimpleContainer;
 
 class BaseController extends Singleton
 {
     protected $container;
 
-    function __construct($container = [])
+    function __construct($container)
     {
         if (is_array($container)) {
-            $container = new PimpleContainer ($container);
+            $container = new Container ($container);
         }
-        /*
-        if (!$container instanceof ContainerInterface) {
-            // exit ( 'Expected a ContainerInterface' );
-            throw new \RuntimeException ('Expected a ContainerInterface');
-        }*/
+
         $this->container = $container;
+//        $this->registerServices($container);
     }
 
     public function getContainer()
     {
         return $this->container;
-    }
-
-    protected function setContainer($id, $value)
-    {
-        return $this->container->offsetSet($id, $value);
     }
 
     protected function config()

@@ -13,7 +13,14 @@ use Psr\Container\ContainerInterface;
 
 final class Container extends PimpleContainer implements ContainerInterface
 {
-    function get($id)
+    function __construct($values = array())
+    {
+        parent::__construct($values);
+
+        $this->registerDefaultServices($this);
+    }
+
+    public function get($id)
     {
         if (!$this->offsetExists($id)) {
             throw new \RuntimeException (sprintf('Identifiler "%s" is not defined.', $id));
@@ -21,8 +28,33 @@ final class Container extends PimpleContainer implements ContainerInterface
         return $this->offsetGet($id);
     }
 
-    function has($id)
+    public function has($id)
     {
         return $this->offsetExists($id);
+    }
+
+    public function set(string $id, $value)
+    {
+        return $this->offsetSet($id, $value);
+    }
+
+    private function registerDefaultServices(Container $container)
+    {
+        $container->set('auth', new  Auth ());
+        $container->set('config', new  Config ());
+        $container->set('request', new  Request ());
+        $container->set('response', new  Response ());
+        $container->set('router', new  Router ());
+        $container->set('template', new  \Template_ ());
+        /**
+         * TODO::
+         * KLogger: Simple Logging for PHP
+         * https://github.com/katzgrau/KLogger
+         */
+        $container->set('logger',
+            $container->factory(function ($c) {
+                return new Manager\LogManager (__DIR__ . '/../log');
+            })
+        );
     }
 }

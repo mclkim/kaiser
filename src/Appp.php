@@ -16,8 +16,21 @@ class Appp extends Controller
 //        phpinfo();
         $this->start();
 //        $func = $this->container->get('settings');
-        var_dump($this->container);
-//        phpinfo();
+//        var_dump($this->container);
+
+//        $tpl = $this->container->get('template');
+//        $tpl->assign(array(
+//            'link_url' => get_class_name(__CLASS__),
+//            'spot' => $spot
+//        ));
+//        $tpl->define(array('index' => "qr_event.tpl.html"));
+//        $tpl->print_('index');
+//        flush();
+
+        $pdo = $this->container->get('DB');
+        $dbm = new  \Kaiser\Manager\DBManager ($pdo);
+        var_dump($dbm->executePreparedQueryOne('select version()'));
+
         $this->end();
     }
 

@@ -18,8 +18,8 @@ class Auth
         'gid' => '0',//그룹ID
         'comment' => '',//정보
         'home' => '/admin',//홈디렉토리
-        'defaultPage' => '/?admin',//홈디렉토리
-        'hashed_password' => '',//비밀번호
+        'defaultPage' => '/admin',//홈페이지
+        'hashed_password' => '',//해쉬비밀번호
         'salt' => '',//비밀번호암호키
     ];
 }

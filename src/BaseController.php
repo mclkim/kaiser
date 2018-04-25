@@ -2,7 +2,7 @@
 
 namespace Kaiser;
 
-//use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class BaseController extends Singleton
 {
@@ -10,19 +10,32 @@ class BaseController extends Singleton
 
     function __construct($container = [])
     {
-        if (is_array($container)) {
-            $container = new Container ($container);
-        }
+//        if (is_array($container)) {
+//            $container = new Container ($container);
+//        }
 //        if (!$container instanceof ContainerInterface) {
 //            exit ('Expected a ContainerInterface');
 //            throw new \RuntimeException ('Expected a ContainerInterface');
 //        }
-        $this->container = $container;
+//        $this->container = $container;
+        $this->setContainer($container);
     }
 
     public function getContainer()
     {
         return $this->container;
+    }
+
+    public function setContainer($container = [])
+    {
+        if (is_array($container)) {
+            $container = new Container ($container);
+        }
+        if (!$container instanceof ContainerInterface) {
+            exit ('Expected a ContainerInterface');
+            throw new \RuntimeException ('Expected a ContainerInterface');
+        }
+        $this->container = $container;
     }
 
     protected function config()

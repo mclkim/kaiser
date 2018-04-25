@@ -1,8 +1,7 @@
 <?php
 
 namespace Kaiser\Manager;
-//use kaiser\Hep
-//use Psr\Container\ContainerInterface;
+
 class DBManager
 {
     var $enableLogging = true;
@@ -251,7 +250,7 @@ class DBManager
         $fields = [];
         $values = [];
         $qs  = [];
-        
+
         foreach ($table_fields as $field => $value) {
             $qs[] = '?';
             $fields [] = $field;

@@ -1,41 +1,41 @@
 {
-    "name": "mclkim/kaiser",
-    "description": "The Kaiser framework",
-    "type": "library",
-    "keywords": ["framework","kaiser"],
-    "license": "MIT",
- 	"homepage": "http://mclkim.github.com",    
-    "support": {
-        "issues": "https://github.com/mclkim/kaiser/issues",
-        "source": "https://github.com/mclkim/kaiser"
-    },    
-    "authors": [
-        {
-            "name": "Kim myung chul",
-            "email": "mclkims@gmail.com"
-        }
-    ],    
-    "replace": {
+  "name": "mclkim/kaiser",
+  "description": "The Kaiser framework for PHP",
+  "type": "library",
+  "keywords": [
+    "framework",
+    "kaiser"
+  ],
+  "license": "MIT",
+  "homepage": "http://mclkim.github.com",
+  "support": {
+    "issues": "https://github.com/mclkim/kaiser/issues",
+    "source": "https://github.com/mclkim/kaiser"
+  },
+  "authors": [
+    {
+      "name": "Kim myung chul",
+      "email": "mclkims@gmail.com"
+    }
+  ],
+  "replace": {
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "pimple/pimple": "^3.0",
+    "aura/web": "^2.0",
+    "katzgrau/klogger": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kaiser\\": "src/"
     },
-    "require": {
-     	"php": ">=5.4.0",
-     	"pimple/pimple": "^3.0",
-        "aura/web": "^2.0",     	
-     	"katzgrau/klogger": "^1.2"
-    },
-    "require-dev": {
-        "monolog/monolog": "~1.11"    
-    },    
-    "autoload": {
-        "classmap": [
-        	"src/Template_/Template_.class.php",
-            "src/Plupload/PluploadHandler.php"
-        ],
-       "files": [
-            "src/Helpers.php"
-        ],        
-        "psr-4": {
-            "Kaiser\\": "src"
-        }
-    }  
+    "classmap": [
+      "src/Template_/Template_.class.php",
+      "src/Plupload/PluploadHandler.php"
+    ],
+    "files": [
+      "src/Helpers.php"
+    ]
+  }
 }

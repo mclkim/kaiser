@@ -2,7 +2,7 @@
 
 namespace Kaiser;
 
-class Controller extends BaseController
+class Controller extends BaseController implements ControllerInterface
 {
     protected $user;
     var $_defaultPage = '?';
@@ -38,7 +38,7 @@ class Controller extends BaseController
         $this->redirect($this->_defaultPage);
     }
 
-    protected function execute()
+    function execute()
     {
         echo 'Hello Kaiser PHP framework~~';
     }
@@ -180,26 +180,27 @@ class Controller extends BaseController
         }
         return true;
     }
-
-    protected function alertRedirect($msg, $redirect = null, $charset = 'utf-8')
-    {
-        if (!$redirect) {
-            echo <<<END
-            <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
-            <script type="text/javascript">
-            alert("$msg");
-            </script>
-END;
-            exit ();
-        } else {
-            echo <<<END
-            <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
-            <script type="text/javascript">
-            alert("$msg");
-            location.href = "$redirect";
-            </script>
-END;
-            exit ();
+    /*
+        protected function alertRedirect($msg, $redirect = null, $charset = 'utf-8')
+        {
+            if (!$redirect) {
+                echo <<<END
+                <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
+                <script type="text/javascript">
+                alert("$msg");
+                </script>
+    END;
+                exit ();
+            } else {
+                echo <<<END
+                <head><meta http-equiv="Content-Type" content="text/html; charset=$charset" /></head>
+                <script type="text/javascript">
+                alert("$msg");
+                location.href = "$redirect";
+                </script>
+    END;
+                exit ();
+            }
         }
-    }
+    */
 }

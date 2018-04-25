@@ -1,4 +1,7 @@
 <?php
+
+//namespace Kaiser;
+
 use Kaiser\App;
 
 if (!function_exists('app')) {

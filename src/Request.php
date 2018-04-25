@@ -48,7 +48,11 @@ class Request //extends Singleton
 
     function get_post($key = null, $alt = null)
     {
-        return empty ($this->post($key)) ? $this->get($key, $alt) : $this->post($key, $alt);
+        //TODO::PHP 5.4 Error
+//        return empty ($this->post($key)) ? $this->get($key, $alt) : $this->post($key, $alt);
+//        return empty ($this->post($key)) ? $this->get($key, $alt) : $this->post($key, $alt);
+        $post = $this->post($key);
+        return empty ($post) ? $this->get($key, $alt) : $this->post($key, $alt);
     }
 
     function header($key = null, $alt = null)

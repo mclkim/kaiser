@@ -1,9 +1,10 @@
 ﻿.buildpath
-.idea
+.idea/
 .project
 .settings
-phpunit.xml
-composer.lock
 /vendor/
 /log/
 /tmp/
+
+# ignore lock file since we have no extra dependencies
+composer.lock

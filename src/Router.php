@@ -4,149 +4,128 @@ namespace Kaiser;
 
 use Kaiser\Request;
 
-class Router //extends Singleton
+class Router
 {
-    protected $query;
-    protected $route;
-    protected $param;
+    const NOT_FOUND = 0;
+    const FOUND = 1;
+    const METHOD_NOT_ALLOWED = 2;
 
-    /**
-     * 클래스명 앞에 경로(/)가 있을 경우
-     * 경로명과 클래스명을 분리하여 처리 한다.(2014.02.28)
-     * C:\>php -r "print_r(__URIPath('/mnt/files/한글.mp3'));"
-     * Array
-     * (
-     * [dirname] => /mnt/files
-     * [basename] => 한글.mp3
-     * [extension] => mp3
-     * [filename] => 한글
-     * )
-     */
-    private function __URIPath($url)
+    private $AppDirectory;
+    private $basePath;
+    private $Url;
+    private $Method;
+    private $parameters;
+
+    public function __construct()
     {
-        preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $url, $m);
-        return array(
-            'dirname' => isset ($m [1]) ? $m [1] : '',
-            'basename' => isset ($m [2]) ? $m [2] : '',
-            'extension' => isset ($m [5]) ? $m [5] : '',
-            'filename' => isset ($m [3]) ? $m [3] : ''
-        );
+
     }
 
-    function setQuery($query)
+    function setAppDir($directory = [])
     {
-        if (strpos($query, '::')) {
-            $query = str_replace('::', '.', $query);
-        }
-        $this->query = $query;
+        $this->AppDirectory = $directory;
     }
 
-    public function getQueryString()
+    function getAppDir()
     {
-        if ($this->query)
-            return $this->query;
-
-        return $this->query = Request::getInstance()->url(PHP_URL_QUERY);
+        return $this->AppDirectory;
     }
 
-    private function splitQueryString($query)
+    public function getBasePath()
     {
-        return $query ? explode('&', $query) : array();
+        return $this->basePath;
     }
 
-    public function getRoute()
+    public function setBasePath($basePath)
     {
-        if ($this->route)
-            return $this->route;
-
-        $action = if_empty($_GET, 'action', null);
-        $query = $this->splitQueryString($this->getQueryString());
-        $param = $this->param = array_slice($query, 1);
-//        var_dump($action);
-//        exit;
-        if (isset($action)) {
-            $x = isset ($action) ? $this->__URIPath($action) : array();
-        } else {
-            $x = isset ($query [0]) ? $this->__URIPath($query [0]) : array();
-        }
-        $this->route = new \stdClass ();
-        $this->route->path = if_empty($x, 'dirname', '');
-        $this->route->class = if_empty($x, 'filename', 'index');
-        $this->route->action = if_empty($x, 'extension', 'execute');
-        $this->route->controller = rtrim($this->route->path, '/') . '/' . $this->route->class;
-        $this->route->param = $param;
-
-        return $this->route;
+        $this->basePath = rtrim($basePath, '/');
     }
 
-    public function getCurrentUrl()
+    public function dispatch($container)
     {
-        return Request::getInstance()->url();
-    }
+        $req = new Request();
+        $this->Url = $req->url(PHP_URL_QUERY);
+        $this->Method = $req->method();
+        $this->parameters = $req->get();
 
-    public function getBaseUrl($atRoot = FALSE)
-    {
-        $http = Request::getInstance()->url(PHP_URL_SCHEME);
-        $host = Request::getInstance()->url(PHP_URL_HOST);
-        /**
-         * TODO::AWS SSL 설정으로 포트 사용 금지(2017.01.06)
-         * $port = Request::getInstance()->url(PHP_URL_PORT);
-         */
-        $port = false;
-        $path = Request::getInstance()->url(PHP_URL_PATH);
-        $path = $atRoot ? '' : trim($path, '/');
-        $tmplt = $port ? ($path ? "%s://%s:%d%s" : "%s://%s:%d") : ($path ? "%s://%s/%s" : "%s://%s");
+        $route = new Route(array('methods' => ['GET', 'POST']));
+        $route->getRoute($this->Url);
 
-        return $port ? sprintf($tmplt, $http, $host, $port, $path) : sprintf($tmplt, $http, $host, $path);
-    }
+        $controller = $route->getController();
+        $action = $route->getAction();
+        $parameters = $route->getParameters();
 
-    function getRequestProtocol()
-    {
-        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']))
-            return $_SERVER['HTTP_X_FORWARDED_PROTO'];
-        else
-            return !empty($_SERVER['HTTPS']) ? "https" : "http";
-    }
+        //TODO::
+        $callable = $this->findController($container, $controller, $action, $this->getAppDir());
 
-    /**
-     * HTTP 로 접속한 사용자를 HTTPS 로 redirect 시키거나
-     * https_redirect();
-     * HTTPS 로 접속한 사용자를 HTTP 로 redirect 처리하는 함수입니다.
-     * https_redirect(true);
-     */
-    function https_redirect($ssl = false)
-    {
-        $https = array(
-            'HTTP_X_FORWARDED_PROTO' => 'HTTPS',
-            'HTTP_X_SSL' => 'ON',
-            'HTTPS' => 'ON',
-            'SSL' => 'ON'
-        );
-
-        $protocol = 'https://';
-        foreach ($https as $q => $w) {
-            if (isset($_SERVER[$q]) && strtoupper($_SERVER[$q]) === $w) {
-                $protocol = false;
+        switch ($callable) {
+            case Router::NOT_FOUND:
+                // ... 404 Not Found
                 break;
+            case Router::METHOD_NOT_ALLOWED:
+                // ... 405 Method Not Allowed
+                break;
+            case Router::FOUND:
+                $controller = self::normalizeClassName($controller);
+                $instance = [
+                    new $controller ($container),
+                    $action
+                ];
+                $result = call_user_func_array($instance, $parameters);
+        }
+        return $this;
+    }
+
+    public function match($requestMethod, $requestUrl)
+    {
+    }
+
+    public static function normalizeClassName($name)
+    {
+        $name = str_replace('/', '\\', $name);
+
+        if (is_object($name))
+            $name = get_class($name);
+
+        $name = '\\' . ltrim($name, '\\');
+        return $name;
+    }
+
+    protected function findController($container, $controller, $action, $inPath)
+    {
+        $directory = is_array($inPath) ? $inPath : array(
+            $inPath
+        );
+
+        /**
+         * Workaround: Composer does not support case insensitivity.
+         * TODO::2016-12-02 unix 시스템에서 파일이름의 대소문자 구별한다.
+         */
+        if (!class_exists($controller)) {
+            $controller = self::normalizeClassName($controller);
+            foreach ($directory as $inPath) {
+                $controllerFile = $inPath . str_replace('\\', '/', $controller) . '.php';
+                if (file_exists($controllerFile)) {
+                    include_once($controllerFile);
+                    break;
+                }
             }
         }
 
-        if ($ssl === true) {
-            $protocol = (false === $protocol) ? 'http://' : false;
+        if (!class_exists($controller)) {
+            return Router::NOT_FOUND;
         }
 
-        if (false !== $protocol) {
-            header('HTTP/1.0 301 Moved Permanently');
-            header('Location: ' . $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-            die();
+        //TODO::
+        $instance = [
+            new $controller ($container),
+            $action
+        ];
+
+        if (is_callable($instance)) {
+            return Router::FOUND;
         }
-    }
 
-    public static function baseUrl()
-    {
-    }
-
-    public static function currentUrl()
-    {
+        return Router::METHOD_NOT_ALLOWED;
     }
 }

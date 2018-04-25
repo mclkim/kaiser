@@ -8,7 +8,7 @@ if (!function_exists('app')) {
     /**
      * Get the available container instance.
      */
-    function app($make = null, $parameters = [])
+    function app($make = null)
     {
         if (is_null($make))
             return App::getInstance();

@@ -11,15 +11,9 @@ class Router
     const METHOD_NOT_ALLOWED = 2;
 
     private $AppDirectory;
-    private $basePath;
     private $Url;
     private $Method;
     private $parameters;
-
-    public function __construct()
-    {
-
-    }
 
     function setAppDir($directory = [])
     {
@@ -29,16 +23,6 @@ class Router
     function getAppDir()
     {
         return $this->AppDirectory;
-    }
-
-    public function getBasePath()
-    {
-        return $this->basePath;
-    }
-
-    public function setBasePath($basePath)
-    {
-        $this->basePath = rtrim($basePath, '/');
     }
 
     public function dispatch($container)
@@ -56,7 +40,7 @@ class Router
         $parameters = $route->getParameters();
 
         //TODO::
-        $callable = $this->findController($container, $controller, $action, $this->getAppDir());
+        $callable = $this->findController($controller, $action, $this->getAppDir());
 
         switch ($callable) {
             case Router::NOT_FOUND:
@@ -67,17 +51,12 @@ class Router
                 break;
             case Router::FOUND:
                 $controller = self::normalizeClassName($controller);
-                $instance = [
-                    new $controller ($container),
-                    $action
-                ];
-                $result = call_user_func_array($instance, $parameters);
+                $instance = new $controller;
+                //TODO::
+                $instance->setContainer($container);
+                $result = call_user_func_array(array($instance, $action), $parameters);
         }
         return $this;
-    }
-
-    public function match($requestMethod, $requestUrl)
-    {
     }
 
     public static function normalizeClassName($name)
@@ -91,7 +70,7 @@ class Router
         return $name;
     }
 
-    protected function findController($container, $controller, $action, $inPath)
+    protected function findController($controller, $action, $inPath)
     {
         $directory = is_array($inPath) ? $inPath : array(
             $inPath
@@ -117,10 +96,7 @@ class Router
         }
 
         //TODO::
-        $instance = [
-            new $controller ($container),
-            $action
-        ];
+        $instance = array(new $controller, $action);
 
         if (is_callable($instance)) {
             return Router::FOUND;

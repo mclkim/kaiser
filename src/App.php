@@ -13,6 +13,11 @@ class App extends Controller
     static $AppDirectory;
     static $basePath;
 
+    function __construct($container = [])
+    {
+        $this->setContainer($container);
+    }
+
     public function start()
     {
         /**

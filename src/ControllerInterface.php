@@ -11,5 +11,9 @@ namespace Kaiser;
 
 interface ControllerInterface
 {
+    function requireLogin();
+
+    function requireAdmin();
+
     function execute();
 }

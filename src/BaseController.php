@@ -8,17 +8,8 @@ class BaseController extends Singleton
 {
     protected $container;
 
-    function __construct($container = [])
+    function __construct()
     {
-//        if (is_array($container)) {
-//            $container = new Container ($container);
-//        }
-//        if (!$container instanceof ContainerInterface) {
-//            exit ('Expected a ContainerInterface');
-//            throw new \RuntimeException ('Expected a ContainerInterface');
-//        }
-//        $this->container = $container;
-        $this->setContainer($container);
     }
 
     public function getContainer()
@@ -32,7 +23,7 @@ class BaseController extends Singleton
             $container = new Container ($container);
         }
         if (!$container instanceof ContainerInterface) {
-            exit ('Expected a ContainerInterface');
+//            exit ('Expected a ContainerInterface');
             throw new \RuntimeException ('Expected a ContainerInterface');
         }
         $this->container = $container;

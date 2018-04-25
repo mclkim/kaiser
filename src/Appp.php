@@ -10,24 +10,23 @@ namespace Kaiser;
 
 class Appp extends Controller
 {
-    public function run()
+    const VERSION = '2018-04-22';
+    var $timestamp = null;
+
+    function __construct($container = [])
+    {
+        $this->setContainer($container);
+    }
+
+    public function run($directory = [])
     {
 //        phpinfo();
         $this->start();
-//        $func = $this->container->get('settings');
-//        var_dump($this->container);
 
-//        $tpl = $this->container->get('template');
-//        $tpl->assign(array(
-//            'link_url' => get_class_name(__CLASS__),
-//            'spot' => $spot
-//        ));
-//        $tpl->define(array('index' => "qr_event.tpl.html"));
-//        $tpl->print_('index');
-//        flush();
-        $pdo = $this->container->get('DB');
-        $dbm = new  \Kaiser\Manager\DBManager ($pdo);
-        var_dump($dbm->executePreparedQueryOne('select version()'));
+        $router = new \Kaiser\Router();
+        $router->setAppDir($directory);
+        $router->dispatch($this->getContainer());
+
         $this->end();
     }
 
@@ -51,4 +50,83 @@ class Appp extends Controller
          */
         $this->info(sprintf('<<END>>The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
     }
+
+    protected function setCsrfToken()
+    {
+        if (function_exists('mcrypt_create_iv')) {
+            $_SESSION ['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+        } else {
+            $_SESSION ['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+        $_SESSION ['token_time'] = time();
+    }
+
+    public function getCsrfToken()
+    {
+        return if_exists($_SESSION, 'csrf_token', null);
+    }
+
+    protected function verifyCsrfToken()
+    {
+        if (!$this->config()->get('enableCsrfProtection')) {
+            return true;
+        }
+        // $this->debug ( $this->container->get ( 'config' )->get ( 'enableCsrfProtection' ) );
+
+        if (in_array($this->method(), [
+            'HEAD',
+            'GET',
+            'OPTIONS'
+        ])) {
+            return true;
+        }
+
+        // $this->debug ( $this->method () );
+        // $this->debug ( Request::getInstance ()->header () );
+
+        $csrftoken = Request::getInstance()->header('x-csrf-token');
+        // $this->debug ( $csrftoken );
+
+        $token = $this->getParameter('csrf_token', $csrftoken);
+        // $this->debug ( $token );
+        // $this->debug ( $this->getCsrfToken () );
+        return $this->getCsrfToken() === $token;
+    }
+
+    protected function check($callable)
+    {
+        // $this->debug ( $callable );
+        // $this->debug ( get_class($callable ));
+        // $this->debug ( $callable ->requireLogin () );
+        if ($callable->requireLogin()) {
+            /**
+             * Check supplied session/cookie is an array (username, persist code)
+             */
+            if ($this->user = $callable->getUser() || $this->user = $callable->getAdmin()) {
+                // $this->debug ( $this->user );
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    protected function checkAdmin($callable)
+    {
+        // $this->debug ( $callable );
+        // $this->debug ( get_class($callable ));
+        // $this->debug ( $callable ->requireLogin () );
+        if ($callable->requireAdmin()) {
+            /**
+             * Check supplied session/cookie is an array (username, persist code)
+             */
+            if ($this->user = $callable->getAdmin()) {
+                // $this->debug ( $this->user );
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -8,55 +8,48 @@ class Router
 {
     const NOT_FOUND = 0;
     const FOUND = 1;
-    const METHOD_NOT_ALLOWED = 2;
+    const NOT_FOUND_ACTION = 2;
+    const METHOD_NOT_ALLOWED = 3;
 
-    private $AppDirectory;
-    private $Url;
-    private $Method;
-    private $parameters;
+    private $AppDir;
+    private $url;
+    private $method;
+
+//    private $parameters;
+
+    function __construct()
+    {
+        $req = new Request();
+        $this->url = $req->url(PHP_URL_QUERY);
+        $this->method = $req->method();
+        if ($handler = $req->header('X-October-Request-Handler')) {
+            $this->url = $handler;
+        } else if ($handler = $req->header('X-Request-Handler')) {
+            $this->url = $handler;
+        }
+    }
 
     function setAppDir($directory = [])
     {
-        $this->AppDirectory = $directory;
+        $this->AppDir = $directory;
     }
 
     function getAppDir()
     {
-        return $this->AppDirectory;
+        return $this->AppDir;
     }
 
-    public function dispatch($container)
+    public function dispatch(array $config)
     {
-        $req = new Request();
-        $this->Url = $req->url(PHP_URL_QUERY);
-        $this->Method = $req->method();
-        $this->parameters = $req->get();
-
-        $route = new Route(array('methods' => ['GET', 'POST']));
-        $route->getRoute($this->Url);
+        $route = new Route($config);
+        $route->getRoute($this->url);
 
         $controller = $route->getController();
         $action = $route->getAction();
         $parameters = $route->getParameters();
 
         //TODO::
-        $callable = $this->findController($controller, $action, $this->getAppDir());
-
-        switch ($callable) {
-            case Router::NOT_FOUND:
-                // ... 404 Not Found
-                break;
-            case Router::METHOD_NOT_ALLOWED:
-                // ... 405 Method Not Allowed
-                break;
-            case Router::FOUND:
-                $controller = self::normalizeClassName($controller);
-                $instance = new $controller;
-                //TODO::
-                $instance->setContainer($container);
-                $result = call_user_func_array(array($instance, $action), $parameters);
-        }
-        return $this;
+        return $this->findController($controller, $action, $parameters, $this->getAppDir());
     }
 
     public static function normalizeClassName($name)
@@ -70,7 +63,7 @@ class Router
         return $name;
     }
 
-    protected function findController($controller, $action, $inPath)
+    protected function findController($controller, $action, $parameters, $inPath)
     {
         $directory = is_array($inPath) ? $inPath : array(
             $inPath
@@ -92,16 +85,16 @@ class Router
         }
 
         if (!class_exists($controller)) {
-            return Router::NOT_FOUND;
+            return [self::NOT_FOUND, $controller, $action, $parameters];
         }
 
         //TODO::
-        $instance = array(new $controller, $action);
+        $handler = array(new $controller, $action);
 
-        if (is_callable($instance)) {
-            return Router::FOUND;
+        if (is_callable($handler)) {
+            return [self::FOUND, $controller, $action, $parameters];
         }
 
-        return Router::METHOD_NOT_ALLOWED;
+        return [self::NOT_FOUND_ACTION, $controller, $action, $parameters];
     }
 }

@@ -27,12 +27,14 @@ class Controller extends BaseController implements ControllerInterface
     /**
      * 로그아웃
      */
-    protected function logout()
+    function logout()
     {
         session_unset();
         session_destroy();
         unset ($_SESSION);
-        $this->redirect($this->_defaultPage);
+
+        $auth = new \Kaiser\Auth();
+        $this->redirect($auth->_defaultPage);
     }
 
     protected function ajax()
@@ -63,16 +65,19 @@ class Controller extends BaseController implements ControllerInterface
 
     function info($message = null, array $context = array())
     {
+        $message = is_array($message) ? var_export($message, true) : $message;
         $this->logger()->info($message, $context);
     }
 
     function debug($message = null, array $context = array())
     {
+        $message = is_array($message) ? var_export($message, true) : $message;
         $this->logger()->debug($message, $context);
     }
 
     function err($message = null, array $context = array())
     {
+        $message = is_array($message) ? var_export($message, true) : $message;
         $this->logger()->error($message, $context);
     }
 }

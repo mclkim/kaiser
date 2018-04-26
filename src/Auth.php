@@ -22,6 +22,7 @@ class Auth
         'hashed_password' => '',//해쉬비밀번호
         'salt' => '',//비밀번호암호키
     ];
+
     protected $user;
     var $_defaultPage = '?';
     var $_defaultAdminPage = '?admin';
@@ -29,23 +30,46 @@ class Auth
     var $_loginAdminPage = '?admin/login';
     var $_admin = 'admin';
     var $_user = 'user';
-    protected function setUser($user)
+
+    function setUser($user)
     {
         $_SESSION [$this->_user] = $user;
     }
 
-    protected function getUser()
+    function getUser()
     {
         return if_exists($_SESSION, $this->_user, false);
     }
 
-    protected function setAdmin($admin)
+    function setAdmin($admin)
     {
         $_SESSION [$this->_admin] = $admin;
     }
 
-    protected function getAdmin()
+    function getAdmin()
     {
         return if_exists($_SESSION, $this->_admin, false);
+    }
+
+    function checkAuth($callable)
+    {
+        if ($callable->requireLogin()) {
+            if ($this->user = $this->getUser() || $this->user = $this->getAdmin()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    function checkAdmin($callable)
+    {
+        if ($callable->requireAdmin()) {
+            if ($this->user = $this->getAdmin()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 }

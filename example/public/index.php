@@ -12,15 +12,13 @@ if (!file_exists($autoload)) {
 $loader = require_once $autoload;
 
 /**
- * Step 2: Instantiate a Kaiser application
+ * Step 2: Setting Kaiser Container 
  */
 $container = new Kaiser\Container ();
 
-/**
- */
 $container ['DB'] = function ($c) {
-    $dbname = 'dbname';
-    $user = 'user';
+    $dbname = 'mysql';
+    $user = 'root';
     $pass = 'pass';
 
     try {
@@ -30,9 +28,12 @@ $container ['DB'] = function ($c) {
     }
 };
 
+/**
+ * Step 3: Instantiate a Kaiser application Controller
+ */
 $app = new Kaiser\App($container);
 
 /**
- * Step 3: Run the Kaiser application
+ * Step 4: Run the Kaiser application
  */
 $app->run([BASE_PATH . '/app']);

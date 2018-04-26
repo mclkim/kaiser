@@ -12,12 +12,14 @@ class hello extends Controller
         return false;
     }
 
-    function world($params)
+    function world($param1 = null,$param2 = null,$param3 = null)
     {
         $getData = $this->getParameters();
         $this->debug($getData);
 
-        var_dump($params);
-        echo 'hello world~~~';
+        var_dump($param1);
+        var_dump($param2);
+        var_dump($param3);
+        echo '<br>hello world~~~';
     }
 }

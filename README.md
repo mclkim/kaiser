@@ -25,8 +25,7 @@ Composer version 1.5.1 2017-08-09 16:07:22
 ```
 $ mkdir homepage
 $ cd homepage
-$ composer require mclkim/kaiser
-Using version ^1.1 for mclkim/kaiser
+$ composer require mclkim/kaiser:dev-master
 ./composer.json has been created
 Loading composer repositories with package information
 Updating dependencies (including require-dev)
@@ -36,7 +35,7 @@ Package operations: 6 installs, 0 updates, 0 removals
   - Installing aura/web (2.1.0): Loading from cache
   - Installing psr/container (1.0.0): Loading from cache
   - Installing pimple/pimple (v3.2.3): Loading from cache
-  - Installing mclkim/kaiser (v1.1): Loading from cache
+  - Installing mclkim/kaiser (dev-master 89be385): Cloning 89be385ac9 from cache
 Writing lock file
 Generating autoload files
 ```
@@ -54,6 +53,6 @@ Press Ctrl-C to quit.
 ###3.Web brower
 ```
 http://localhost:8000/?
-http://localhost:8000/?hello.world
 http://localhost:8000/?mysql
+http://localhost:8000/?hello.world&p1=1&p2=2&p3=3
 ```

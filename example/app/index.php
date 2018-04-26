@@ -2,11 +2,11 @@
 use Kaiser\Controller;
 
 /**
- * http://localhost/test/public/?index
+ * http://localhost/?index
  */
 class index extends Controller
 {
-    protected function requireLogin()
+     function requireLogin()
     {
         return false;
     }

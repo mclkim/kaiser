@@ -27,5 +27,7 @@ php -S localhost:8000 -t public/
 Web brower
 -------
 ```
-http://localhost:8000/?hello
+http://localhost:8000/?
+http://localhost:8000/?hello.world
+http://localhost:8000/?mysql
 ```

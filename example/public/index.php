@@ -1,23 +1,38 @@
 <?php
+defined('ROOT_PATH') or define('ROOT_PATH', dirname(__FILE__));
+defined('BASE_PATH') or define('BASE_PATH', dirname(ROOT_PATH));
 
 /**
  * Step 1: Require the Kaiser Framework using Composer's autoloader
  */
-require __DIR__ . '/../vendor/autoload.php';
+$autoload = BASE_PATH . '/vendor/autoload.php';
+if (!file_exists($autoload)) {
+    exit ('You need to execute <strong>composer install</strong>');
+}
+$loader = require_once $autoload;
 
 /**
  * Step 2: Instantiate a Kaiser application
  */
-$app = new Kaiser\App ();
+$container = new Kaiser\Container ();
 
 /**
- * Step 3: Setting Kaiser application Controller
  */
-$app->setAppDir([
-    __DIR__ . '/../app'
-]);
+$container ['DB'] = function ($c) {
+    $dbname = 'dbname';
+    $user = 'user';
+    $pass = 'pass';
+
+    try {
+        return new PDO('mysql:host=localhost;dbname=' . $dbname, $user, $pass);
+    } catch (PDOException $e) {
+        die('Connection failed.' . $e->getMessage());
+    }
+};
+
+$app = new Kaiser\App($container);
 
 /**
- * Step 4: Run the Kaiser application
+ * Step 3: Run the Kaiser application
  */
-$app->run();
+$app->run([BASE_PATH . '/app']);

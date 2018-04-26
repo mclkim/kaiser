@@ -1,18 +1,23 @@
 <?php
+
 use Kaiser\Controller;
 
 /**
- * http://localhost/test/public/?hello.world
+ * http://localhost/?hello.world&p1=1&p2=2&p3=3
  */
 class hello extends Controller
 {
-    protected function requireLogin()
+    function requireLogin()
     {
         return false;
     }
 
-    function world()
+    function world($params)
     {
+        $getData = $this->getParameters();
+        $this->debug($getData);
+
+        var_dump($params);
         echo 'hello world~~~';
     }
 }

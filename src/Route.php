@@ -34,9 +34,10 @@ class Route
         $url = (string)$url;
 
         // make sure that the URL is suffixed with a forward slash
-        if (substr($url, -1) !== '/') {
-            $url .= '/';
-        }
+        //TODO::
+//        if (substr($url, -1) !== '/') {
+//            $url .= '/';
+//        }
 
         $this->url = $url;
     }
@@ -97,7 +98,7 @@ class Route
         $this->class = if_empty($x, 'filename', 'index');
         $this->action = if_empty($x, 'extension', 'execute');
         $this->controller = rtrim($this->path, '/') . '/' . $this->class;
-//        var_dump($this);
+//        var_dump($this);exit;
         return $this;
     }
 

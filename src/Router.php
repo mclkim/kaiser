@@ -14,6 +14,7 @@ class Router
     private $AppDir;
     private $url;
     private $method;
+    private $handler;
 
 //    private $parameters;
 
@@ -22,10 +23,11 @@ class Router
         $req = new Request();
         $this->url = $req->url(PHP_URL_QUERY);
         $this->method = $req->method();
+
         if ($handler = $req->header('X-October-Request-Handler')) {
-            $this->url = $handler;
+            $this->url = $this->handler = $handler;
         } else if ($handler = $req->header('X-Request-Handler')) {
-            $this->url = $handler;
+            $this->url = $this->handler = $handler;
         }
     }
 

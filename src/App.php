@@ -1,4 +1,10 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: 김명철
+ * Date: 2018-04-22
+ * Time: 오후 3:34
+ */
 
 namespace Kaiser;
 
@@ -10,33 +16,30 @@ class App extends Controller
     const VERSION = '2018-04-22';
     var $timestamp = null;
 
-    static $AppDirectory;
-    static $basePath;
-
     function __construct($container = [])
     {
         $this->setContainer($container);
     }
 
-    public function start()
+    protected function start()
     {
         /**
          * 시작을 로그파일에 기록한다.
          */
-        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
+        $this->info(sprintf('<<START>>The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
          */
         $this->timestamp = new \Kaiser\Timer ();
     }
 
-    public function end()
+    protected function end()
     {
         /**
          * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
          * 사용한 메모리를 기록한다.
          */
-        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
+        $this->info(sprintf('<<END>>The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
     }
 
     public function version()
@@ -44,339 +47,141 @@ class App extends Controller
         return self::VERSION;
     }
 
-    protected function getAjaxHandler()
+    public function run($directory = [])
     {
-        $request = $this->request();
-
-        if (!$this->ajax() || $this->method() != 'POST') {
-            return null;
-        }
-
-        if ($handler = $request->header('X-October-Request-Handler')) {
-            return trim($handler);
-        }
-
-        if ($handler = $request->header('X-Request-Handler')) {
-            return trim($handler);
-        }
-
-        return null;
-    }
-
-    protected function getPostHandler()
-    {
-        $request = $this->request();
-
-        if ($this->method() != 'POST') {
-            return null;
-        }
-
-        if ($handler = $request->post('X-October-Request-Handler')) {
-            return trim($handler);
-        }
-
-        if ($handler = $request->header('X-Request-Handler')) {
-            return trim($handler);
-        }
-
-        return null;
-    }
-
-    /**
-     * Execute the controller action.
-     */
-    public function run()
-    {
-        // phpinfo();exit;
-        //$this->debug('------------------');
-        //$this->debug($_SERVER);
-        //$this->debug($_POST);
-        //$this->debug($_REQUEST);
-        //$this->debug($_FILES);
-        //$this->debug('------------------');
-
+        //        phpinfo();exit;
         $this->start();
-
         /**
-         * TODO::
          * 세션스타트..
          */
-        $this->container->get('session');
+//        $this->container->get('session');
+        session_start();
 
-        if (!$this->getCsrfToken()) {
-            $this->setCsrfToken();
-        }
-
-        /**
-         * Check security token.
-         */
-        if (!$this->verifyCsrfToken()) {
-            throw new ApplicationException ('Invalid security token.');
-        }
-        //$this->debug('hello #1');
-        /**
-         * Execute AJAX event
-         */
-        if (($ajaxResponse = $this->execAjaxHandler()) != null) {
-            //$this->debug('hello #2');
-            //$this->debug($ajaxResponse);
-            return $ajaxResponse;
-        }
-        //$this->debug('hello #3');
-        /**
-         * Execute page action
-         */
-        $result = $this->execPageAction();
-        //$this->debug('hello #4');
-        //$this->debug($result);
-        if (is_string($result)) {
-            return $result;
-        }
-        //$this->debug('hello #5');
+        $result = $this->execPageAction($directory);
+        $this->debug($result);
 
         $this->end();
     }
 
-    protected
-    function execAjaxHandler()
+    protected function execPageAction($directory = [])
     {
-        if (($handler = $this->getAjaxHandler()) == null) {
-            //$this->debug('hello #00');
-            return null;
-        }
+        $router = new \Kaiser\Router();
+        $router->setAppDir($directory);
+        $routeInfo = $router->dispatch(array('methods' => ['GET', 'POST']));
 
-        try {
-            //$this->debug('hello #11');
-            $rout = $this->router();
-            $rout->setQuery($handler);
+        //TODO::
+        $controller = $routeInfo[1];
+        $action = $routeInfo[2];
+        $parameters = $routeInfo[3];
+        $this->debug($controller);
+        $this->debug($action);
+        $this->debug($parameters);
 
-            /**
-             * URL의 라우팅 설정
-             * 실행파일의 클래스명과 실행메소드를 분리하여 구한다.
-             */
-            $router = $rout->getRoute();
+        switch ($routeInfo[0]) {
+            case Router::NOT_FOUND:
+                // ... 404 Not Found
+                $this->err(sprintf('The Class "%s" does not found', $controller));
+                header('HTTP/1.0 404 Not Found');
+                break;
+            case Router::NOT_FOUND_ACTION:
+                // ... 405 Method Not Allowed
+                $this->err(sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
+                header('HTTP/1.0 404 Not Found');
+                break;
+            case Router::FOUND:
+                //TODO::
+                $instance = new $controller;
+                $instance->setContainer($this->getContainer());
 
-            /**
-             * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
-             */
-            $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
-
-            /**
-             * 클래스 인스턴스를 실행한다.
-             */
-            if (!$result = $this->runAjaxHandler($callable)) {
-//                $this->err($result);
-//                return $result;
-                $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-                throw new ApplicationException ('runAjaxHandler');
-            }
-
-            //$this->debug($result);
-            //$this->debug('hello #12');
-            $responseContents = [];
-
-            /**
-             * 핸들러가 배열을 반환 한 경우 렌더링을 위해 출력에 추가해야 합니다.
-             * 문자열 인 경우 키 "result"를 사용하여 배열에 추가합니다.
-             */
-            if (is_array($result)) {
-                $responseContents = array_merge($responseContents, $result);
-            } elseif (is_string($result)) {
-                $responseContents ['result'] = $result;
-            }
-
-            //$this->debug('hello #13');
-            $this->response()->setContent($responseContents);
-            //$this->debug($result);
-            return ($result) ?: true;
-//        } catch (AjaxException $ex) {
-//            $this->err($ex->getMessage());
-//            $this->response()->setContent($ex->getMessage());
-//        } catch (ApplicationException $ex) {
-//            $this->err($ex->getMessage());
-        } catch (Exception $ex) {
-            $this->err($ex->getMessage());
-            throw $ex;
-        }
-
-        return -1;
-    }
-
-    private
-    function runAjaxHandler($callable)
-    {
-        try {
-            $result = null;
-
-//            if (!method_exists($callable [0], $callable [1])) {
-//                $this->err($callable);
-//                $this->err(sprintf('Action "%s" is not found in the controller "%s"', $callable [1], $callable [0]));
-//                throw new SystemException (sprintf("Action %s is not found in the controller %s", $callable [1], $callable [0]));
-//            }
-
-            /**
-             * Not logged in, redirect to login screen or show ajax error.
-             * 로그인 여부를 체크 할 페이지 인지 확인한다.
-             * TODO::다른 좋은 방법이 있을 것 같은데~
-             */
-            $request_query = $this->router()->getQueryString();
-//            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-            $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $request_query);
-            $return_uri = $callable [0]->getParameter('returnURI', $request_uri);
-            $redirect = '?' . implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-//            logger($request_query);
-//            logger($request_uri);
-//            logger($return_uri);
-//            logger($redirect);
-
-            if (!$this->checkAdmin($callable [0])) {
-                if ($this->ajax()) {
-                    return 'Access denied!';
-                } else {
-                    $this->response()->redirect($this->_loginAdminPage . '&returnURI=' . $redirect);
+                //TODO::
+                $auth = new \Kaiser\Auth();
+                if (!$auth->checkAdmin($instance)) {
+                    $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+                    $return_uri = $instance->getParameter('returnURI', $request_uri);
+                    $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+                    $this->debug($redirect);
+                    $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
+                    return true;
+                } else if (!$auth->checkAuth($instance)) {
+                    $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+                    $return_uri = $instance->getParameter('returnURI', $request_uri);
+                    $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+                    $this->debug($redirect);
+                    $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
                     return true;
                 }
-            } else if (!$this->check($callable [0])) {
-                if ($this->ajax()) {
-                    return 'Access denied!';
-                } else {
-                    $this->response()->redirect($this->_loginPage . '&returnURI=' . $redirect);
+
+                //TODO::
+                try {
+                    $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
+                    $result = call_user_func_array(array($instance, $action), $parameters);
+                    $this->debug($result);
+                } catch (AjaxException $ex) {
+                    $this->err($ex->getMessage());
+                    $this->response()->setContent($ex->getMessage());
+                    return false;
+                } catch (Exception $ex) {
+                    $this->err($ex->getMessage());
+                    return false;
+                }
+
+                //TODO::
+                if ($this->ajax() && $this->method() == 'POST') {
+                    $responseContents = [];
+                    if (is_array($result)) {
+                        $responseContents += $result;
+                    } elseif (is_string($result)) {
+                        $responseContents ['result'] = $result;
+                    }
+                    $this->debug($responseContents);
+                    $this->response()->setContent($responseContents);
                     return true;
                 }
-            }
 
-            /**
-             * Execute the handler
-             */
-            $this->info(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-            $result = call_user_func_array($callable, []);
-            //$this->debug($result);
-            return ($result) ?: true;
-        } catch (AjaxException $ex) {
-            $this->err($ex->getMessage());
-            $this->response()->setContent($ex->getMessage());
-        } catch (Exception $ex) {
-            $this->err($ex->getMessage());
-            throw $ex;
+                return ($result) ?: true;
         }
-        //$this->debug($result);
-        return $result;
+        return false;
     }
 
-    protected
-    function execPageAction()
+    protected function setCsrfToken()
     {
-        try {
-            $rout = $this->router();
+        if (function_exists('mcrypt_create_iv')) {
+            $_SESSION ['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+        } else {
+            $_SESSION ['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+        $_SESSION ['token_time'] = time();
+    }
 
-            if ($handler = $this->getPostHandler()) {
-                //$this->debug('hello #10');
-                $rout->setQuery($handler);
-            }
+    public function getCsrfToken()
+    {
+        return if_exists($_SESSION, 'csrf_token', null);
+    }
 
-            /**
-             * URL의 라우팅 설정
-             * 실행파일의 클래스명과 실행메소드를 분리하여 구한다.
-             */
-            $router = $rout->getRoute();
+    protected function verifyCsrfToken()
+    {
+        if (!$this->config()->get('enableCsrfProtection')) {
+            return true;
+        }
+        // $this->debug ( $this->container->get ( 'config' )->get ( 'enableCsrfProtection' ) );
 
-            /**
-             * 클래스명과 파일 경로를 전달받아 클래스 인스턴스를 생성한다.
-             */
-            $callable = $this->findController($router->controller, $router->action, $this->getAppDir());
-
-            /**
-             * 클래스 인스턴스를 실행한다.
-             */
-            if (!$result = $this->runAjaxHandler($callable)) {
-//                $this->err($result);
-//                return $result;
-                $this->err(sprintf('The Class "%s" does "%s" method', get_class($callable [0]), $callable [1]));
-                throw new ApplicationException ('runAjaxHandler');
-            }
-
-            return ($result) ?: true;
-//        } catch (AjaxException $ex) {
-//            $this->err($ex->getMessage());
-//            $this->response()->setContent($ex->getMessage());
-//        } catch (ApplicationException $ex) {
-//            $this->err($ex->getMessage());
-        } catch (Exception $ex) {
-            $this->err($ex->getMessage());
-            throw $ex;
+        if (in_array($this->method(), [
+            'HEAD',
+            'GET',
+            'OPTIONS'
+        ])) {
+            return true;
         }
 
-        return -1;
-    }
+        // $this->debug ( $this->method () );
+        // $this->debug ( Request::getInstance ()->header () );
 
-    public static function normalizeClassName($name)
-    {
-        $name = str_replace('/', '\\', $name);
+        $csrftoken = Request::getInstance()->header('x-csrf-token');
+        // $this->debug ( $csrftoken );
 
-        if (is_object($name))
-            $name = get_class($name);
-
-        $name = '\\' . ltrim($name, '\\');
-        return $name;
-    }
-
-    protected function findController($controller, $action, $inPath)
-    {
-        $directory = is_array($inPath) ? $inPath : array(
-            $inPath
-        );
-
-        /**
-         * Workaround: Composer does not support case insensitivity.
-         * TODO::2016-12-02 unix 시스템에서 파일이름의 대소문자 구별한다.
-         */
-        if (!class_exists($controller)) {
-            $controller = self::normalizeClassName($controller);
-            foreach ($directory as $inPath) {
-//                $controllerFile = $inPath . strtolower(str_replace('\\', '/', $controller)) . '.php';
-                $controllerFile = $inPath . str_replace('\\', '/', $controller) . '.php';
-                if (file_exists($controllerFile)) {
-                    include_once($controllerFile);
-                    break;
-                }
-            }
-        }
-
-        if (!class_exists($controller)) {
-//          return false;
-            throw new ApplicationException (sprintf('The Class "%s" does not found', $controller));
-        }
-
-        $controllerObj = [
-            new $controller ($this->container),
-            $action
-        ];
-
-        if (is_callable($controllerObj)) {
-            return $controllerObj;
-        }
-
-//      return false;
-        throw new ApplicationException (sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
-    }
-
-    function setAppDir($directory = [])
-    {
-        self::$AppDirectory = $directory;
-    }
-
-    function getAppDir()
-    {
-        return self::$AppDirectory;
-    }
-
-    function setBasePath($directory)
-    {
-        self::$basePath = $directory;
-    }
-
-    function getBasePath()
-    {
-        return self::$basePath;
+        $token = $this->getParameter('csrf_token', $csrftoken);
+        // $this->debug ( $token );
+        // $this->debug ( $this->getCsrfToken () );
+        return $this->getCsrfToken() === $token;
     }
 }

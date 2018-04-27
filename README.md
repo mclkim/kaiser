@@ -22,35 +22,29 @@ Composer version 1.5.1 2017-08-09 16:07:22
 ```
 
 ###1.Install
+First, at the command line, make working directory:
 ```
 $ mkdir homepage
 $ cd homepage
+```
+and require the necessary libraries:
+```
 $ composer require mclkim/kaiser:dev-master
-./composer.json has been created
-Loading composer repositories with package information
-Updating dependencies (including require-dev)
-Package operations: 6 installs, 0 updates, 0 removals
-  - Installing psr/log (1.0.2): Loading from cache
-  - Installing katzgrau/klogger (1.2.1): Loading from cache
-  - Installing aura/web (2.1.0): Loading from cache
-  - Installing psr/container (1.0.0): Loading from cache
-  - Installing pimple/pimple (v3.2.3): Loading from cache
-  - Installing mclkim/kaiser (dev-master 89be385): Cloning 89be385ac9 from cache
-Writing lock file
-Generating autoload files
 ```
 
 ###2.Example copy on local development
+The following is a working example. 
 ```
 $ cp -rf vendor/mclkim/kaiser/example/* .
-$ php -S localhost:8000 -t public/
-PHP 5.5.X Development Server started at Thu Apr 26 14:56:29 2018
-Listening on http://localhost:8000
-Document root is /workspace/homepage/public
-Press Ctrl-C to quit.
 ```
 
 ###3.Web brower
+Now start the built in PHP server ...
+```
+$ php -S localhost:8000 -t public/
+```
+... and point your browser to http://localhost:8000/ 
+
 ```
 http://localhost:8000/?
 http://localhost:8000/?mysql

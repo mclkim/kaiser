@@ -32,13 +32,6 @@ class Route
     public function setUrl($url)
     {
         $url = (string)$url;
-
-        // make sure that the URL is suffixed with a forward slash
-        //TODO::
-//        if (substr($url, -1) !== '/') {
-//            $url .= '/';
-//        }
-
         $this->url = $url;
     }
 
@@ -78,7 +71,6 @@ class Route
         $this->setUrl($uri);
         $query = $uri = $this->getUrl();
 
-        // strip GET variables from URL
         if (($pos = strpos($uri, '&')) !== false) {
             $uri = substr($uri, 0, $pos);
         }

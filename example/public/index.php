@@ -19,7 +19,7 @@ $container = new Kaiser\Container ();
 $container ['DB'] = function ($c) {
     $dbname = 'mysql';
     $user = 'root';
-    $pass = 'pass';
+    $pass = '';
 
     try {
         return new PDO('mysql:host=localhost;dbname=' . $dbname, $user, $pass);

@@ -47,6 +47,11 @@ class Controller extends BaseController implements ControllerInterface
         return $this->request()->method();
     }
 
+    protected function header($key = null, $alt = null)
+    {
+        return $this->request()->header($key = null, $alt = null);
+    }
+
     protected function getParameters()
     {
 //        return array_merge($this->request()->get(), $this->request()->post());
@@ -58,9 +63,14 @@ class Controller extends BaseController implements ControllerInterface
         return $this->request()->get_post($index, $no_result);
     }
 
-    protected function redirect($redirect)
+    protected function redirect($location, $code = 302, $phrase = null)
     {
-        return $this->response()->redirect($redirect);
+        return $this->response()->redirect($location, $code, $phrase);
+    }
+
+    protected function status($code, $phrase = null, $version = null)
+    {
+        return $this->response()->status($code, $phrase, $version);
     }
 
     function info($message = null, array $context = array())

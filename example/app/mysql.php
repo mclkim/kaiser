@@ -16,7 +16,7 @@ class mysql extends Controller
     function execute()
     {
         $pdo = $this->container->get('DB');
-        $dbm = new  \Kaiser\Manager\DBManager ($pdo);
+        $dbm = new \Kaiser\Manager\DBManager ($pdo);
         var_dump($dbm->executePreparedQueryOne('select version()'));
     }
 }

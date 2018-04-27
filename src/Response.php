@@ -61,6 +61,12 @@ class Response //extends Singleton
         return $this->response_sender->__invoke();
     }
 
+    function status($code, $phrase = null, $version = null)
+    {
+        $this->response->status->set($code, $phrase, $version);
+        return $this->response_sender->__invoke();
+    }
+
     function getJSON($content, $options = JSON_UNESCAPED_UNICODE)
     {
         $this->response->headers->set('Content-Type', 'application/json; charset=UTF-8');

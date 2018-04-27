@@ -26,7 +26,7 @@ class App extends Controller
         /**
          * 시작을 로그파일에 기록한다.
          */
-        $this->info(sprintf('<<START>>The Class "%s" Initialized ', get_class($this)));
+        $this->info(sprintf('<<START<<The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
          */
@@ -39,7 +39,7 @@ class App extends Controller
          * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
          * 사용한 메모리를 기록한다.
          */
-        $this->info(sprintf('<<END>>The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
+        $this->info(sprintf('>>END>>The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
     }
 
     public function version()
@@ -73,6 +73,7 @@ class App extends Controller
         $controller = $routeInfo[1];
         $action = $routeInfo[2];
         $parameters = $routeInfo[3];
+
         $this->debug($controller);
         $this->debug($action);
         $this->debug($parameters);
@@ -81,37 +82,40 @@ class App extends Controller
             case Router::NOT_FOUND:
                 // ... 404 Not Found
                 $this->err(sprintf('The Class "%s" does not found', $controller));
-                header('HTTP/1.0 404 Not Found');
+                $this->status('404', 'Not Found', '1.1');
                 break;
             case Router::NOT_FOUND_ACTION:
                 // ... 405 Method Not Allowed
                 $this->err(sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
-                header('HTTP/1.0 404 Not Found');
+                $this->status('404', 'Not Found', '1.1');
                 break;
             case Router::FOUND:
                 //TODO::
                 $instance = new $controller;
                 $instance->setContainer($this->getContainer());
 
-                //TODO::
+                /**
+                 * TODO::
+                 * requireLogin && requireAdmin
+                 */
                 $auth = new \Kaiser\Auth();
+                $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+                $return_uri = $instance->getParameter('returnURI', $request_uri);
+                $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
                 if (!$auth->checkAdmin($instance)) {
-                    $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-                    $return_uri = $instance->getParameter('returnURI', $request_uri);
-                    $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
                     $this->debug($redirect);
                     $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
                     return true;
                 } else if (!$auth->checkAuth($instance)) {
-                    $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-                    $return_uri = $instance->getParameter('returnURI', $request_uri);
-                    $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
                     $this->debug($redirect);
                     $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
                     return true;
                 }
 
-                //TODO::
+                /**
+                 * TODO:
+                 * Execute the handler
+                 */
                 try {
                     $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
                     $result = call_user_func_array(array($instance, $action), $parameters);
@@ -125,7 +129,10 @@ class App extends Controller
                     return false;
                 }
 
-                //TODO::
+                /**
+                 * TODO::
+                 * Execute AJAX event
+                 */
                 if ($this->ajax() && $this->method() == 'POST') {
                     $responseContents = [];
                     if (is_array($result)) {
@@ -163,20 +170,12 @@ class App extends Controller
         if (!$this->config()->get('enableCsrfProtection')) {
             return true;
         }
-        // $this->debug ( $this->container->get ( 'config' )->get ( 'enableCsrfProtection' ) );
 
-        if (in_array($this->method(), [
-            'HEAD',
-            'GET',
-            'OPTIONS'
-        ])) {
+        if (in_array($this->method(), ['HEAD', 'GET', 'OPTIONS'])) {
             return true;
         }
 
-        // $this->debug ( $this->method () );
-        // $this->debug ( Request::getInstance ()->header () );
-
-        $csrftoken = Request::getInstance()->header('x-csrf-token');
+        $csrftoken = $this->header('x-csrf-token');
         // $this->debug ( $csrftoken );
 
         $token = $this->getParameter('csrf_token', $csrftoken);

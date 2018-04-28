@@ -33,8 +33,8 @@ class Controller extends BaseController implements ControllerInterface
         session_destroy();
         unset ($_SESSION);
 
-        $auth = new \Kaiser\Auth();
-        $this->redirect($auth->_defaultPage);
+        // $auth = new \Kaiser\Auth();
+        $this->redirect($this->auth()->_defaultPage);
     }
 
     protected function ajax()

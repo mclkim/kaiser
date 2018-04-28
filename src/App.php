@@ -65,9 +65,9 @@ class App extends Controller
 
     protected function execPageAction($directory = [])
     {
-        $router = new \Kaiser\Router();
-        $router->setAppDir($directory);
-        $routeInfo = $router->dispatch(array('methods' => ['GET', 'POST']));
+        // $router = new \Kaiser\Router();
+        $this->router()->setAppDir($directory);
+        $routeInfo = $this->router()->dispatch(array('methods' => ['GET', 'POST']));
 
         //TODO::
         $controller = $routeInfo[1];
@@ -98,15 +98,15 @@ class App extends Controller
                  * TODO::
                  * requireLogin && requireAdmin
                  */
-                $auth = new \Kaiser\Auth();
+                // $auth = new \Kaiser\Auth();
                 $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
                 $return_uri = $instance->getParameter('returnURI', $request_uri);
                 $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-                if (!$auth->checkAdmin($instance)) {
+                if (!$this->auth()->checkAdmin($instance)) {
                     $this->debug($redirect);
                     $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
                     return true;
-                } else if (!$auth->checkAuth($instance)) {
+                } else if (!$this->auth()->checkAuth($instance)) {
                     $this->debug($redirect);
                     $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
                     return true;

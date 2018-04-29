@@ -104,11 +104,11 @@ class App extends Controller
                 $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
                 if (!$this->auth()->checkAdmin($instance)) {
                     $this->debug($redirect);
-                    $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
+                    $this->response()->redirect($this->auth()->_loginAdminPage . '&returnURI=' . $redirect);
                     return true;
                 } else if (!$this->auth()->checkAuth($instance)) {
                     $this->debug($redirect);
-                    $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
+                    $this->response()->redirect($this->auth()->_loginPage . '&returnURI=' . $redirect);
                     return true;
                 }
 

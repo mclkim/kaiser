@@ -39,12 +39,13 @@ class Container extends PimpleContainer implements ContainerInterface
 
     private function registerDefaultServices(Container $container)
     {
-        $container->set('auth', new  Auth ());
-        $container->set('config', new  Config ());
-        $container->set('request', new  Request ());
-        $container->set('response', new  Response ());
-        $container->set('router', new  Router ());
-        $container->set('template', new  \Template_ ());
+        $container->set('auth', new  Auth());
+        $container->set('config', new  Config());
+        $container->set('request', new  Request());
+        $container->set('response', new  Response());
+        $container->set('router', new  Router());
+//        $container->set('session', new  Session());
+        $container->set('template', new  \Template_());
         /**
          * TODO::
          * KLogger: Simple Logging for PHP

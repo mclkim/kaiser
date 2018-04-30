@@ -8,10 +8,6 @@ class BaseController //extends Singleton
 {
     protected $container;
 
-//    function __construct()
-//    {
-//    }
-
     public function getContainer()
     {
         return $this->container;
@@ -23,7 +19,6 @@ class BaseController //extends Singleton
             $container = new Container ($container);
         }
         if (!$container instanceof ContainerInterface) {
-//            exit ('Expected a ContainerInterface');
             throw new \RuntimeException ('Expected a ContainerInterface');
         }
         $this->container = $container;

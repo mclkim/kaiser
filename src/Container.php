@@ -7,11 +7,6 @@ use Psr\Container\ContainerInterface;
 
 class Container extends PimpleContainer implements ContainerInterface
 {
-    /**
-     * The current globally available container (if any).
-     *
-     * @var static
-     */
     function __construct(array $values = [])
     {
         parent::__construct($values);
@@ -44,10 +39,8 @@ class Container extends PimpleContainer implements ContainerInterface
         $container->set('request', new  Request());
         $container->set('response', new  Response());
         $container->set('router', new  Router());
-//        $container->set('session', new  Session());
         $container->set('template', new  \Template_());
         /**
-         * TODO::
          * KLogger: Simple Logging for PHP
          * https://github.com/katzgrau/KLogger
          */

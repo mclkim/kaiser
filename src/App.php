@@ -54,8 +54,9 @@ class App extends Controller
         /**
          * 세션스타트..
          */
-//        $this->container->get('session');
-        session_start();
+        $sess = $this->container->get('session');
+        $sess->start_session();
+//        session_start();
 
         $result = $this->execPageAction($directory);
         $this->debug($result);

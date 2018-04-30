@@ -39,6 +39,7 @@ class Container extends PimpleContainer implements ContainerInterface
         $container->set('request', new  Request());
         $container->set('response', new  Response());
         $container->set('router', new  Router());
+        $container->set('session', new  Session());
         $container->set('template', new  \Template_());
         /**
          * KLogger: Simple Logging for PHP

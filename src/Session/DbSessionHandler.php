@@ -29,6 +29,11 @@ class DbSessionHandler extends SecureHandler
         session_set_save_handler(array($this, "open"), array($this, "close"), array($this, "read"), array($this, "write"), array($this, "destroy"), array($this, "gc"));
     }
 
+    public function __destruct()
+    {
+//        session_write_close();
+    }
+
     function start_session($sessionName = 'PHPSESSID')
     {
         // change the default session folder in a temporary dir
@@ -38,11 +43,6 @@ class DbSessionHandler extends SecureHandler
         session_name($sessionName);
 
         session_start();
-    }
-
-    public function __destruct()
-    {
-        session_write_close();
     }
 
     public function open($save_path, $session_name)

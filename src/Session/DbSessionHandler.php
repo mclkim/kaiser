@@ -25,25 +25,19 @@ class DbSessionHandler extends SecureHandler
 
         $this->db = new DBManager($pdo);
 
-        session_cache_expire($this->session_cache_expire_minutes); #2 hours
+        // set our custom session functions.
+        session_set_save_handler(array($this, "open"), array($this, "close"), array($this, "read"), array($this, "write"), array($this, "destroy"), array($this, "gc"));
+    }
 
-        $cache_expire = session_cache_expire();
+    function start_session($sessionName = 'PHPSESSID')
+    {
+        // change the default session folder in a temporary dir
+        session_save_path(sys_get_temp_dir());
 
-        session_cache_limiter('private');
+        // Change the session name
+        session_name($sessionName);
 
-        $cache_limiter = session_cache_limiter();
-
-        session_set_save_handler(
-            array(&$this, "open"), array(&$this, "close"), array(&$this, "read"), array(&$this, "write"), array(&$this, "destroy"), array(&$this, "gc")
-        );
-
-        if (!is_null($this->session_name)) {
-            session_name($this->session_name);
-        }
-
-        if ($this->session_auto_start) {
-            session_start();
-        }
+        session_start();
     }
 
     public function __destruct()
@@ -53,8 +47,6 @@ class DbSessionHandler extends SecureHandler
 
     public function open($save_path, $session_name)
     {
-        $this->key = $this->getKey('KEY_' . $session_name);
-        if (is_null($this->db)) return false;
         return true;
     }
 
@@ -66,22 +58,29 @@ class DbSessionHandler extends SecureHandler
 
     public function read($id)
     {
-        $sql = "SELECT privilege FROM sessions WHERE id = ?";
+        $sql = "SELECT privilege,session_key FROM sessions WHERE id = ?";
 
-        $data = $this->db->executePreparedQueryOne($sql, array(
+        $data = $this->db->executePreparedQueryToMap($sql, array(
             $id
         ));
 
-        return empty($data) ? '' : $this->decrypt($data, $this->key);
+        $key = $data['session_key'];
+        return empty($data['privilege']) ? '' : $this->encrypt(base64_decode($data['privilege']), $key);
     }
 
     public function write($id, $data)
     {
-        $encrypt = $this->decrypt($data, $this->key);
+        $key = $this->session_key($id);
+        $encrypt = $this->encrypt($data, $key);
+
+        logger()->error($key);
+        logger()->error($data);
+        logger()->error($encrypt);
 
         $data = array(
             'id' => $id,
-            'privilege' => $encrypt,
+            'privilege' => base64_encode($encrypt),
+            'session_key' => $key,
             'updated' => Timestamp::getUNIXtime()
         );
 
@@ -94,5 +93,17 @@ class DbSessionHandler extends SecureHandler
 
     function gc($maxlifetime)
     {
+    }
+
+    protected function session_key($session_id)
+    {
+        $sql = "SELECT session_key FROM sessions WHERE id = ? LIMIT 1";
+
+        $res = $this->db->executePreparedQueryOne($sql, array(
+            $session_id
+        ));
+
+//        return ($res) ? $res : substr(hash('sha512', uniqid(mt_rand(1, 32), true)), 0, 64);
+        return ($res) ? $res : base64_encode(random_bytes(64));
     }
 }

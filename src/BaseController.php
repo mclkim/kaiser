@@ -4,9 +4,13 @@ namespace Kaiser;
 
 use Psr\Container\ContainerInterface;
 
-class BaseController //extends Singleton
+class BaseController extends Singleton
 {
     protected $container;
+
+    function __construct()
+    {
+    }
 
     public function getContainer()
     {

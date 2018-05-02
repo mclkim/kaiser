@@ -4,15 +4,10 @@ namespace Kaiser;
 
 use SessionHandler;
 
-class MySessionHandler
-{
-}
-
 class Session
 {
     function __construct()
     {
-        session_set_save_handler(new MySessionHandler(), true);
     }
 
     function start_session($sessionName = 'PHPSESSID')

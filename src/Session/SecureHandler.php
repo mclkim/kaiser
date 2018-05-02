@@ -8,9 +8,11 @@
  * @author    Enrico Zimuel (enrico@zimuel.it)
  * @copyright MIT License
  */
+
 namespace Kaiser\Session;
 
 use SessionHandler;
+use Kaiser\Exception\AuthenticationFailedException;
 
 class SecureHandler extends SessionHandler
 {
@@ -25,13 +27,13 @@ class SecureHandler extends SessionHandler
      */
     public function __construct()
     {
-        if (! extension_loaded('openssl')) {
+        if (!extension_loaded('openssl')) {
             throw new \RuntimeException(sprintf(
                 "You need the OpenSSL extension to use %s",
                 __CLASS__
             ));
         }
-        if (! extension_loaded('mbstring')) {
+        if (!extension_loaded('mbstring')) {
             throw new \RuntimeException(sprintf(
                 "You need the Multibytes extension to use %s",
                 __CLASS__
@@ -111,8 +113,8 @@ class SecureHandler extends SessionHandler
      */
     protected function decrypt($data, $key)
     {
-        $hmac       = mb_substr($data, 0, 32, '8bit');
-        $iv         = mb_substr($data, 32, 16, '8bit');
+        $hmac = mb_substr($data, 0, 32, '8bit');
+        $iv = mb_substr($data, 32, 16, '8bit');
         $ciphertext = mb_substr($data, 48, null, '8bit');
         // Authentication
         $hmacNew = hash_hmac(
@@ -121,8 +123,8 @@ class SecureHandler extends SessionHandler
             mb_substr($key, 32, null, '8bit'),
             true
         );
-        if (! hash_equals($hmac, $hmacNew)) {
-            throw new Exception\AuthenticationFailedException('Authentication failed');
+        if (!hash_equals($hmac, $hmacNew)) {
+            throw new AuthenticationFailedException('Authentication failed');
         }
         // Decrypt
         return openssl_decrypt(
@@ -143,9 +145,9 @@ class SecureHandler extends SessionHandler
     protected function getKey($name)
     {
         if (empty($_COOKIE[$name])) {
-            $key         = random_bytes(64); // 32 for encryption and 32 for authentication
+            $key = random_bytes(64); // 32 for encryption and 32 for authentication
             $cookieParam = session_get_cookie_params();
-            $encKey      = base64_encode($key);
+            $encKey = base64_encode($key);
             setcookie(
                 $name,
                 $encKey,

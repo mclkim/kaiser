@@ -33,13 +33,13 @@ class DBManager
 
     protected function debug($message, array $context = array())
     {
-//        if ($this->enableLogging)
-//            logger()->debug($message, $context);
+        if ($this->enableLogging)
+            logger()->debug($message, $context);
     }
 
     protected function err($message, array $context = array())
     {
-//        logger()->error($message, $context);
+        logger()->error($message, $context);
     }
 
     function version()

@@ -1,18 +1,20 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: 김명철
+ * Date: 2018-05-02
+ * Time: 오후 1:37
+ */
 
-namespace Kaiser;
+namespace Kaiser\Session;
 
-use SessionHandler;
-
-class MySessionHandler
-{
-}
-
-class Session
+class FileSessionHandler
 {
     function __construct()
     {
-        session_set_save_handler(new MySessionHandler(), true);
+        ini_set('session.save_handler', 'files');
+        
+        session_set_save_handler(new \PHPSecureSession\SecureHandler(), true);
     }
 
     function start_session($sessionName = 'PHPSESSID')

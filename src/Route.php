@@ -97,10 +97,12 @@ class Route
     public function dispatch()
     {
         if (!is_null($this->action)) {
-            $instance = new $this->controller;
-            call_user_func_array(array($instance, $this->action), $this->parameters);
+            $handler = new $this->controller;
+            if (is_callable(array($handler, $this->action))) {
+                call_user_func_array(array($handler, $this->action), $this->parameters);
+            }
         } else {
-            $instance = new $this->controller($this->parameters);
+            $handler = new $this->controller($this->parameters);
         }
     }
 

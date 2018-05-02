@@ -26,7 +26,8 @@ class App extends Controller
         /**
          * 시작을 로그파일에 기록한다.
          */
-        $this->info(sprintf('<<START<<The Class "%s" Initialized ', get_class($this)));
+        $this->info('<<START --------------------------------------------');
+        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
          */
@@ -39,7 +40,8 @@ class App extends Controller
          * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
          * 사용한 메모리를 기록한다.
          */
-        $this->info(sprintf('>>END>>The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
+        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
+        $this->info('---------------------------------------------- END>>');
     }
 
     public function version()
@@ -54,9 +56,9 @@ class App extends Controller
         /**
          * 세션스타트..
          */
-        $sess = $this->container->get('session');
-        $sess->start_session();
-//        session_start();
+//        $sess = $this->container->get('session');
+//        $sess->start_session();
+        session_start();
 
         $result = $this->execPageAction($directory);
         $this->debug($result);
@@ -92,24 +94,24 @@ class App extends Controller
                 break;
             case Router::FOUND:
                 //TODO::
-                $instance = new $controller;
-                $instance->setContainer($this->getContainer());
+                $handler = new $controller;
+                $handler->setContainer($this->getContainer());
 
                 /**
                  * TODO::
                  * requireLogin && requireAdmin
                  */
-                // $auth = new \Kaiser\Auth();
+                $auth = $this->auth();
                 $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-                $return_uri = $instance->getParameter('returnURI', $request_uri);
+                $return_uri = $handler->getParameter('returnURI', $request_uri);
                 $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-                if (!$this->auth()->checkAdmin($instance)) {
-                    $this->debug($redirect);
-                    $this->response()->redirect($this->auth()->_loginAdminPage . '&returnURI=' . $redirect);
+                if (!$auth->checkAdmin($handler)) {
+                    $this->debug('redirect=>' . $redirect);
+                    $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
                     return true;
-                } else if (!$this->auth()->checkAuth($instance)) {
-                    $this->debug($redirect);
-                    $this->response()->redirect($this->auth()->_loginPage . '&returnURI=' . $redirect);
+                } else if (!$auth->checkAuth($handler)) {
+                    $this->debug('redirect=>' . $redirect);
+                    $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
                     return true;
                 }
 
@@ -119,7 +121,7 @@ class App extends Controller
                  */
                 try {
                     $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
-                    $result = call_user_func_array(array($instance, $action), $parameters);
+                    $result = call_user_func_array(array($handler, $action), $parameters);
                     $this->debug($result);
                 } catch (AjaxException $ex) {
                     $this->err($ex->getMessage());
@@ -161,7 +163,7 @@ class App extends Controller
         $_SESSION ['token_time'] = time();
     }
 
-    public function getCsrfToken()
+    protected function getCsrfToken()
     {
         return if_exists($_SESSION, 'csrf_token', null);
     }

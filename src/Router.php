@@ -23,11 +23,13 @@ class Router
         $req = new Request();
         $this->url = $req->url(PHP_URL_QUERY);
         $this->method = $req->method();
-
+        //TODO::
         if ($handler = $req->header('X-October-Request-Handler')) {
             $this->url = $this->handler = $handler;
         } else if ($handler = $req->header('X-Request-Handler')) {
             $this->url = $this->handler = $handler;
+        } else if ($L = $req->get_post('L')) {
+            $this->url = $L;
         }
     }
 
@@ -73,7 +75,7 @@ class Router
 
         /**
          * Workaround: Composer does not support case insensitivity.
-         * TODO::2016-12-02 unix 시스템에서 파일이름의 대소문자 구별한다.
+         * TODO::UNIX 시스템에서 파일이름의 대소문자 구별한다.(2016-12-02)
          */
         if (!class_exists($controller)) {
             $controller = self::normalizeClassName($controller);
@@ -92,7 +94,6 @@ class Router
 
         //TODO::
         $handler = array(new $controller, $action);
-
         if (is_callable($handler)) {
             return [self::FOUND, $controller, $action, $parameters];
         }

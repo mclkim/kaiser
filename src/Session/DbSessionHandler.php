@@ -13,7 +13,7 @@ use Kaiser\Manager\DBManager;
 use Kaiser\Timestamp;
 use Kaiser\Timer;
 
-class DbSessionHandler extends \PHPSecureSession\SecureHandler
+class DbSessionHandler extends SecureHandler
 {
     const SESS_EXPIRATION = 7200; // the number of SECONDS you want the session to last.
 

@@ -13,8 +13,8 @@ class FileSessionHandler
     function __construct()
     {
         ini_set('session.save_handler', 'files');
-        
-        session_set_save_handler(new \PHPSecureSession\SecureHandler(), true);
+
+        session_set_save_handler(new SecureHandler(), true);
     }
 
     function start_session($sessionName = 'PHPSESSID')

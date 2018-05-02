@@ -24,7 +24,7 @@
     "php": "^5.6 || ^7.0",
     "pimple/pimple": "^3.0",
     "aura/web": "^2.0",
-    "katzgrau/klogger": "^1.2"
+    "katzgrau/klogger": "^1.2",
     "ext-openssl": "*",
     "ext-mbstring": "*",
     "paragonie/random_compat": "^2.0.2"

@@ -127,7 +127,7 @@ class App extends Controller
                     $this->err($ex->getMessage());
                     $this->response()->setContent($ex->getMessage());
                     return false;
-                } catch (Exception $ex) {
+                } catch (\Exception $ex) {
                     $this->err($ex->getMessage());
                     return false;
                 }

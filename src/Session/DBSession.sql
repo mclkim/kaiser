@@ -19,19 +19,8 @@ CREATE TABLE `sessions` (
  `request` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '요청정보',
  `referer` VARCHAR(255) DEFAULT NULL COMMENT '참조정보',
  `timer` FLOAT NOT NULL DEFAULT '0' COMMENT '타이머',
- `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
- #`created` INT(11) NOT NULL DEFAULT '0' COMMENT '생성시간',
+ `created` INT(11) NOT NULL DEFAULT '0' COMMENT '생성시간',
  `updated` INT(11) NOT NULL DEFAULT '0' COMMENT '수정시간',
  `session_key` TEXT NOT NULL COMMENT '세션KEY',
  PRIMARY KEY (`no`), UNIQUE KEY `idx_sessions_id` (`id`), KEY `updated` (`updated`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-
-
-CREATE TABLE `sessions` (
-	`id` varchar(63) CHARACTER SET ascii NOT NULL DEFAULT '',
-	`data` text,
-	`expire` int(10) unsigned DEFAULT NULL,
-	`created` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
-	PRIMARY KEY (`id`),
-	KEY `expire` (`expire`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -33,12 +33,14 @@ class DBManager
 
     protected function debug($message, array $context = array())
     {
+        $message = is_array($message) ? var_export($message, true) : $message;
         if ($this->enableLogging)
             logger()->debug($message, $context);
     }
 
     protected function err($message, array $context = array())
     {
+        $message = is_array($message) ? var_export($message, true) : $message;
         logger()->error($message, $context);
     }
 

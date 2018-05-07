@@ -31,6 +31,7 @@
  * KEY `updated` (`updated`)
  * ) ENGINE=InnoDB DEFAULT CHARSET=utf8
  */
+
 namespace Kaiser\Session;
 
 use Kaiser\Manager\DBManager;
@@ -116,6 +117,10 @@ final class DBSession extends DBManager
             Timestamp::getUNIXtime() - self::$sess_expiration
         ));
 
+        if (is_null($data)) {
+            return '';
+        }
+
         $key = $this->getkey($sessionId);
 //        $this->err($key);
 
@@ -137,6 +142,7 @@ final class DBSession extends DBManager
 
         $crypt = new MCrypt($key);
         $decrypt = $crypt->decrypt($data);
+
 
 //        $this->err($data);
 //        $this->err($decrypt);

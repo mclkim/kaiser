@@ -2,7 +2,7 @@
 
 namespace Kaiser;
 
-use SessionHandler;
+// use SessionHandler;
 
 class Session
 {

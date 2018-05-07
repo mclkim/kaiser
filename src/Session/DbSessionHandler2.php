@@ -8,12 +8,11 @@
 
 namespace Kaiser\Session;
 
-
 use Kaiser\Manager\DBManager;
 use Kaiser\Timestamp;
 use Kaiser\Timer;
 
-class DbSessionHandler extends SecureHandler
+class DbSessionHandler2 extends SecureHandler
 {
     const SESS_EXPIRATION = 7200; // the number of SECONDS you want the session to last.
 
@@ -65,7 +64,15 @@ class DbSessionHandler extends SecureHandler
         ));
 
         $key = $data['session_key'];
-        return empty($data['privilege']) ? '' : $this->encrypt(base64_decode($data['privilege']), $key);
+        $encrypt = $data['privilege'];
+        $decrypt = $this->decrypt(base64_decode($data['privilege']), $key);
+
+//        logger()->error('hello world');
+//        logger()->error($data);
+//        logger()->error($encrypt);
+//        logger()->error($decrypt);
+
+        return empty($data['privilege']) ? '' : $this->decrypt(base64_decode($data['privilege']), $key);
     }
 
     public function write($id, $data)
@@ -73,9 +80,10 @@ class DbSessionHandler extends SecureHandler
         $key = $this->session_key($id);
         $encrypt = $this->encrypt($data, $key);
 
-        logger()->error($key);
-        logger()->error($data);
-        logger()->error($encrypt);
+//        logger()->error('hello world');
+//        logger()->error($key);
+//        logger()->error($data);
+//        logger()->error($encrypt);
 
         $data = array(
             'id' => $id,

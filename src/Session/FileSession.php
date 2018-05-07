@@ -8,6 +8,10 @@ final class FileSession
 //    var $iv = 'ddky2235gee1g3mr';
     private $savePath;
 
+    //sudo apt-get install php5-mcrypt
+    //sudo a2enmod mcrypt
+    // sudo php5enmod mcrypt
+    //sudo service apache2 restart //if server not reloaded automatically
     public function __construct($savePath = null)
     {
         // $temp_file = tempnam(sys_get_temp_dir(), 'Tux');

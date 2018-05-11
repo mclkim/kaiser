@@ -4,8 +4,8 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON `sbdc2016`.* TO 'sbdc2016'@'localhost';
 GRANT ALL PRIVILEGES ON *.* TO sbdc2016@'%' IDENTIFIED BY 'sbdc2016!..';
 FLUSH PRIVILEGES;
 #---------------------------------------------------------------
-USE `sessionsDB`;
- #DROP TABLE IF EXISTS `sessions`;
+#USE `sessionsDB`;
+#DROP TABLE IF EXISTS `sessions`;
 #---------------------------------------------------------------
 CREATE TABLE `sessions` (
  `no` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -22,5 +22,7 @@ CREATE TABLE `sessions` (
  `created` INT(11) NOT NULL DEFAULT '0' COMMENT '생성시간',
  `updated` INT(11) NOT NULL DEFAULT '0' COMMENT '수정시간',
  `session_key` TEXT NOT NULL COMMENT '세션KEY',
- PRIMARY KEY (`no`), UNIQUE KEY `idx_sessions_id` (`id`), KEY `updated` (`updated`)
+ PRIMARY KEY (`no`),
+ UNIQUE KEY `idx_sessions_id` (`id`),
+ KEY `updated` (`updated`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

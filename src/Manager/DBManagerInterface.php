@@ -11,11 +11,11 @@ namespace Kaiser\Manager;
 
 interface DBManagerInterface
 {
+    function getData();
     function getList();
 
     function getMapList();
 
-    function getData();
 
     function putData();
 

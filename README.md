@@ -57,11 +57,12 @@ http://localhost:8000/?hello.world&p1=1&p2=2&p3=3
  * [Router](https://github.com/nikic/FastRoute)
  * [Logger](https://github.com/katzgrau/KLogger)
  * [Session](https://github.com/ezimuel/PHP-Secure-Session)
- * [Auth](https://github.com/delight-im/PHP-Auth)
  * [Config](https://github.com/hassankhan/config)
  * [Template_](http://www.xtac.net)
+ * [PHP Paginator](https://github.com/jasongrimes/php-paginator)
+ * [Auth](https://github.com/delight-im/PHP-Auth)
  * [PHP-FileUpload](https://github.com/delight-im/PHP-FileUpload)
  * [PHP-Router](https://github.com/delight-im/PHP-Router)
-
+ * [PHP-DB](https://github.com/delight-im/PHP-DB)
 
 Released under the [MIT License](LICENSE)

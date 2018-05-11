@@ -122,89 +122,151 @@ class DBManager
         return $tokens;
     }
 
-    function executePreparedQueryOne($statement, $params = array())
+    private function executePreparedQuery(callable $callback, $query, array $bindValues = null)
     {
-        $sql = $this->executeEmulateQuery($statement, $params);
+        $sql = $this->executeEmulateQuery($query, $bindValues);
         $this->debug($sql);
+
+        // create a prepared statement from the supplied SQL string
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            return $result = $stmt->fetch(\PDO::FETCH_COLUMN);
+            $stmt = $this->pdo->prepare($query);
         } catch (\PDOException $e) {
             $this->err($e->getMessage());
         }
-        return false;
+
+        // bind the supplied values to the query and execute it
+        try {
+            $stmt->execute($bindValues);
+        } catch (\PDOException $e) {
+            $this->err($e->getMessage());
+        }
+
+        // fetch the desired results from the result set via the supplied callback
+        $results = $callback($stmt);
+
+        // if the result is empty
+        if (empty($results) && $stmt->rowCount() === 0) {
+            // consistently return `null`
+            return null;
+        } // if some results have been found
+        else {
+            // return these as extracted by the callback
+            return $results;
+        }
     }
 
-    function executePreparedQueryToMap($statement, $params = array())
+    function executePreparedQueryOne($query, array $bindValues = null)
     {
-        $sql = $this->executeEmulateQuery($statement, $params);
-        $this->debug($sql);
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            return $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            $this->err($e->getMessage());
-        }
-        return false;
+        return $this->executePreparedQuery(function ($stmt) {
+            return $stmt->fetch(\PDO::FETCH_COLUMN);
+        }, $query, $bindValues);
     }
 
-    function executePreparedQueryToMapList($statement, $params = array())
+    function executePreparedQueryToMap($query, array $bindValues = null)
     {
-        $sql = $this->executeEmulateQuery($statement, $params);
-        $this->debug($sql);
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            return $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            $this->err($e->getMessage());
-        }
-        return false;
+        return $this->executePreparedQuery(function ($stmt) {
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        }, $query, $bindValues);
     }
 
-    function executePreparedQueryToArrayList($statement, $params = array())
+    function executePreparedQueryToMapList($query, array $bindValues = null)
     {
-        $sql = $this->executeEmulateQuery($statement, $params);
-        $this->debug($sql);
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            return $result = $stmt->fetchAll(\PDO::FETCH_NUM);
-        } catch (\PDOException $e) {
-            $this->err($e->getMessage());
-        }
-        return false;
+        return $this->executePreparedQuery(function ($stmt) {
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }, $query, $bindValues);
     }
 
-    function executePreparedQueryToObjList($statement, $params = array())
+    function executePreparedQueryToArrayList($query, array $bindValues = null)
     {
-        $sql = $this->executeEmulateQuery($statement, $params);
-        $this->debug($sql);
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            return $result = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        } catch (\PDOException $e) {
-            $this->err($e->getMessage());
-        }
-        return false;
+        return $this->executePreparedQuery(function ($stmt) {
+            return $stmt->fetchAll(\PDO::FETCH_NUM);
+        }, $query, $bindValues);
     }
 
-    function executePreparedUpdate($statement, $params = array())
+    function executePreparedQueryToObjList($query, array $bindValues = null)
     {
-        $sql = $this->executeEmulateQuery($statement, $params);
+        return $this->executePreparedQuery(function ($stmt) {
+            return $stmt->fetchAll(\PDO::FETCH_OBJ);
+        }, $query, $bindValues);
+    }
+
+    function executePreparedUpdate($query, array $bindValues = null)
+    {
+        $sql = $this->executeEmulateQuery($query, $bindValues);
         $this->debug($sql);
+
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            $result = $this->pdo->lastInsertId();
-            return $result === '0' ? $stmt->rowCount() : $result;
+            // create a prepared statement from the supplied SQL string
+            $stmt = $this->pdo->prepare($query);
         } catch (\PDOException $e) {
             $this->err($e->getMessage());
         }
-        return false;
+
+        try {
+            // bind the supplied values to the query and execute it
+            $stmt->execute($bindValues);
+        } catch (\PDOException $e) {
+            $this->err($e->getMessage());
+        }
+
+        $lastInsertId = $this->getLastInsertId();
+        return $lastInsertId === '0' ? $stmt->rowCount() : $lastInsertId;
+    }
+
+    public function getLastInsertId($sequenceName = null)
+    {
+        $id = $this->pdo->lastInsertId($sequenceName);
+        return $id;
+    }
+
+    public function beginTransaction()
+    {
+        try {
+            $success = $this->pdo->beginTransaction();
+        } catch (PDOException $e) {
+            $success = $e->getMessage();
+        }
+
+        if ($success !== true) {
+            throw new Exception(is_string($success) ? $success : null);
+        }
+    }
+
+    public function startTransaction()
+    {
+        $this->startTransaction();
+    }
+
+    public function isTransactionActive()
+    {
+        $state = $this->pdo->inTransaction();
+        return $state;
+    }
+
+    public function commit()
+    {
+        try {
+            $success = $this->pdo->commit();
+        } catch (PDOException $e) {
+            $success = $e->getMessage();
+        }
+
+        if ($success !== true) {
+            throw new Exception(is_string($success) ? $success : null);
+        }
+    }
+
+    public function rollBack()
+    {
+        try {
+            $success = $this->pdo->rollBack();
+        } catch (PDOException $e) {
+            $success = $e->getMessage();
+        }
+
+        if ($success !== true) {
+            throw new Exception(is_string($success) ? $success : null);
+        }
     }
 
     function executeTransaction()
@@ -285,76 +347,6 @@ class DBManager
                 return array(
                     'query' => $query,
                     'params' => $values
-                );
-            default :
-                return false;
-        }
-    }
-
-    private function _buildManipSQL_($table, $table_fields, $mode, $where = false)
-    {
-        if (count($table_fields) == 0) {
-            return false;
-        }
-        $first = true;
-        $params = array();
-        switch ($mode) {
-            case self::DB_AUTO_INSERT :
-                $values = '';
-                $fields = '';
-                foreach ($table_fields as $field => $value) {
-                    $params [] = $value;
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $fields .= ',';
-                        $values .= ',';
-                    }
-                    $fields .= $field;
-                    $values .= '?';
-                }
-                $sql = "INSERT INTO $table ($fields) VALUES ($values)";
-                return array(
-                    'query' => $sql,
-                    'params' => $params
-                );
-            case self::DB_AUTO_UPDATE :
-                $set = '';
-                foreach ($table_fields as $field => $value) {
-                    $params [] = $value;
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $set .= ',';
-                    }
-                    $set .= "$field = ?";
-                }
-                $sql = "UPDATE $table SET $set";
-                if ($where) {
-                    $sql .= " WHERE $where";
-                }
-                return array(
-                    'query' => $sql,
-                    'params' => $params
-                );
-            case self::DB_AUTO_REPLACE :
-                $values = '';
-                $fields = '';
-                foreach ($table_fields as $field => $value) {
-                    $params [] = $value;
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $fields .= ',';
-                        $values .= ',';
-                    }
-                    $fields .= $field;
-                    $values .= '?';
-                }
-                $sql = "REPLACE INTO $table ($fields) VALUES ($values)";
-                return array(
-                    'query' => $sql,
-                    'params' => $params
                 );
             default :
                 return false;

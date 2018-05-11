@@ -61,7 +61,7 @@ class App extends Controller
 //        session_start();
 
         $result = $this->execPageAction($directory);
-        $this->debug($result);
+//        $this->debug($result);
 
         $this->end();
     }

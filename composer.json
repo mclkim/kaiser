@@ -34,8 +34,7 @@
       "Kaiser\\": "src/"
     },
     "classmap": [
-      "src/Template_/Template_.class.php",
-      "src/Plupload/PluploadHandler.php"
+      "src/Template_/Template_.class.php"
     ],
     "files": [
       "src/Helpers.php"

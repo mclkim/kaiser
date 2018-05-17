@@ -68,9 +68,9 @@ class App extends Controller
 
     protected function execPageAction($directory = [])
     {
-        // $router = new \Kaiser\Router();
-        $this->router()->setAppDir($directory);
-        $routeInfo = $this->router()->dispatch(array('methods' => ['GET', 'POST']));
+        $router = new \Kaiser\Router();
+        $router->setAppDir($directory);
+        $routeInfo = $router->dispatch(array('methods' => ['GET', 'POST']));
 
         //TODO::
         $controller = $routeInfo[1];
@@ -109,7 +109,7 @@ class App extends Controller
                     $this->debug('redirect=>' . $redirect);
                     $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
                     return true;
-                } else if (!$auth->checkAuth($handler)) {
+                } else if (!$auth->checkUser($handler)) {
                     $this->debug('redirect=>' . $redirect);
                     $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
                     return true;

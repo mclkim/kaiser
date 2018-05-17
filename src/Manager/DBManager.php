@@ -2,6 +2,9 @@
 
 namespace Kaiser\Manager;
 
+use PDO;
+use PDOException;
+
 class DBManager
 {
     var $enableLogging = true;
@@ -16,14 +19,9 @@ class DBManager
 
     private $pdo = null;
 
-    function __construct($pdo = null)
+    function __construct(PDO $pdoInstance = null)
     {
-        $this->pdo = $pdo;
-    }
-
-    function __destruct()
-    {
-        // parent::__destruct ();
+        $this->pdo = $pdoInstance;
     }
 
     public function getPdo()
@@ -63,7 +61,7 @@ class DBManager
         $this->last_parameters = $data;
 
         if (count($this->prepare_types) != count($data)) {
-            // throw new DBException ( $e->getMessage () );
+            // throw new DB\Exception ( $e->getMessage () );
             return false;
         }
 
@@ -77,7 +75,7 @@ class DBManager
                 $fp = @fopen($value, 'rb');
                 if (!$fp) {
                     // return $this->raiseError ( DB_ERROR_ACCESS_VIOLATION );
-                    // throw new DBException ( $e->getMessage () );
+                    // throw new DB\Exception ( $e->getMessage () );
                     return false;
                 }
                 $realquery .= $this->quote(fread($fp, filesize($value)));
@@ -130,14 +128,14 @@ class DBManager
         // create a prepared statement from the supplied SQL string
         try {
             $stmt = $this->pdo->prepare($query);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->err($e->getMessage());
         }
 
         // bind the supplied values to the query and execute it
         try {
             $stmt->execute($bindValues);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->err($e->getMessage());
         }
 
@@ -198,14 +196,14 @@ class DBManager
         try {
             // create a prepared statement from the supplied SQL string
             $stmt = $this->pdo->prepare($query);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->err($e->getMessage());
         }
 
         try {
             // bind the supplied values to the query and execute it
             $stmt->execute($bindValues);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->err($e->getMessage());
         }
 
@@ -215,8 +213,7 @@ class DBManager
 
     public function getLastInsertId($sequenceName = null)
     {
-        $id = $this->pdo->lastInsertId($sequenceName);
-        return $id;
+        return $id = $this->pdo->lastInsertId($sequenceName);
     }
 
     public function beginTransaction()
@@ -228,13 +225,13 @@ class DBManager
         }
 
         if ($success !== true) {
-            throw new Exception(is_string($success) ? $success : null);
+            throw new \Exception(is_string($success) ? $success : null);
         }
     }
 
     public function startTransaction()
     {
-        $this->startTransaction();
+        $this->beginTransaction();
     }
 
     public function isTransactionActive()
@@ -252,7 +249,7 @@ class DBManager
         }
 
         if ($success !== true) {
-            throw new Exception(is_string($success) ? $success : null);
+            throw new \Exception(is_string($success) ? $success : null);
         }
     }
 
@@ -265,7 +262,7 @@ class DBManager
         }
 
         if ($success !== true) {
-            throw new Exception(is_string($success) ? $success : null);
+            throw new \Exception(is_string($success) ? $success : null);
         }
     }
 
@@ -280,7 +277,7 @@ class DBManager
             $this->pdo->commit();
 
             return $this;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             // something happened, rollback changes
             $this->pdo->rollBack();
             return $this;

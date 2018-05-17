@@ -23,11 +23,10 @@ class Auth
         'salt' => '',//비밀번호암호키
     ];
 
-    protected $user;
     var $_defaultPage = '?';
     var $_defaultAdminPage = '?admin';
     var $_loginPage = '?login';
-    var $_loginAdminPage = '?admin/login';
+    var $_loginAdminPage = '?admin.login';
     var $_admin = 'admin';
     var $_user = 'user';
 
@@ -51,10 +50,10 @@ class Auth
         return if_exists($_SESSION, $this->_admin, false);
     }
 
-    function checkAuth($callable)
+    function checkUser($callable)
     {
         if ($callable->requireLogin()) {
-            if ($this->user = $this->getUser() || $this->user = $this->getAdmin()) {
+            if ($this->getUser() || $this->getAdmin()) {
                 return true;
             }
             return false;
@@ -65,7 +64,7 @@ class Auth
     function checkAdmin($callable)
     {
         if ($callable->requireAdmin()) {
-            if ($this->user = $this->getAdmin()) {
+            if ($this->getAdmin()) {
                 return true;
             }
             return false;

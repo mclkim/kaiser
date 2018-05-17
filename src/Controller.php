@@ -54,6 +54,7 @@ class Controller extends BaseController implements ControllerInterface
 
     protected function getParameters()
     {
+        //TODO::
 //        return array_merge($this->request()->get(), $this->request()->post());
         return $this->request()->get() + $this->request()->post();
     }

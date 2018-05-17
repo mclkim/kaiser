@@ -28,7 +28,7 @@ class Router
             $this->url = $this->handler = $handler;
         } else if ($handler = $req->header('X-Request-Handler')) {
             $this->url = $this->handler = $handler;
-        } else if ($L = $req->get_post('L')) {
+        } else if ($L = $req->get('L')) {
             $this->url = $L;
         }
     }
@@ -73,14 +73,16 @@ class Router
             $inPath
         );
 
+        $classname = self::normalizeClassName($controller);
         /**
-         * Workaround: Composer does not support case insensitivity.
          * TODO::UNIX 시스템에서 파일이름의 대소문자 구별한다.(2016-12-02)
          */
-        if (!class_exists($controller)) {
-            $controller = self::normalizeClassName($controller);
+        if (!class_exists($classname)) {
             foreach ($directory as $inPath) {
-                $controllerFile = $inPath . str_replace('\\', '/', $controller) . '.php';
+//                $controllerFile = $inPath . str_replace('\\', '/', $controller) . '.php';
+                $controllerFile = $inPath . $controller . '.php';
+//                var_dump($controllerFile);
+//                exit;
                 if (file_exists($controllerFile)) {
                     include_once($controllerFile);
                     break;
@@ -88,16 +90,16 @@ class Router
             }
         }
 
-        if (!class_exists($controller)) {
-            return [self::NOT_FOUND, $controller, $action, $parameters];
+        if (!class_exists($classname)) {
+            return [self::NOT_FOUND, $classname, $action, $parameters];
         }
 
         //TODO::
-        $handler = array(new $controller, $action);
+        $handler = array(new $classname, $action);
         if (is_callable($handler)) {
-            return [self::FOUND, $controller, $action, $parameters];
+            return [self::FOUND, $classname, $action, $parameters];
         }
 
-        return [self::NOT_FOUND_ACTION, $controller, $action, $parameters];
+        return [self::NOT_FOUND_ACTION, $classname, $action, $parameters];
     }
 }

@@ -10,6 +10,7 @@ class BaseController extends Singleton
 
     function __construct()
     {
+        //TODO::
     }
 
     public function getContainer()
@@ -51,11 +52,6 @@ class BaseController extends Singleton
     protected function response()
     {
         return $this->container->get('response');
-    }
-
-    protected function router()
-    {
-        return $this->container->get('router');
     }
 
     protected function template()

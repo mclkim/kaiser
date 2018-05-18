@@ -26,7 +26,7 @@ class App extends Controller
         /**
          * 시작을 로그파일에 기록한다.
          */
-        $this->info('<<START --------------------------------------------');
+        $this->info('<< START --------------------------------------------');
         $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
         /**
          * 타임스템프를 기록..
@@ -41,7 +41,7 @@ class App extends Controller
          * 사용한 메모리를 기록한다.
          */
         $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
-        $this->info('---------------------------------------------- END>>');
+        $this->info('---------------------------------------------- END >>');
     }
 
     public function version()
@@ -100,8 +100,12 @@ class App extends Controller
                 /**
                  * TODO::
                  * requireLogin && requireAdmin
+                 * Not logged in, redirect to login screen or show ajax error.
+                 * 로그인 여부를 체크 할 페이지 인지 확인한다.
+                 * TODO::다른 좋은 방법이 있을 것 같은데~
                  */
-                $auth = $this->auth();
+                // $auth = $this->auth();
+                $auth = new \Kaiser\Auth();
                 $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
                 $return_uri = $handler->getParameter('returnURI', $request_uri);
                 $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
@@ -122,6 +126,7 @@ class App extends Controller
                 try {
                     $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
                     $result = call_user_func_array(array($handler, $action), $parameters);
+                    $this->debug('Execute the handler');
                     $this->debug($result);
                 } catch (AjaxException $ex) {
                     $this->err($ex->getMessage());
@@ -135,6 +140,8 @@ class App extends Controller
                 /**
                  * TODO::
                  * Execute AJAX event
+                 * 핸들러가 배열을 반환 한 경우 렌더링을 위해 출력에 추가해야 합니다.
+                 * 문자열 인 경우 키 "result"를 사용하여 배열에 추가합니다.
                  */
                 if ($this->ajax() && $this->method() == 'POST') {
                     $responseContents = [];
@@ -143,6 +150,7 @@ class App extends Controller
                     } elseif (is_string($result)) {
                         $responseContents ['result'] = $result;
                     }
+                    $this->debug('Execute AJAX event');
                     $this->debug($responseContents);
                     $this->response()->setContent($responseContents);
                     return true;

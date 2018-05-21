@@ -1,9 +1,13 @@
 <?php
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
 use Pimple\Container as PimpleContainer;
 use Psr\Container\ContainerInterface;
+
+//use Mcl\Kaiser\Logger;
+//use Mcl\Kaiser\Request;
+//use Mcl\Kaiser\Response;
 
 class Container extends PimpleContainer implements ContainerInterface
 {
@@ -34,16 +38,9 @@ class Container extends PimpleContainer implements ContainerInterface
 
     private function registerDefaultServices(Container $container)
     {
-        $container->set('auth', new  Auth());
-        $container->set('config', new  Config());
+        $container->set('logger', new  Logger(__DIR__ . '/../log'));
         $container->set('request', new  Request());
         $container->set('response', new  Response());
-        $container->set('session', new  Session());
         $container->set('template', new  \Template_());
-        /**
-         * KLogger: Simple Logging for PHP
-         * https://github.com/katzgrau/KLogger
-         */
-        $container->set('logger', new  Manager\LogManager (__DIR__ . '/../log'));
     }
 }

@@ -1,17 +1,14 @@
 <?php
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
 use Psr\Container\ContainerInterface;
 
-class BaseController extends Singleton
+class BaseController //extends Singleton
 {
     protected $container;
 
-    function __construct()
-    {
-        //TODO::
-    }
+//    function __construct(){}
 
     public function getContainer()
     {
@@ -27,16 +24,6 @@ class BaseController extends Singleton
             throw new \RuntimeException ('Expected a ContainerInterface');
         }
         $this->container = $container;
-    }
-
-    protected function auth()
-    {
-        return $this->container->get('auth');
-    }
-
-    protected function config()
-    {
-        return $this->container->get('config');
     }
 
     protected function logger()

@@ -1,8 +1,8 @@
 <?php
 
-//namespace Kaiser;
+//namespace Mcl\Kaiser;
 
-use Kaiser\App;
+use Mcl\Kaiser\App;
 
 if (!function_exists('app')) {
     /**

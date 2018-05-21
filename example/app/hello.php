@@ -1,6 +1,6 @@
 <?php
 
-use Kaiser\Controller;
+use Mcl\Kaiser\Controller;
 
 /**
  * http://localhost/?hello.world&p1=1&p2=2&p3=3
@@ -12,14 +12,14 @@ class hello extends Controller
         return false;
     }
 
-    function world($param1 = null,$param2 = null,$param3 = null)
+    function world($param1 = null, $param2 = null, $param3 = null)
     {
-        $getData = $this->getParameters();
-        $this->debug($getData);
-
         var_dump($param1);
         var_dump($param2);
         var_dump($param3);
-        echo '<br>hello world~~~';
+
+        echo '<br>';
+        echo 'hello world~~~';
+        return $param1 + $param2 + $param3;
     }
 }

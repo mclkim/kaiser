@@ -1,10 +1,13 @@
-﻿.buildpath
-.idea/
+!robots.txt
+**/_compile/**
+**/bootstrap/**
+**/log/**
+**/test/**
+**/vendor/**
+*.lock
+.buildpath
+.idea
 .project
 .settings
-/vendor/
-/log/
-/tmp/
-
-# ignore lock file since we have no extra dependencies
-composer.lock
+.vagrant
+/config/config.php

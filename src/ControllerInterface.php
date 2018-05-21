@@ -6,7 +6,7 @@
  * Time: 오전 8:06
  */
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
 
 interface ControllerInterface

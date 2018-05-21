@@ -1,12 +1,13 @@
 <?php
-use Kaiser\Controller;
+
+use Mcl\Kaiser\Controller;
 
 /**
  * http://localhost/?index
  */
 class index extends Controller
 {
-     function requireLogin()
+    function requireLogin()
     {
         return false;
     }

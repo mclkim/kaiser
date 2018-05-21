@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
 use Aura\Web\WebFactory;
 
@@ -48,9 +48,6 @@ class Request //extends Singleton
 
     function get_post($key = null, $alt = null)
     {
-        //TODO::PHP 5.4 Error
-//        return empty ($this->post($key)) ? $this->get($key, $alt) : $this->post($key, $alt);
-//        return empty ($this->post($key)) ? $this->get($key, $alt) : $this->post($key, $alt);
         $post = $this->post($key);
         return empty ($post) ? $this->get($key, $alt) : $this->post($key, $alt);
     }

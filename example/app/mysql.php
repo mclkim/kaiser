@@ -1,11 +1,13 @@
 <?php
 
-use Kaiser\Controller;
+use Mcl\Kaiser\Controller;
+use Mcl\Db\DBManager;
 
 /**
+ * composer require mclkim/db
+ *
  * http://localhost/?mysql
  */
-
 class mysql extends Controller
 {
     function requireLogin()
@@ -15,8 +17,8 @@ class mysql extends Controller
 
     function execute()
     {
-        $pdo = $this->container->get('DB');
-        $dbm = new \Kaiser\Manager\DBManager ($pdo);
+        $pdo = $this->container->get('MYSQL');
+        $dbm = new DBManager ($pdo);
         var_dump($dbm->executePreparedQueryOne('select version()'));
     }
 }

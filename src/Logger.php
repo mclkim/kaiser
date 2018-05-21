@@ -1,8 +1,15 @@
 <?php
 
-namespace Kaiser\Manager;
+namespace Mcl\Kaiser;
 
-class LogManager extends \Katzgrau\KLogger\Logger
+use Katzgrau\KLogger\Logger as KLogger;
+
+/**
+ * composer require katzgrau/klogger "^1.2"
+ * Class Logger
+ * @package Mcl\Kaiser
+ */
+class Logger extends KLogger
 {
     public function log($level, $message, array $context = array())
     {

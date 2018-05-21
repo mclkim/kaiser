@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
 use Aura\Web\WebFactory;
 use Aura\Web\ResponseSender;
@@ -67,7 +67,7 @@ class Response //extends Singleton
         return $this->response_sender->__invoke();
     }
 
-    function getJSON($content, $options = JSON_UNESCAPED_UNICODE)
+    function setJSON($content, $options = JSON_UNESCAPED_UNICODE)
     {
         $this->response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         $content = json_encode($content, $options);
@@ -75,7 +75,7 @@ class Response //extends Singleton
         return $this->response_sender->__invoke();
     }
 
-    function getTEXT($content)
+    function setTEXT($content)
     {
         $this->response->headers->set('Content-Type', 'text/plain; charset=ISO-8859-1');
         $this->response->content->set($content);

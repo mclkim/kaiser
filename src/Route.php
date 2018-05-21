@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
 
 class Route

@@ -6,42 +6,19 @@
  * Time: 오후 3:34
  */
 
-namespace Kaiser;
+namespace Mcl\Kaiser;
 
-use Kaiser\Exception\ApplicationException;
-use Kaiser\Exception\AjaxException;
+use Mcl\Kaiser\ApplicationException;
+use Mcl\Kaiser\AjaxException;
 
 class App extends Controller
 {
-    const VERSION = '2018-04-22';
+    const VERSION = '2018-05-20';
     var $timestamp = null;
 
     function __construct($container = [])
     {
         $this->setContainer($container);
-    }
-
-    protected function start()
-    {
-        /**
-         * 시작을 로그파일에 기록한다.
-         */
-        $this->info('<< START --------------------------------------------');
-        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
-        /**
-         * 타임스템프를 기록..
-         */
-        $this->timestamp = new \Kaiser\Timer ();
-    }
-
-    protected function end()
-    {
-        /**
-         * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
-         * 사용한 메모리를 기록한다.
-         */
-        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
-        $this->info('---------------------------------------------- END >>');
     }
 
     public function version()
@@ -51,24 +28,13 @@ class App extends Controller
 
     public function run($directory = [])
     {
-        //        phpinfo();exit;
-        $this->start();
-        /**
-         * 세션스타트..
-         */
-        $sess = $this->container->get('session');
-//        $sess->start_session();
-//        session_start();
-
         $result = $this->execPageAction($directory);
-//        $this->debug($result);
-
-        $this->end();
+        $this->debug($result);
     }
 
     protected function execPageAction($directory = [])
     {
-        $router = new \Kaiser\Router();
+        $router = new Router();
         $router->setAppDir($directory);
         $routeInfo = $router->dispatch(array('methods' => ['GET', 'POST']));
 
@@ -105,19 +71,19 @@ class App extends Controller
                  * TODO::다른 좋은 방법이 있을 것 같은데~
                  */
                 // $auth = $this->auth();
-                $auth = new \Kaiser\Auth();
-                $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-                $return_uri = $handler->getParameter('returnURI', $request_uri);
-                $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-                if (!$auth->checkAdmin($handler)) {
-                    $this->debug('redirect=>' . $redirect);
-                    $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
-                    return true;
-                } else if (!$auth->checkUser($handler)) {
-                    $this->debug('redirect=>' . $redirect);
-                    $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
-                    return true;
-                }
+//                $auth = new \Kaiser\Auth();
+//                $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+//                $return_uri = $handler->getParameter('returnURI', $request_uri);
+//                $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+//                if (!$auth->checkAdmin($handler)) {
+//                    $this->debug('redirect=>' . $redirect);
+//                    $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
+//                    return true;
+//                } else if (!$auth->checkUser($handler)) {
+//                    $this->debug('redirect=>' . $redirect);
+//                    $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
+//                    return true;
+//                }
 
                 /**
                  * TODO:
@@ -128,6 +94,9 @@ class App extends Controller
                     $result = call_user_func_array(array($handler, $action), $parameters);
                     $this->debug('Execute the handler');
                     $this->debug($result);
+                } catch (ApplicationException $ex) {
+                    $this->err($ex->getMessage());
+                    return false;
                 } catch (AjaxException $ex) {
                     $this->err($ex->getMessage());
                     $this->response()->setContent($ex->getMessage());
@@ -153,45 +122,10 @@ class App extends Controller
                     $this->debug('Execute AJAX event');
                     $this->debug($responseContents);
                     $this->response()->setContent($responseContents);
-                    return true;
                 }
 
                 return ($result) ?: true;
         }
         return false;
-    }
-
-    protected function setCsrfToken()
-    {
-        if (function_exists('mcrypt_create_iv')) {
-            $_SESSION ['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
-        } else {
-            $_SESSION ['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
-        }
-        $_SESSION ['token_time'] = time();
-    }
-
-    protected function getCsrfToken()
-    {
-        return if_exists($_SESSION, 'csrf_token', null);
-    }
-
-    protected function verifyCsrfToken()
-    {
-        if (!$this->config()->get('enableCsrfProtection')) {
-            return true;
-        }
-
-        if (in_array($this->method(), ['HEAD', 'GET', 'OPTIONS'])) {
-            return true;
-        }
-
-        $csrftoken = $this->header('x-csrf-token');
-        // $this->debug ( $csrftoken );
-
-        $token = $this->getParameter('csrf_token', $csrftoken);
-        // $this->debug ( $token );
-        // $this->debug ( $this->getCsrfToken () );
-        return $this->getCsrfToken() === $token;
     }
 }

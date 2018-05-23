@@ -31,7 +31,7 @@ class Container extends PimpleContainer implements ContainerInterface
         return $this->offsetExists($id);
     }
 
-    public function set(string $id, $value)
+    public function set($id, $value)
     {
         return $this->offsetSet($id, $value);
     }

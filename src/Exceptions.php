@@ -13,3 +13,7 @@ class ApplicationException extends ExceptionBase
 class AjaxException extends ExceptionBase
 {
 }
+
+class EchoException extends ExceptionBase
+{
+}

@@ -51,6 +51,9 @@ class App extends Controller
 
     public function run($directory = [])
     {
+        if ($this->container->has('session'))
+            $this->container->get('session');
+
         $result = $this->execPageAction($directory);
         $this->debug($result);
     }

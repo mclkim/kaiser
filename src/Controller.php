@@ -11,7 +11,7 @@ class Controller extends BaseController implements ControllerInterface
      */
     function requireLogin()
     {
-        return true;
+        return false;
     }
 
     function requireAdmin()
@@ -55,6 +55,11 @@ class Controller extends BaseController implements ControllerInterface
     protected function getParameters()
     {
         return $this->request()->get() + $this->request()->post();
+    }
+
+    protected function getPostParameter($key = null, $alt = null)
+    {
+        return $this->request()->post($key, $alt);
     }
 
     protected function getParameter($index, $no_result = FALSE)

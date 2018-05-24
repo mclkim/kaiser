@@ -14,6 +14,6 @@ class AjaxException extends ExceptionBase
 {
 }
 
-class EchoException extends ExceptionBase
+class EchoException extends AjaxException
 {
 }

@@ -51,8 +51,8 @@ class App extends Controller
 
     public function run($directory = [])
     {
-        if ($this->container->has('session'))
-            $this->container->get('session');
+//        if ($this->container->has('session'))
+//            $this->container->get('session');
 
         $result = $this->execPageAction($directory);
         $this->debug($result);
@@ -117,7 +117,7 @@ class App extends Controller
                 try {
                     $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
                     $result = call_user_func_array(array($handler, $action), $parameters);
-//                    $this->debug('Execute the handler');
+                    $this->debug('Execute the handler');
                     $this->debug($result);
                 } catch (ApplicationException $ex) {
                     $this->err($ex->getMessage());

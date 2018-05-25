@@ -13,7 +13,7 @@ use Mcl\Kaiser\AjaxException;
 
 class App extends Controller
 {
-    const VERSION = '2018-05-20';
+    const VERSION = '2018-05-25';
     var $timestamp = null;
 
     function __construct($container = [])
@@ -28,34 +28,31 @@ class App extends Controller
 
     protected function start()
     {
-        /**
-         * 시작을 로그파일에 기록한다.
-         */
-        $this->info('<<START --------------------------------------------');
-        $this->info(sprintf('The Class "%s" Initialized ', get_class($this)));
-        /**
-         * 타임스템프를 기록..
-         */
-        $this->timestamp = new \Mcl\Kaiser\Timer ();
     }
 
     protected function end()
     {
         /**
-         * 타임스템프를 기록한 시간 차이를 계산하여 기록한다.
          * 사용한 메모리를 기록한다.
          */
-        $this->info(sprintf('The Class "%s" total execution time: ', get_class($this)) . $this->timestamp->fetch() . ", Memory used: " . bytesize(memory_get_peak_usage()));
-        $this->info('---------------------------------------------- END>>');
+        $this->info(\sprintf('Memory used: ' . bytesize(\memory_get_peak_usage(true))));
     }
 
     public function run($directory = [])
     {
-//        if ($this->container->has('session'))
-//            $this->container->get('session');
+        $this->start();
+
+        if ($this->container->has('session')) {
+            $this->container->get('session');
+            if (session_status() !== PHP_SESSION_ACTIVE) {
+                session_start();
+            }
+        }
 
         $result = $this->execPageAction($directory);
-        $this->debug($result);
+//        $this->debug($result);
+
+        $this->end();
     }
 
     protected function execPageAction($directory = [])
@@ -64,14 +61,16 @@ class App extends Controller
         $router->setAppDir($directory);
         $routeInfo = $router->dispatch(array('methods' => ['GET', 'POST']));
 
+        $this->debug($routeInfo);
+
         //TODO::
         $controller = $routeInfo[1];
         $action = $routeInfo[2];
         $parameters = $routeInfo[3];
 
-        $this->debug($controller);
-        $this->debug($action);
-        $this->debug($parameters);
+//        $this->debug($controller);
+//        $this->debug($action);
+//        $this->debug($parameters);
 
         switch ($routeInfo[0]) {
             case Router::NOT_FOUND:

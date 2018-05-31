@@ -70,4 +70,13 @@ class Auth
         }
         return true;
     }
+
+    function logout($callable)
+    {
+        session_unset();
+        session_destroy();
+        unset ($_SESSION);
+
+        $callable->redirect($this->_defaultPage);
+    }
 }

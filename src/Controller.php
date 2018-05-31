@@ -29,12 +29,8 @@ class Controller extends BaseController implements ControllerInterface
      */
     function logout()
     {
-        session_unset();
-        session_destroy();
-        unset ($_SESSION);
-
         $auth = new \Mcl\Kaiser\Auth();
-        $this->redirect($auth->_defaultPage);
+        $auth->logout($this);
     }
 
     protected function ajax()

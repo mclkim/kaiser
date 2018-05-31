@@ -81,7 +81,7 @@ class App extends Controller
             case Router::NOT_FOUND_ACTION:
                 // ... 405 Method Not Allowed
                 $this->err(sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
-                $this->status('404', 'Not Found', '1.1');
+                $this->status('405', 'Method Not Allowed', '1.1');
                 break;
             case Router::FOUND:
                 //TODO::

@@ -47,9 +47,9 @@ $ php -S 0.0.0.0:8000 -t public/
 ... and point your browser to http://localhost:8000/ 
 
 ```
-http://localhost:8000/?
-http://localhost:8000/?mysql
-http://localhost:8000/?hello.world&p1=1&p2=2&p3=3
+http://localhost:8000/
+http://localhost:8000/mysql
+http://localhost:8000/hello.world&p1=1&p2=2&p3=3
 ```
 ## Reference
  * [Container](https://github.com/silexphp/Pimple)

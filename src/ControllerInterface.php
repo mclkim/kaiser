@@ -8,6 +8,9 @@
 
 namespace Mcl\Kaiser;
 
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
 
 interface ControllerInterface
 {
@@ -15,5 +18,7 @@ interface ControllerInterface
 
     function requireAdmin();
 
-    function execute();
+    function execute(Request $request, Response $response);
+
+    function methods();
 }

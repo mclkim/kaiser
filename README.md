@@ -21,6 +21,7 @@ Composer version 1.5.1 2017-08-09 16:07:22
 ```
 
 ## 1.Install
+
 First, at the command line, make working directory:
 ```
 $ mkdir homepage
@@ -32,12 +33,14 @@ $ composer require mclkim/kaiser:dev-master
 ```
 
 ## 2.Example copy on local development
+
 The following is a working example. 
 ```
 $ cp -rf vendor/mclkim/kaiser/example/* .
 ```
 
 ## 3.Web brower
+
 You can test the framework using the [public/index.php](public/index.php)
 example. You can run the demo using the internal web server of PHP with the
 following command:
@@ -52,7 +55,8 @@ http://localhost:8000/mysql
 http://localhost:8000/hello.world&p1=1&p2=2&p3=3
 ```
 ## Reference
+
  * [Slim - PHP micro framework](https://www.slimframework.com/)
- * [Monolog - Logging for PHP](https://github.com/Seldaek/monolog)
+ * [KLogger: Simple Logging for PHP](https://github.com/katzgrau/klogger)
  
 Released under the [MIT License](LICENSE)

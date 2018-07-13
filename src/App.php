@@ -33,7 +33,7 @@ class App extends Slim
         $uri = $request->getUri();
         $path = $uri->getPath();
 
-        $router = new Router($container);
+        $router = new Router();
         $router->setAppDir($directory);
         $routeInfo = $router->dispatch($path);
 
@@ -53,7 +53,6 @@ class App extends Slim
                 //TODO::
                 $handler = new $controller($container);
 
-                //                $path = str_replace('.', '/', $path);
                 if ($handler->requireAdmin()) {
                     $this->map($handler->methods(), $path, $controller . ':' . $action)->add('Auth');
                 } elseif ($handler->requireLogin()) {

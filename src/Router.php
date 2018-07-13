@@ -10,12 +10,6 @@ class Router
     const METHOD_NOT_ALLOWED = 3;
 
     private $AppDir;
-    private $container;
-
-    public function __construct($container = [])
-    {
-        $this->container = $container;
-    }
 
     public function dispatch($url)
     {
@@ -54,7 +48,7 @@ class Router
         }
 
         //TODO::
-        $handler = array(new $classname($this->container), $action);
+        $handler = array(new $classname, $action);
         if (is_callable($handler)) {
             return [self::FOUND, $classname, $action, $parameters];
         }

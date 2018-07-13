@@ -20,7 +20,10 @@ class Logger extends KLogger
     function log($level, $message, array $context = array())
     {
         list ($file, $line, $function, $class) = $this->_getBacktraceVars(2);
-        $message = "[{$file} {$line} {$function}] {$message}";
+
+        $memory_peak_usage = bytesize(\memory_get_peak_usage(true));
+
+        $message = "[{$file} {$line} {$function}] [{$memory_peak_usage}] {$message}";
 
         parent::log($level, $message, $context);
     }

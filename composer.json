@@ -29,6 +29,9 @@
     },
     "classmap": [
       "src/Template_/Template_.class.php"
+    ],
+    "files": [
+      "src/Helpers.php"
     ]
   }
 }

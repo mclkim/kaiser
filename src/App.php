@@ -28,10 +28,12 @@ class App extends Slim
 //        var_dump($_SERVER);
 //        phpinfo();
 //        exit;
-        $request = $this->getContainer()->get('request');
-        $path = $request->getUri()->getPath();
+        $container = $this->getContainer();
+        $request = $container->get('request');
+        $uri = $request->getUri();
+        $path = $uri->getPath();
 
-        $router = new Router($this->getContainer());
+        $router = new Router($container);
         $router->setAppDir($directory);
         $routeInfo = $router->dispatch($path);
 
@@ -49,7 +51,7 @@ class App extends Slim
                 break;
             case Router::FOUND:
                 //TODO::
-                $handler = new $controller($this->getContainer());
+                $handler = new $controller($container);
 
                 //                $path = str_replace('.', '/', $path);
                 if ($handler->requireAdmin()) {
@@ -77,12 +79,13 @@ class App extends Slim
 
     private function registerDefaultServices($container)
     {
+        //TODO::How to Direct Routing basePath
         $reqServer = $_SERVER;
         $reqServer['SCRIPT_NAME'] = "/{$_SERVER['SCRIPT_NAME']}";
         /**
          * Add Overide on Application initial
          * set container request with new value of \Slim\Http\Request
-         *  with new values
+         * with new values
          */
         $container['request'] = \Slim\Http\Request::createFromEnvironment(
             \Slim\Http\Environment::mock(

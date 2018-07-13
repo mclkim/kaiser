@@ -1,5 +1,7 @@
 <?php
 
+//namespace App;
+
 use Mcl\Kaiser\Controller;
 
 /**
@@ -7,7 +9,7 @@ use Mcl\Kaiser\Controller;
  */
 class index extends Controller
 {
-    function execute()
+    function execute($request, $response)
     {
         echo 'Kaiser PHP framework~~';
     }

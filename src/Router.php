@@ -12,10 +12,15 @@ class Router
     private $AppDir;
     private $container;
 
-    public function dispatch($path)
+    public function __construct($container = [])
     {
-        $route = new Route();
-        $route->getRoute($path);
+        $this->container = $container;
+    }
+
+    public function dispatch($url)
+    {
+        $route = new Route($url);
+        $route->getRoute();
 
         $controller = $route->getController();
         $action = $route->getAction();
@@ -76,15 +81,5 @@ class Router
     function setAppDir($directory = [])
     {
         $this->AppDir = $directory;
-    }
-
-    function getContainer()
-    {
-        return $this->container;
-    }
-
-    function setContainer($container)
-    {
-        $this->container = $container;
     }
 }

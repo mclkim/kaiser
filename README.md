@@ -42,7 +42,7 @@ You can test the framework using the [public/index.php](public/index.php)
 example. You can run the demo using the internal web server of PHP with the
 following command:
 ```
-$ php -S 0.0.0.0:8000 -t public/
+$ php -S localhost:8000 -t public public/index.php
 ```
 ... and point your browser to http://localhost:8000/ 
 

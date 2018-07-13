@@ -1,9 +1,9 @@
 <?php
 
+//namespace App;
+
 use Mcl\Db\DBManager;
 use Mcl\Kaiser\Controller;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * composer require mclkim/db
@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  */
 class mysql extends Controller
 {
-    function execute(Request $request, Response $response)
+    function execute($request, $response)
     {
         $pdo = $this->container->get('MYSQL');
         $dbm = new DBManager ($pdo);

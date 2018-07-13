@@ -8,6 +8,7 @@
 
 namespace Mcl\Kaiser;
 
+use Interop\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -15,7 +16,7 @@ class Controller implements ControllerInterface
 {
     protected $container;
 
-    public function __construct($container)
+    public function __construct($container = [])
     {
         $this->container = $container;
     }
@@ -30,7 +31,7 @@ class Controller implements ControllerInterface
         return false;
     }
 
-    function execute(Request $request, Response $response)
+    function execute($request, $response)
     {
 //        echo 'Hello Kaiser PHP framework~~';
         return $response->withStatus(200)->write("Hello Kaiser PHP framework~~");

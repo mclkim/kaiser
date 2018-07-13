@@ -12,20 +12,19 @@ class Route
     var $parameters = array();
     private $url;
 
+    public function __construct($url)
+    {
+        $this->url = $url;
+    }
+
     public function getParameters()
     {
         return $this->parameters;
     }
 
-    public function setParameters(array $parameters)
+    public function getRoute()
     {
-        $this->parameters += $parameters;
-    }
-
-    public function getRoute($uri)
-    {
-        $this->setUrl($uri);
-        $query = $uri = $this->getUrl();
+        $query = $uri = $this->url;
 
         if (($pos = strpos($uri, '&')) !== false) {
             $uri = substr($uri, 0, $pos);
@@ -51,16 +50,6 @@ class Route
         $this->action = empty($x['extension']) ? 'execute' : $x['extension'];
         $this->controller = rtrim($this->path, '/') . '/' . $this->class;
         return $this;
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    public function setUrl($url)
-    {
-        $this->url = $url;
     }
 
     private function __URIPath($url)

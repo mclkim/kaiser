@@ -14,7 +14,11 @@ $loader = require_once $autoload;
 /**
  * Step 2: Instantiate a Kaiser application Controller
  */
-$app = new Mcl\Kaiser\App();
+$config = ['settings' => [
+    'displayErrorDetails' => true, // set to false in production
+    'addContentLengthHeader' => false, // Allow the web server to send the content-length header
+]];
+$app = new Mcl\Kaiser\App($config);
 
 /**
  * Step 3: Setting Kaiser Container
@@ -34,6 +38,14 @@ $container ['MYSQL'] = function ($c) {
 };
 
 /**
- * Step 4: Run the Kaiser application
+ * Step 4: Define app routes
+ */
+$app->get('/hello/{name}', function ($request, $response, $args) {
+    return $response->write("Hello " . $args['name']);
+});
+
+
+/**
+ * Step 5: Run the Kaiser application
  */
 $app->run([BASE_PATH . '/app']);

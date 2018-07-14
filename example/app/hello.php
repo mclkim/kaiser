@@ -11,8 +11,7 @@ class hello extends Controller
     {
         $getParams = $request->getQueryParams();
         var_dump($getParams);
-        echo 'hello world~~~';
-        echo 'hello world~~~';
+        echo '<br>';
         echo 'hello world~~~';
     }
 }

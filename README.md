@@ -52,7 +52,7 @@ $ php -S localhost:8000 -t public public/index.php
 ```
 http://localhost:8000/
 http://localhost:8000/mysql
-http://localhost:8000/hello.world&p1=1&p2=2&p3=3
+http://localhost:8000/hello.world?p1=1&p2=2&p3=3
 ```
 ## Reference
 

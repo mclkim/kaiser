@@ -1,21 +1,16 @@
 <?php
 
-use Mcl\Kaiser\Controller;
 use Mcl\Db\DBManager;
+use Mcl\Kaiser\Controller;
 
 /**
  * composer require mclkim/db
  *
- * http://localhost/?mysql
+ * http://localhost/mysql
  */
 class mysql extends Controller
 {
-    function requireLogin()
-    {
-        return false;
-    }
-
-    function execute()
+    function execute($request, $response)
     {
         $pdo = $this->container->get('MYSQL');
         $dbm = new DBManager ($pdo);

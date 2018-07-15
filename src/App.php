@@ -8,39 +8,17 @@
 
 namespace Mcl\Kaiser;
 
-use Mcl\Kaiser\ApplicationException;
-use Mcl\Kaiser\AjaxException;
-
 class App extends Controller
 {
-    const VERSION = '2018-05-25';
-    var $timestamp = null;
-
-    function __construct($container = [])
-    {
-        $this->setContainer($container);
-    }
+    const VERSION = '2018-07-15';
 
     public function version()
     {
         return self::VERSION;
     }
 
-    protected function start()
-    {
-    }
-
-    protected function end()
-    {
-        /**
-         * 사용한 메모리를 기록한다.
-         */
-        $this->info(\sprintf('Memory used: ' . bytesize(\memory_get_peak_usage(true))));
-    }
-
     public function run($directory = [])
     {
-        $this->start();
 
         if ($this->container->has('session')) {
             $this->container->get('session');
@@ -49,107 +27,60 @@ class App extends Controller
             }
         }
 
-        $result = $this->execPageAction($directory);
-//        $this->debug($result);
+        $request = $this->container->request;
+        $response = $this->container->response;
 
-        $this->end();
-    }
+        $path = $request->url(PHP_URL_PATH);
 
-    protected function execPageAction($directory = [])
-    {
         $router = new Router();
         $router->setAppDir($directory);
-        $routeInfo = $router->dispatch(array('methods' => ['GET', 'POST']));
+        $routeInfo = $router->dispatch($path);
 
-        $this->debug($routeInfo);
-
-        //TODO::
-        $controller = $routeInfo[1];
-        $action = $routeInfo[2];
-        $parameters = $routeInfo[3];
-
-//        $this->debug($controller);
-//        $this->debug($action);
-//        $this->debug($parameters);
+        $this->debug('routeInfo', $routeInfo);
 
         switch ($routeInfo[0]) {
             case Router::NOT_FOUND:
                 // ... 404 Not Found
-                $this->err(sprintf('The Class "%s" does not found', $controller));
-                $this->status('404', 'Not Found', '1.1');
+                // $this->err(sprintf('The Class "%s" does not found', $controller));
+                $response->status(404, 'Not Found', '1.1');
                 break;
             case Router::NOT_FOUND_ACTION:
                 // ... 405 Method Not Allowed
-                $this->err(sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
-                $this->status('405', 'Method Not Allowed', '1.1');
+                // $this->err(sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
+                $response->status(405, 'Method Not Allowed', '1.1');
                 break;
             case Router::FOUND:
                 //TODO::
-                $handler = new $controller;
-                $handler->setContainer($this->getContainer());
+                $controller = $routeInfo[1];
+                $action = $routeInfo[2];
+                $parameters = $routeInfo[3];
 
-                /**
-                 * TODO::
-                 * requireLogin && requireAdmin
-                 * Not logged in, redirect to login screen or show ajax error.
-                 * 로그인 여부를 체크 할 페이지 인지 확인한다.
-                 * TODO::다른 좋은 방법이 있을 것 같은데~
-                 */
-                $auth = new \Mcl\Kaiser\Auth();
-                $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-                $return_uri = $handler->getParameter('returnURI', $request_uri);
-                $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-                if (!$auth->checkAdmin($handler)) {
-                    $this->debug('redirect=>' . $redirect);
-                    $this->response()->redirect($auth->_loginAdminPage . '&returnURI=' . $redirect);
-                    return true;
-                } else if (!$auth->checkUser($handler)) {
-                    $this->debug('redirect=>' . $redirect);
-                    $this->response()->redirect($auth->_loginPage . '&returnURI=' . $redirect);
-                    return true;
-                }
+                $handler = new $controller($this->container);
 
                 /**
                  * TODO:
-                 * Execute the handler
                  */
                 try {
-                    $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
-                    $result = call_user_func_array(array($handler, $action), $parameters);
-                    $this->debug('Execute the handler');
-                    $this->debug($result);
+                    // $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
+                    // $result = call_user_func_array(array($handler, $action), $parameters);
+                    // $this->debug('Execute the handler');
+                    // $this->debug($result);
+                    $result = call_user_func_array(array($handler, $action), [$request, $response, $parameters]);
                 } catch (ApplicationException $ex) {
                     $this->err($ex->getMessage());
-                    return false;
+                    $result = false;
                 } catch (AjaxException $ex) {
                     $this->err($ex->getMessage());
-                    $this->response()->setContent($ex->getMessage());
-                    return false;
+                    $response->setContent($ex->getMessage());
+                    $result = false;
                 } catch (\Exception $ex) {
                     $this->err($ex->getMessage());
-                    return false;
+                    $result = false;
                 }
-
-                /**
-                 * TODO::
-                 * Execute AJAX event
-                 * 핸들러가 배열을 반환 한 경우 렌더링을 위해 출력에 추가해야 합니다.
-                 * 문자열 인 경우 키 "result"를 사용하여 배열에 추가합니다.
-                 */
-                if ($this->ajax() && $this->method() == 'POST') {
-                    $this->info('Execute AJAX event');
-                    $responseContents = [];
-                    if (is_array($result)) {
-                        $responseContents += $result;
-                    } elseif (is_string($result)) {
-                        $responseContents ['result'] = $result;
-                    }
-                    $this->debug($responseContents);
-                    $this->response()->setContent($responseContents);
-                }
-
+                $response->response_sender();
                 return ($result) ?: true;
         }
+        $response->response_sender();
         return false;
     }
 }

@@ -2,41 +2,6 @@
 
 //namespace Mcl\Kaiser;
 
-use Mcl\Kaiser\App;
-
-if (!function_exists('app')) {
-    /**
-     * Get the available container instance.
-     */
-    function app($make = null)
-    {
-        if (is_null($make))
-            return App::getInstance();
-
-        return App::getInstance()->getContainer()->get($make);
-    }
-}
-if (!function_exists('logger')) {
-    /**
-     * Log a debug message to the logs.
-     */
-    function logger($message = null, array $context = array())
-    {
-        if (is_null($message))
-            return app('logger');
-
-        return app('logger')->debug($message, $context);
-    }
-}
-if (!function_exists('base_path')) {
-    /**
-     * Get the path to the base of the install.
-     */
-    function base_path($path = '')
-    {
-        return app()->getBasePath() . ($path ? '/' . $path : $path);
-    }
-}
 /**
  * ---------------------------------------------------------------
  * 기본함수
@@ -76,14 +41,7 @@ if (!function_exists('bytesize')) {
         if (empty ($bytes) || $bytes < 0)
             return 0;
 
-        $units = array(
-            'B',
-            'KB',
-            'MB',
-            'GB',
-            'TB',
-            'PB'
-        );
+        $units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', "EB", "ZB", "YB");
 
         $unit = floor(log($bytes, 2) / 10);
         if ($unit == 0)

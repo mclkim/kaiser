@@ -2,24 +2,28 @@
 
 use Mcl\Kaiser\Controller;
 
+
 /**
- * http://localhost/?hello.world&p1=1&p2=2&p3=3
+ * http://localhost/hello.world?p1=1&p2=2&p3=3
  */
 class hello extends Controller
 {
-    function requireLogin()
+    function world($request, $response)
     {
-        return false;
-    }
-
-    function world($param1 = null, $param2 = null, $param3 = null)
-    {
-        var_dump($param1);
-        var_dump($param2);
-        var_dump($param3);
-
+        $getParams = $request->get();
+        var_dump($getParams);
         echo '<br>';
         echo 'hello world~~~';
-        return $param1 + $param2 + $param3;
+    }
+
+    function index($request, $response)
+    {
+        return $response->status(200)->setContent('OK Kaiser Framework');
+    }
+
+    function not($request, $response)
+    {
+//        var_dump($response);
+        return $response->status(404)->setContent('Not Found');
     }
 }

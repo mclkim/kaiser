@@ -19,9 +19,15 @@ class Controller extends BaseController implements ControllerInterface
         return false;
     }
 
-    function execute()
+    function execute($request, $response)
     {
-        echo 'Hello Kaiser PHP framework~~';
+//        echo 'Hello Kaiser PHP framework~~';
+        return $response->status(200)->setContent('OK! Kaiser PHP Framework');
+    }
+
+    function methods()
+    {
+        return ['GET'];
     }
 
     /**
@@ -29,65 +35,20 @@ class Controller extends BaseController implements ControllerInterface
      */
     function logout()
     {
-        $auth = new \Mcl\Kaiser\Auth();
-        $auth->logout($this);
-    }
-
-    protected function ajax()
-    {
-        return $this->request()->isXhr();
-    }
-
-    protected function method()
-    {
-        return $this->request()->method();
-    }
-
-    protected function header($key = null, $alt = null)
-    {
-        return $this->request()->header($key = null, $alt = null);
-    }
-
-    protected function getParameters()
-    {
-        return $this->request()->get() + $this->request()->post();
-    }
-
-    protected function getPostParameter($key = null, $alt = null)
-    {
-        return $this->request()->post($key, $alt);
-    }
-
-    protected function getParameter($index, $no_result = FALSE)
-    {
-        return $this->request()->get_post($index, $no_result);
-    }
-
-    protected function redirect($location, $code = 302, $phrase = null)
-    {
-        return $this->response()->redirect($location, $code, $phrase);
-    }
-
-    protected function status($code, $phrase = null, $version = null)
-    {
-        return $this->response()->status($code, $phrase, $version);
     }
 
     function info($message = null, array $context = array())
     {
-        $message = is_array($message) ? var_export($message, true) : $message;
-        $this->logger()->info($message, $context);
+        $this->container->logger->info($message, $context);
     }
 
     function debug($message = null, array $context = array())
     {
-        $message = is_array($message) ? var_export($message, true) : $message;
-        $this->logger()->debug($message, $context);
+        $this->container->logger->debug($message, $context);
     }
 
     function err($message = null, array $context = array())
     {
-        $message = is_array($message) ? var_export($message, true) : $message;
-        $this->logger()->error($message, $context);
+        $this->container->logger->error($message, $context);
     }
 }

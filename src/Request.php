@@ -49,7 +49,7 @@ class Request //extends Singleton
     function get_post($key = null, $alt = null)
     {
         $post = $this->post($key);
-        return empty ($post) ? $this->get($key, $alt) : $this->post($key, $alt);
+        return empty ($post) ? $this->get($key, $alt) : $alt;
     }
 
     function header($key = null, $alt = null)

@@ -5,44 +5,16 @@ namespace Mcl\Kaiser;
 
 class Route
 {
-    private $url;
-    private $methods = array(
-        'GET',
-        'POST',
-        'PUT',
-        'DELETE',
-    );
     var $path;
     var $class;
     var $action;
     var $controller;
     var $parameters = array();
+    private $url;
 
-    public function __construct(array $config)
+    public function __construct($url)
     {
-        $this->config = $config;
-        $this->methods = isset($config['methods']) ? (array)$config['methods'] : array();
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    public function setUrl($url)
-    {
-        $url = (string)$url;
         $this->url = $url;
-    }
-
-    public function getMethods()
-    {
-        return $this->methods;
-    }
-
-    public function setMethods(array $methods)
-    {
-        $this->methods = $methods;
     }
 
     public function getParameters()
@@ -50,26 +22,9 @@ class Route
         return $this->parameters;
     }
 
-    public function setParameters(array $parameters)
+    public function getRoute()
     {
-        $this->parameters += $parameters;
-    }
-
-    private function __URIPath($url)
-    {
-        preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $url, $m);
-        return array(
-            'dirname' => isset ($m [1]) ? $m [1] : '',
-            'basename' => isset ($m [2]) ? $m [2] : '',
-            'extension' => isset ($m [5]) ? $m [5] : '',
-            'filename' => isset ($m [3]) ? $m [3] : ''
-        );
-    }
-
-    public function getRoute($uri)
-    {
-        $this->setUrl($uri);
-        $query = $uri = $this->getUrl();
+        $query = $uri = $this->url;
 
         if (($pos = strpos($uri, '&')) !== false) {
             $uri = substr($uri, 0, $pos);
@@ -86,24 +41,26 @@ class Route
         $this->parameters = $param;
 
         $x = $this->__URIPath($uri);
-        $this->path = if_empty($x, 'dirname', '');
-        $this->class = if_empty($x, 'filename', 'index');
-        $this->action = if_empty($x, 'extension', 'execute');
+//        var_dump($x);
+//        $this->path = if_empty($x, 'dirname', '');
+//        $this->class = if_empty($x, 'filename', 'index');
+//        $this->action = if_empty($x, 'extension', 'execute');
+        $this->path = empty($x['dirname']) ? '' : $x['dirname'];
+        $this->class = empty($x['filename']) ? 'index' : $x['filename'];
+        $this->action = empty($x['extension']) ? 'execute' : $x['extension'];
         $this->controller = rtrim($this->path, '/') . '/' . $this->class;
-//        var_dump($this);exit;
         return $this;
     }
 
-    public function dispatch()
+    private function __URIPath($url)
     {
-        if (!is_null($this->action)) {
-            $handler = new $this->controller;
-            if (is_callable(array($handler, $this->action))) {
-                call_user_func_array(array($handler, $this->action), $this->parameters);
-            }
-        } else {
-            $handler = new $this->controller($this->parameters);
-        }
+        preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $url, $m);
+        return array(
+            'dirname' => isset ($m [1]) ? $m [1] : '',
+            'basename' => isset ($m [2]) ? $m [2] : '',
+            'extension' => isset ($m [5]) ? $m [5] : '',
+            'filename' => isset ($m [3]) ? $m [3] : ''
+        );
     }
 
     public function getPath()

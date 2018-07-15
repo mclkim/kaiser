@@ -8,14 +8,7 @@ class BaseController //extends Singleton
 {
     protected $container;
 
-//    function __construct(){}
-
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    public function setContainer($container = [])
+    public function __construct($container = [])
     {
         if (is_array($container)) {
             $container = new Container ($container);
@@ -26,24 +19,21 @@ class BaseController //extends Singleton
         $this->container = $container;
     }
 
-    protected function logger()
+    function getContainer()
     {
-        return $this->container->get('logger');
+        return $this->container;
     }
 
-    protected function request()
+    public function __call($method, $args)
     {
-        return $this->container->get('request');
-    }
+        if ($this->container->has($method)) {
+            $obj = $this->container->get($method);
+            if (is_callable($obj)) {
+                return call_user_func_array($obj, $args);
+            }
+        }
 
-    protected function response()
-    {
-        return $this->container->get('response');
-    }
-
-    protected function template()
-    {
-        return $this->container->get('template');
+        throw new \BadMethodCallException("Method $method is not a valid method");
     }
 
 }

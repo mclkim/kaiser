@@ -8,12 +8,13 @@
 
 namespace Mcl\Kaiser;
 
-
 interface ControllerInterface
 {
     function requireLogin();
 
     function requireAdmin();
 
-    function execute();
+    function execute($request, $response);
+
+    function methods();
 }

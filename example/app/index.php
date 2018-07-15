@@ -3,16 +3,11 @@
 use Mcl\Kaiser\Controller;
 
 /**
- * http://localhost/?index
+ * http://localhost/
  */
 class index extends Controller
 {
-    function requireLogin()
-    {
-        return false;
-    }
-
-    function execute()
+    function execute($request, $response)
     {
         echo 'Kaiser PHP framework~~';
     }

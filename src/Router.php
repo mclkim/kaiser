@@ -2,8 +2,6 @@
 
 namespace Mcl\Kaiser;
 
-//use Mcl\Kaiser\Request;
-
 class Router
 {
     const NOT_FOUND = 0;
@@ -12,41 +10,11 @@ class Router
     const METHOD_NOT_ALLOWED = 3;
 
     private $AppDir;
-    private $url;
-    private $method;
-    private $handler;
 
-//    private $parameters;
-
-    function __construct()
+    public function dispatch($url)
     {
-        $req = new Request();
-        $this->url = $req->url(PHP_URL_QUERY);
-        $this->method = $req->method();
-        //TODO::
-        if ($handler = $req->header('X-October-Request-Handler')) {
-            $this->url = $this->handler = $handler;
-        } else if ($handler = $req->header('X-Request-Handler')) {
-            $this->url = $this->handler = $handler;
-        } else if ($L = $req->get('L')) {
-            $this->url = $L;
-        }
-    }
-
-    function setAppDir($directory = [])
-    {
-        $this->AppDir = $directory;
-    }
-
-    function getAppDir()
-    {
-        return $this->AppDir;
-    }
-
-    public function dispatch(array $config)
-    {
-        $route = new Route($config);
-        $route->getRoute($this->url);
+        $route = new Route($url);
+        $route->getRoute();
 
         $controller = $route->getController();
         $action = $route->getAction();
@@ -56,22 +24,9 @@ class Router
         return $this->findController($controller, $action, $parameters, $this->getAppDir());
     }
 
-    public static function normalizeClassName($name)
-    {
-        $name = str_replace('/', '\\', $name);
-
-        if (is_object($name))
-            $name = get_class($name);
-
-        $name = '\\' . ltrim($name, '\\');
-        return $name;
-    }
-
     protected function findController($controller, $action, $parameters, $inPath)
     {
-        $directory = is_array($inPath) ? $inPath : array(
-            $inPath
-        );
+        $directory = is_array($inPath) ? $inPath : array($inPath);
 
         $classname = self::normalizeClassName($controller);
         /**
@@ -79,10 +34,8 @@ class Router
          */
         if (!class_exists($classname)) {
             foreach ($directory as $inPath) {
-//                $controllerFile = $inPath . str_replace('\\', '/', $controller) . '.php';
                 $controllerFile = $inPath . $controller . '.php';
-//                var_dump($controllerFile);
-//                exit;
+                $controllerFile = realpath($controllerFile);
                 if (file_exists($controllerFile)) {
                     include_once($controllerFile);
                     break;
@@ -101,5 +54,26 @@ class Router
         }
 
         return [self::NOT_FOUND_ACTION, $classname, $action, $parameters];
+    }
+
+    public static function normalizeClassName($name)
+    {
+        $name = str_replace('/', '\\', $name);
+
+        if (is_object($name))
+            $name = get_class($name);
+
+        $name = '\\' . ltrim($name, '\\');
+        return $name;
+    }
+
+    function getAppDir()
+    {
+        return $this->AppDir;
+    }
+
+    function setAppDir($directory = [])
+    {
+        $this->AppDir = $directory;
     }
 }

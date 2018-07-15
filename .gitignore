@@ -1,7 +1,7 @@
-!robots.txt
 **/_compile/**
 **/bootstrap/**
 **/log/**
+**/logs/**
 **/test/**
 **/vendor/**
 *.lock
@@ -11,3 +11,4 @@
 .settings
 .vagrant
 /config/config.php
+!robots.txt

@@ -42,27 +42,21 @@ You can test the framework using the [public/index.php](public/index.php)
 example. You can run the demo using the internal web server of PHP with the
 following command:
 ```
-$ php -S 0.0.0.0:8000 -t public/
+$ php -S localhost:8000 -t public public/index.php
 ```
 ... and point your browser to http://localhost:8000/ 
 
 ```
-http://localhost:8000/?
-http://localhost:8000/?mysql
-http://localhost:8000/?hello.world&p1=1&p2=2&p3=3
+http://localhost:8000/
+http://localhost:8000/mysql
+http://localhost:8000/hello.world?p1=1&p2=2&p3=3
 ```
 ## Reference
  * [Container](https://github.com/silexphp/Pimple)
  * [Logger](https://github.com/katzgrau/KLogger) 
  * [Request and Response](https://github.com/auraphp/Aura.Web)
  * [Router](https://github.com/nikic/FastRoute)
- * [Session](https://github.com/ezimuel/PHP-Secure-Session)
- * [Config](https://github.com/hassankhan/config)
  * [Template_](http://www.xtac.net)
- * [PHP Paginator](https://github.com/jasongrimes/php-paginator)
- * [Auth](https://github.com/delight-im/PHP-Auth)
- * [PHP-FileUpload](https://github.com/delight-im/PHP-FileUpload)
- * [PHP-Router](https://github.com/delight-im/PHP-Router)
  * [PHP-DB](https://github.com/delight-im/PHP-DB)
 
 Released under the [MIT License](LICENSE)

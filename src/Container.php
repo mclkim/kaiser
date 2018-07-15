@@ -5,10 +5,6 @@ namespace Mcl\Kaiser;
 use Pimple\Container as PimpleContainer;
 use Psr\Container\ContainerInterface;
 
-//use Mcl\Kaiser\Logger;
-//use Mcl\Kaiser\Request;
-//use Mcl\Kaiser\Response;
-
 class Container extends PimpleContainer implements ContainerInterface
 {
     function __construct(array $values = [])
@@ -16,6 +12,24 @@ class Container extends PimpleContainer implements ContainerInterface
         parent::__construct($values);
 
         $this->registerDefaultServices($this);
+    }
+
+    private function registerDefaultServices(Container $container)
+    {
+        $container->set('logger', new  Logger(__DIR__ . '/../log'));
+        $container->set('request', new  Request());
+        $container->set('response', new  Response());
+        $container->set('template', new  \Template_());
+    }
+
+    public function set($id, $value)
+    {
+        return $this->offsetSet($id, $value);
+    }
+
+    public function __get($name)
+    {
+        return $this->get($name);
     }
 
     public function get($id)
@@ -26,21 +40,14 @@ class Container extends PimpleContainer implements ContainerInterface
         return $this->offsetGet($id);
     }
 
+    public function __isset($name)
+    {
+        return $this->has($name);
+    }
+
     public function has($id)
     {
         return $this->offsetExists($id);
     }
 
-    public function set($id, $value)
-    {
-        return $this->offsetSet($id, $value);
-    }
-
-    private function registerDefaultServices(Container $container)
-    {
-        $container->set('logger', new  Logger(__DIR__ . '/../log'));
-        $container->set('request', new  Request());
-        $container->set('response', new  Response());
-        $container->set('template', new  \Template_());
-    }
 }

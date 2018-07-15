@@ -1,9 +1,15 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: 김준수
+ * Date: 2018-07-15
+ * Time: 오후 9:49
+ */
 
 namespace Mcl\Kaiser;
 
-use Aura\Web\WebFactory;
 use Aura\Web\ResponseSender;
+use Aura\Web\WebFactory;
 
 class Response //extends Singleton
 {
@@ -17,19 +23,6 @@ class Response //extends Singleton
         $factory = new WebFactory ($globals);
         $this->response = $factory->newResponse();
         $this->response_sender = new ResponseSender ($this->response);
-    }
-
-    protected function morphToJson($content)
-    {
-        if ($content instanceof Jsonable)
-            return $content->toJson();
-
-        return json_encode($content);
-    }
-
-    protected function shouldBeJson($content)
-    {
-        return $content instanceof Jsonable || $content instanceof ArrayObject || is_array($content);
     }
 
     function setContent($content)
@@ -52,33 +45,36 @@ class Response //extends Singleton
         }
 
         $this->response->content->set($content);
-        return $this->response_sender->__invoke();
+        return $this;
+    }
+
+    protected function shouldBeJson($content)
+    {
+        return $content instanceof Jsonable || $content instanceof ArrayObject || is_array($content);
+    }
+
+    protected function morphToJson($content)
+    {
+        if ($content instanceof Jsonable)
+            return $content->toJson();
+
+        return json_encode($content);
     }
 
     function redirect($location, $code = 302, $phrase = null)
     {
         $this->response->redirect->to($location, $code, $phrase);
-        return $this->response_sender->__invoke();
+        return $this;
     }
 
     function status($code, $phrase = null, $version = null)
     {
         $this->response->status->set($code, $phrase, $version);
-        return $this->response_sender->__invoke();
+        return $this;
     }
 
-    function setJSON($content, $options = JSON_UNESCAPED_UNICODE)
+    function response_sender()
     {
-        $this->response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        $content = json_encode($content, $options);
-        $this->response->content->set($content);
-        return $this->response_sender->__invoke();
-    }
-
-    function setTEXT($content)
-    {
-        $this->response->headers->set('Content-Type', 'text/plain; charset=ISO-8859-1');
-        $this->response->content->set($content);
         return $this->response_sender->__invoke();
     }
 }

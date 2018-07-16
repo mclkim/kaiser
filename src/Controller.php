@@ -1,14 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: 김준수
- * Date: 2018-07-05
- * Time: 오후 1:24
- */
 
 namespace Mcl\Kaiser;
 
-<<<<<<< HEAD
 class Controller implements ControllerInterface
 {
     protected $container;
@@ -28,24 +21,6 @@ class Controller implements ControllerInterface
         return false;
     }
 
-=======
-use Interop\Container\ContainerInterface;
-
-class Controller implements ControllerInterface
-{
-    protected $container;
-
-    public function __construct($container = [])
-    {
-        $this->container = $container;
-    }
-
-    function requireLogin()
-    {
-        return false;
-    }
-
->>>>>>> 26aa3e402fdbd25eed47c460755f00c907c00a92
     function requireAdmin()
     {
         return false;
@@ -53,18 +28,12 @@ class Controller implements ControllerInterface
 
     function execute($request, $response)
     {
-<<<<<<< HEAD
         return $response->status(200)->setContent('OK! Kaiser PHP Framework');
-=======
-//        echo 'Hello Kaiser PHP framework~~';
-        return $response->withStatus(200)->write("Hello Kaiser PHP framework~~");
->>>>>>> 26aa3e402fdbd25eed47c460755f00c907c00a92
     }
 
     function methods()
     {
         return ['GET'];
-<<<<<<< HEAD
     }
 
     /**
@@ -72,8 +41,6 @@ class Controller implements ControllerInterface
      */
     function logout()
     {
-=======
->>>>>>> 26aa3e402fdbd25eed47c460755f00c907c00a92
     }
 
     function info($message = null, array $context = array())

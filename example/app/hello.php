@@ -10,7 +10,6 @@ class hello extends Controller
 {
     function world($request, $response)
     {
-<<<<<<< HEAD
         $getParams = $request->get();
         var_dump($getParams);
         echo '<br>';
@@ -25,11 +24,5 @@ class hello extends Controller
     function not($request, $response)
     {
         return $response->status(404)->setContent('Not Found');
-=======
-        $getParams = $request->getQueryParams();
-        var_dump($getParams);
-        echo '<br>';
-        echo 'hello world~~~';
->>>>>>> 26aa3e402fdbd25eed47c460755f00c907c00a92
     }
 }

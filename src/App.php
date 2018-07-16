@@ -12,7 +12,8 @@ use Psr\Container\ContainerInterface;
 
 class App
 {
-    const VERSION = '2018-07-15';
+    const VERSION = '1.5';
+    const DATE_APPROVED = '2018-07-15';
 
     private $container;
 

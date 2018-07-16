@@ -52,8 +52,6 @@ if (!function_exists('bytesize')) {
 if (!function_exists('get_class_name')) {
     function get_class_name($classname)
     {
-//        if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
-//        return $pos;
         $path = explode('\\', $classname);
         return array_pop($path);
     }

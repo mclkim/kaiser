@@ -19,9 +19,8 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0",
-    "pimple/pimple": "^3.0",
-    "aura/web": "^2.0",
+    "php": ">=5.5.0",
+    "slim/slim": "^3.10",
     "katzgrau/klogger": "^1.2"
   },
   "autoload": {

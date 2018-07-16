@@ -10,17 +10,17 @@ namespace Mcl\Kaiser;
 
 class Auth
 {
-    var $admin = [
-        'username' => 'admin',//사용자명(아이디)
-        'password' => 'X',//패스워드
-        'uid' => '0',//사용자ID
-        'gid' => '0',//그룹ID
-        'comment' => '',//정보
-        'home' => '/admin',//홈디렉토리
-        'defaultPage' => '/admin',//홈페이지
-        'hashed_password' => '',//해쉬비밀번호
-        'salt' => '',//비밀번호암호키
-    ];
+//    var $admin = [
+//        'username' => 'admin',//사용자명(아이디)
+//        'password' => 'X',//패스워드
+//        'uid' => '0',//사용자ID
+//        'gid' => '0',//그룹ID
+//        'comment' => '',//정보
+//        'home' => '/admin',//홈디렉토리
+//        'defaultPage' => '/admin',//홈페이지
+//        'hashed_password' => '',//해쉬비밀번호
+//        'salt' => '',//비밀번호암호키
+//    ];
 
     var $_defaultPage = '/';
     var $_defaultAdminPage = '/admin';
@@ -29,14 +29,29 @@ class Auth
     var $_admin = 'admin';
     var $_user = 'user';
 
-    function getUser()
+    function __invoke($handler, $request, $response)
     {
-        return if_exists($_SESSION, $this->_user, false);
+        $res = true;
+        if ($handler->requireAdmin()) {
+            $res = $this->checkAdmin($request, $response);
+        } elseif ($handler->requireLogin()) {
+            $res = $this->checkUser($request, $response);
+        }
+        return $res;
     }
 
-    function setUser($user)
+    function checkAdmin($request, $response)
     {
-        $_SESSION [$this->_user] = $user;
+        $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+        $return_uri = $request->get('returnURI', $request_uri);
+        $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+
+        if ($this->getAdmin()) {
+            return true;
+        } else {
+            $response->redirect($this->_loginAdminPage . '?returnURI=' . $redirect);
+            return false;
+        }
     }
 
     function getAdmin()
@@ -49,51 +64,27 @@ class Auth
         $_SESSION [$this->_admin] = $admin;
     }
 
-    // function checkUser($callable)
-    // {
-    //     if ($callable->requireLogin()) {
-    //         if ($this->getUser() || $this->getAdmin()) {
-    //             return true;
-    //         }
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
-    // function checkAdmin($callable)
-    // {
-    //     if ($callable->requireAdmin()) {
-    //         if ($this->getAdmin()) {
-    //             return true;
-    //         }
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
-    function logout($callable)
+    function checkUser($request, $response)
     {
-        session_unset();
-        session_destroy();
-        unset ($_SESSION);
+        $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
+        $return_uri = $request->get('returnURI', $request_uri);
+        $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
 
-        $callable->redirect($this->_defaultPage);
+        if ($this->getUser() || $this->getAdmin()) {
+            return true;
+        } else {
+            $response->redirect($this->_loginPage . '?returnURI=' . $redirect);
+            return false;
+        }
     }
 
-    public function __invoke($request, $response, $next)
+    function getUser()
     {
-        $loggedIn = isset($_SESSION['isLoggedIn']) ? $_SESSION['isLoggedIn'] : 'no';
+        return if_exists($_SESSION, $this->_user, false);
+    }
 
-        if ($loggedIn != 'yes') {
-            // If the user is not logged in, redirect them home
-//            return $response->withRedirect($this->router->pathFor('login'));
-            return $response->redirect('/login');
-        }
-
-        // The user must be logged in, so pass this request down the middleware chain
-        $response = $next($request, $response);
-
-        // And pass the request back up the middleware chain.
-        return $response;
+    function setUser($user)
+    {
+        $_SESSION [$this->_user] = $user;
     }
 }

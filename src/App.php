@@ -8,9 +8,41 @@
 
 namespace Mcl\Kaiser;
 
-class App extends Controller
+use Psr\Container\ContainerInterface;
+
+class App //extends Controller
 {
     const VERSION = '2018-07-15';
+
+    private $container;
+
+    public function __construct($container = [])
+    {
+        if (is_array($container)) {
+            $container = new Container ($container);
+        }
+        if (!$container instanceof ContainerInterface) {
+            throw new \RuntimeException ('Expected a ContainerInterface');
+        }
+        $this->container = $container;
+    }
+
+    function getContainer()
+    {
+        return $this->container;
+    }
+
+    public function __call($method, $args)
+    {
+        if ($this->container->has($method)) {
+            $obj = $this->container->get($method);
+            if (is_callable($obj)) {
+                return call_user_func_array($obj, $args);
+            }
+        }
+
+        throw new \BadMethodCallException("Method $method is not a valid method");
+    }
 
     public function version()
     {
@@ -19,34 +51,31 @@ class App extends Controller
 
     public function run($directory = [])
     {
-
         if ($this->container->has('session')) {
             $this->container->get('session');
+
             if (session_status() !== PHP_SESSION_ACTIVE) {
                 session_start();
             }
         }
 
-        $request = $this->container->request;
-        $response = $this->container->response;
-
-        $path = $request->url(PHP_URL_PATH);
+        $request = $this->container->get('request');
+        $response = $this->container->get('response');
 
         $router = new Router();
         $router->setAppDir($directory);
+        $path = $request->url(PHP_URL_PATH);
         $routeInfo = $router->dispatch($path);
 
-        $this->debug('routeInfo', $routeInfo);
+        $this->container->logger->debug('routeInfo', $routeInfo);
 
         switch ($routeInfo[0]) {
             case Router::NOT_FOUND:
                 // ... 404 Not Found
-                // $this->err(sprintf('The Class "%s" does not found', $controller));
                 $response->status(404, 'Not Found', '1.1');
                 break;
             case Router::NOT_FOUND_ACTION:
                 // ... 405 Method Not Allowed
-                // $this->err(sprintf("The Action '%s' is not found in the controller '%s'", $action, $controller));
                 $response->status(405, 'Method Not Allowed', '1.1');
                 break;
             case Router::FOUND:
@@ -61,26 +90,46 @@ class App extends Controller
                  * TODO:
                  */
                 try {
-                    // $this->info(sprintf('The Class "%s" does "%s" method', $controller, $action));
-                    // $result = call_user_func_array(array($handler, $action), $parameters);
-                    // $this->debug('Execute the handler');
-                    // $this->debug($result);
-                    $result = call_user_func_array(array($handler, $action), [$request, $response, $parameters]);
+
+                    $auth = new Auth();
+                    $res = $auth($handler, $request, $response);
+
+                    if ($res) {
+                        ob_start();
+                        $result = call_user_func_array(array($handler, $action), [$request, $response]);
+                    }
                 } catch (ApplicationException $ex) {
-                    $this->err($ex->getMessage());
+                    $this->container->logger->error('ApplicationException', ['error' => $ex->getMessage()]);
                     $result = false;
                 } catch (AjaxException $ex) {
-                    $this->err($ex->getMessage());
+                    $this->container->logger->error('AjaxException', ['error' => $ex->getMessage()]);
                     $response->setContent($ex->getMessage());
                     $result = false;
                 } catch (\Exception $ex) {
-                    $this->err($ex->getMessage());
+                    $this->container->logger->error('Exception', ['error' => $ex->getMessage()]);
                     $result = false;
+                } finally {
+                    $output = ob_get_clean();
+                    $response->setContent($output);
                 }
                 $response->response_sender();
                 return ($result) ?: true;
         }
         $response->response_sender();
         return false;
+    }
+
+    public function process($request, $response)
+    {
+        // Traverse middleware stack
+        try {
+            $response = $this->callMiddlewareStack($request, $response);
+        } catch (Exception $e) {
+            $response = $this->handleException($e, $request, $response);
+        } catch (Throwable $e) {
+            $response = $this->handlePhpError($e, $request, $response);
+        }
+
+        return $response;
     }
 }

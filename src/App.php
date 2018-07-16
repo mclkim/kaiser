@@ -10,7 +10,7 @@ namespace Mcl\Kaiser;
 
 use Psr\Container\ContainerInterface;
 
-class App //extends Controller
+class App
 {
     const VERSION = '2018-07-15';
 
@@ -90,12 +90,11 @@ class App //extends Controller
                  * TODO:
                  */
                 try {
-
+                    $result = true;
                     $auth = new Auth();
                     $res = $auth($handler, $request, $response);
 
                     if ($res) {
-                        ob_start();
                         $result = call_user_func_array(array($handler, $action), [$request, $response]);
                     }
                 } catch (ApplicationException $ex) {
@@ -109,8 +108,6 @@ class App //extends Controller
                     $this->container->logger->error('Exception', ['error' => $ex->getMessage()]);
                     $result = false;
                 } finally {
-                    $output = ob_get_clean();
-                    $response->setContent($output);
                 }
                 $response->response_sender();
                 return ($result) ?: true;

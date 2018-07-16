@@ -4,7 +4,7 @@ namespace Mcl\Kaiser;
 
 use Aura\Web\WebFactory;
 
-class Request //extends Singleton
+class Request
 {
     protected $request;
 
@@ -36,6 +36,12 @@ class Request //extends Singleton
         return $this->request->method->get();
     }
 
+    function get_post($key = null, $alt = null)
+    {
+        $post = $this->post($key);
+        return empty ($post) ? $this->get($key, $alt) : $alt;
+    }
+
     function post($key = null, $alt = null)
     {
         return $this->request->post->get($key, $alt);
@@ -44,12 +50,6 @@ class Request //extends Singleton
     function get($key = null, $alt = null)
     {
         return $this->request->query->get($key, $alt);
-    }
-
-    function get_post($key = null, $alt = null)
-    {
-        $post = $this->post($key);
-        return empty ($post) ? $this->get($key, $alt) : $alt;
     }
 
     function header($key = null, $alt = null)

@@ -37,20 +37,27 @@ class Controller implements ControllerInterface
     }
 
     /**
+     * 로그인
+     */
+    function login($request, $response)
+    {
+    }
+
+    /**
      * 로그아웃
      */
     function logout()
     {
     }
 
-    function info($message = null, array $context = array())
-    {
-        $this->container->logger->info($message, $context);
-    }
-
     function debug($message = null, array $context = array())
     {
         $this->container->logger->debug($message, $context);
+    }
+
+    function info($message = null, array $context = array())
+    {
+        $this->container->logger->info($message, $context);
     }
 
     function err($message = null, array $context = array())

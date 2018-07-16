@@ -15,14 +15,4 @@ class hello extends Controller
         echo '<br>';
         echo 'hello world~~~';
     }
-
-    function index($request, $response)
-    {
-        return $response->status(200)->setContent('OK Kaiser Framework');
-    }
-
-    function not($request, $response)
-    {
-        return $response->status(404)->setContent('Not Found');
-    }
 }

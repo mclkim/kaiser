@@ -11,7 +11,7 @@ namespace Mcl\Kaiser;
 use Aura\Web\ResponseSender;
 use Aura\Web\WebFactory;
 
-class Response //extends Singleton
+class Response
 {
     protected $response;
     protected $response_sender;
@@ -70,6 +70,21 @@ class Response //extends Singleton
     function status($code, $phrase = null, $version = null)
     {
         $this->response->status->set($code, $phrase, $version);
+        return $this;
+    }
+
+    function setJson($content, $options = JSON_UNESCAPED_UNICODE)
+    {
+        $this->response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        $content = json_encode($content, $options);
+        $this->response->content->set($content);
+        return $this;
+    }
+
+    function setText($content)
+    {
+        $this->response->headers->set('Content-Type', 'text/plain; charset=ISO-8859-1');
+        $this->response->content->set($content);
         return $this;
     }
 

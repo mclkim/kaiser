@@ -23,7 +23,6 @@ class hello extends Controller
 
     function not($request, $response)
     {
-//        var_dump($response);
         return $response->status(404)->setContent('Not Found');
     }
 }

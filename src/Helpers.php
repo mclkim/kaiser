@@ -64,7 +64,6 @@ if (!function_exists('get_digit')) {
         return $num = preg_replace("/[^0-9]*/s", "", $str);
     }
 }
-
 if (!function_exists('base_url')) {
     function base_url($atRoot = FALSE, $atCore = FALSE, $parse = FALSE)
     {
@@ -89,4 +88,3 @@ if (!function_exists('base_url')) {
         return $base_url;
     }
 }
-

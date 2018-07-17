@@ -26,6 +26,19 @@ class Request
         return $this->request->cookies->get($key, $alt);
     }
 
+    function getBaseUrl($port = null)
+    {
+        $scheme = $this->url(PHP_URL_SCHEME);
+        $host = $this->url(PHP_URL_HOST);
+        if (!is_null($port)) {
+            $port = $this->url(PHP_URL_PORT);
+        }
+
+        $host_port = $host . ($port !== null ? ':' . $port : '');
+
+        return ($scheme ? $scheme . ':' : '') . ($host_port ? '//' . $host_port : '');
+    }
+
     function url($component = null)
     {
         return $this->request->url->get($component);

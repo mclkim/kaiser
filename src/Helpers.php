@@ -23,6 +23,13 @@ if (!function_exists('if_empty')) {
         return !empty ($ret) ? $ret : $def;
     }
 }
+if (!function_exists('if_digit')) {
+    function if_digit($array, $key, $def = null)
+    {
+        $ret = if_exists($array, $key, $def);
+        return is_numeric($ret) ? $ret : $def;
+    }
+}
 /**
  * ---------------------------------------------------------------
  * 기타함수

@@ -71,27 +71,16 @@ if (!function_exists('get_digit')) {
         return $num = preg_replace("/[^0-9]*/s", "", $str);
     }
 }
-if (!function_exists('base_url')) {
-    function base_url($atRoot = FALSE, $atCore = FALSE, $parse = FALSE)
+if (!function_exists('starts_with')) {
+    function starts_with($haystack, $needle)
     {
-        if (isset($_SERVER['HTTP_HOST'])) {
-            $http = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
-            $hostname = $_SERVER['HTTP_HOST'];
-            $dir = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
-
-            $core = preg_split('@/@', str_replace($_SERVER['DOCUMENT_ROOT'], '', realpath(dirname(__FILE__))), NULL, PREG_SPLIT_NO_EMPTY);
-            $core = $core[0];
-
-            $tmplt = $atRoot ? ($atCore ? "%s://%s/%s/" : "%s://%s/") : ($atCore ? "%s://%s/%s/" : "%s://%s%s");
-            $end = $atRoot ? ($atCore ? $core : $hostname) : ($atCore ? $core : $dir);
-            $base_url = sprintf($tmplt, $http, $hostname, $end);
-        } else $base_url = 'http://localhost/';
-
-        if ($parse) {
-            $base_url = parse_url($base_url);
-            if (isset($base_url['path'])) if ($base_url['path'] == '/') $base_url['path'] = '';
-        }
-
-        return $base_url;
+        return ((FALSE !== strpos($haystack, $needle)) &&
+            (0 == strpos($haystack, $needle)));
+    }
+}
+if (!function_exists('ends_with')) {
+    function ends_with($haystack, $needle)
+    {
+        return strrpos($haystack, $needle) === strlen($haystack) - strlen($needle);
     }
 }

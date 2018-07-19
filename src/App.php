@@ -97,6 +97,7 @@ class App
 
                     if ($res) {
                         $result = call_user_func_array(array($handler, $action), [$request, $response]);
+//                        $response->setContent($result);
                     }
                 } catch (ApplicationException $ex) {
                     $this->container->logger->error('ApplicationException', ['error' => $ex->getMessage()]);

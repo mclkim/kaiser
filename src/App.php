@@ -14,8 +14,13 @@ class App
 {
     const VERSION = '1.5';
     const DATE_APPROVED = '2018-07-15';
-
+    var $path;
+    var $class;
+    var $action;
+    var $controller;
+    var $parameters = array();
     private $container;
+    private $url;
 
     public function __construct($container = [])
     {
@@ -50,16 +55,76 @@ class App
         return self::VERSION;
     }
 
+    function run2($app = '\App')
+    {
+        $request = $this->container->get('request');
+        $response = $this->container->get('response');
+        $this->url = $request->url(PHP_URL_PATH);
+
+        $x = self::__URIPath($this->url);
+
+        $this->path = empty($x['dirname']) ? '' : $x['dirname'];
+        $this->class = empty($x['filename']) ? 'index' : $x['filename'];
+        $this->action = empty($x['extension']) ? 'execute' : $x['extension'];
+        $this->controller = $app . rtrim($this->path, '/') . '/' . $this->class;
+        $this->controller = str_replace('/', '\\', $this->controller);
+
+        $dispatcher = \FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $r) {
+            $callable = new $this->controller($this->container);
+            $r->addRoute($callable->methods(), $this->url, $callable);
+        });
+
+        // Fetch method and URI from somewhere
+        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        $uri = $_SERVER['REQUEST_URI'];
+
+        // Strip query string (?foo=bar) and decode URI
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
+        $uri = rawurldecode($uri);
+
+        $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+        switch ($routeInfo[0]) {
+            case \FastRoute\Dispatcher::NOT_FOUND:
+                // ... 404 Not Found
+                break;
+            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                $allowedMethods = $routeInfo[1];
+                // ... 405 Method Not Allowed
+                break;
+            case \FastRoute\Dispatcher::FOUND:
+
+                $handler = $routeInfo[1];
+                $vars = $routeInfo[2];
+
+                $result = true;
+                $auth = new Auth();
+                $res = $auth($handler, $request, $response);
+
+                if ($res) {
+                    // ... call $handler with $vars
+                    $result = call_user_func_array(array($handler, $this->action), array($request, $response, $vars));
+                }
+          
+                break;
+        }
+        $response->response_sender();
+    }
+
+    private function __URIPath($url)
+    {
+        preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $url, $m);
+        return array(
+            'dirname' => isset ($m [1]) ? $m [1] : '',
+            'basename' => isset ($m [2]) ? $m [2] : '',
+            'extension' => isset ($m [5]) ? $m [5] : '',
+            'filename' => isset ($m [3]) ? $m [3] : ''
+        );
+    }
+
     public function run($directory = [])
     {
-        if ($this->container->has('session')) {
-            $this->container->get('session');
-
-            if (session_status() !== PHP_SESSION_ACTIVE) {
-                session_start();
-            }
-        }
-
         $request = $this->container->get('request');
         $response = $this->container->get('response');
 

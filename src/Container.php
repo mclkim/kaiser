@@ -16,10 +16,18 @@ class Container extends PimpleContainer implements ContainerInterface
 
     private function registerDefaultServices(Container $container)
     {
+        $container['routecollector'] = function ($container) {
+            return new \FastRoute\RouteCollector(new \FastRoute\RouteParser\Std, new \FastRoute\DataGenerator\GroupCountBased);
+        };
+
         $container->set('logger', new  Logger(__DIR__ . '/../log'));
         $container->set('request', new  Request());
         $container->set('response', new  Response());
         $container->set('template', new  \Template_());
+
+        $container['notFoundHandler'] = function ($container) {
+            return new NotFound;
+        };
     }
 
     public function set($id, $value)

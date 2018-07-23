@@ -52,10 +52,10 @@ http://localhost:8000/mysql
 http://localhost:8000/hello.world?p1=1&p2=2&p3=3
 ```
 ## Reference
- * [Container](https://github.com/silexphp/Pimple)
- * [Logger](https://github.com/katzgrau/KLogger) 
- * [Request and Response](https://github.com/auraphp/Aura.Web)
- * [Router](https://github.com/nikic/FastRoute)
+ * [Pimple](https://github.com/silexphp/Pimple)
+ * [Aura.Web](https://github.com/auraphp/Aura.Web)
+ * [FastRoute: Fast request router for PHP](https://github.com/nikic/FastRoute)
+ * [KLogger: Simple Logging for PHP](https://github.com/katzgrau/KLogger) 
  * [Template_](http://www.xtac.net)
  * [PHP-DB](https://github.com/delight-im/PHP-DB)
 

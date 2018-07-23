@@ -48,7 +48,7 @@ class Route
         $this->path = empty($x['dirname']) ? '' : $x['dirname'];
         $this->class = empty($x['filename']) ? 'index' : $x['filename'];
         $this->action = empty($x['extension']) ? 'execute' : $x['extension'];
-        $this->controller = rtrim($this->path, '/') . '/' . $this->class;
+        $this->controller = trim($this->path, '/') . '/' . $this->class;
         return $this;
     }
 

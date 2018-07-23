@@ -11,6 +11,11 @@ class Controller implements ControllerInterface
         $this->container = $container;
     }
 
+    function setContainer($container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * 로그인 여부를 체크 할 페이지 인지에 대한 세팅을 한다.
      * true를 리턴하면 로그인 체크를 하며, false를 리턴할 경우 로그인 체크를 하지 않는다.

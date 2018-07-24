@@ -1,6 +1,6 @@
 <?php
 
-namespace admin;
+namespace App\Admin;
 
 use Mcl\Kaiser\Controller;
 

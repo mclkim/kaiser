@@ -24,17 +24,24 @@ class Router
         return $this->findController($controller, $action, $parameters, $this->getAppDir());
     }
 
-    protected function findController($controller, $action, $parameters, $inPath)
+    protected function findController($controller, $action, $parameters, $map)
     {
-        $directory = is_array($inPath) ? $inPath : array($inPath);
+        $directory = is_array($map) ? $map : ["App\\" => $map];
 
-        $classname = self::normalizeClassName($controller);
-        /**
-         * TODO::UNIX 시스템에서 파일이름의 대소문자 구별한다.(2016-12-02)
-         */
-        if (!class_exists($classname)) {
-            foreach ($directory as $inPath) {
-                $controllerFile = $inPath . $controller . '.php';
+        foreach ($directory as $prefix => $path) {
+            $length = strlen($prefix);
+            if ('\\' !== $prefix[$length - 1]) {
+                continue;
+            }
+
+            $classname = trim($prefix, '\\') . '/' . trim($controller, '/');
+            $classname = self::normalizeClassName($classname);
+
+            /**
+             * TODO::UNIX 시스템에서 파일이름의 대소문자 구별한다.(2016-12-02)
+             */
+            if (!class_exists($classname)) {
+                $controllerFile = trim($path, '/') . '/' . trim($controller, '/') . '.php';
                 $controllerFile = realpath($controllerFile);
                 if (file_exists($controllerFile)) {
                     include_once($controllerFile);
@@ -47,13 +54,11 @@ class Router
             return [self::NOT_FOUND, $classname, $action, $parameters];
         }
 
-        //TODO::
-        $handler = array(new $classname, $action);
-        if (is_callable($handler)) {
-            return [self::FOUND, $classname, $action, $parameters];
+        if (!is_callable([new $classname, $action])) {
+            return [self::NOT_FOUND_ACTION, $classname, $action, $parameters];
         }
 
-        return [self::NOT_FOUND_ACTION, $classname, $action, $parameters];
+        return [self::FOUND, $classname, $action, $parameters];
     }
 
     public static function normalizeClassName($name)
@@ -75,25 +80,5 @@ class Router
     function setAppDir($directory = [])
     {
         $this->AppDir = $directory;
-    }
-
-    function array_find($needle, array $haystack, $column = null)
-    {
-        if (is_array($haystack[0]) === true) { // check for multidimentional array
-
-            foreach (array_column($haystack, $column) as $key => $value) {
-                if (strpos(strtolower($value), strtolower($needle)) !== false) {
-                    return $key;
-                }
-            }
-
-        } else {
-            foreach ($haystack as $key => $value) { // for normal array
-                if (strpos(strtolower($value), strtolower($needle)) !== false) {
-                    return $key;
-                }
-            }
-        }
-        return false;
     }
 }

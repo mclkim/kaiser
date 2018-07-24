@@ -28,10 +28,10 @@ class Request
 
     function getBaseUrl($port = null)
     {
-        $scheme = $this->url(PHP_URL_SCHEME);
-        $host = $this->url(PHP_URL_HOST);
+        $scheme = $this->request->url->get(PHP_URL_SCHEME);
+        $host = $this->request->url->get(PHP_URL_HOST);
         if (!is_null($port)) {
-            $port = $this->url(PHP_URL_PORT);
+            $port = $this->request->url->get(PHP_URL_PORT);
         }
 
         $host_port = $host . ($port !== null ? ':' . $port : '');
@@ -39,12 +39,17 @@ class Request
         return ($scheme ? $scheme . ':' : '') . ($host_port ? '//' . $host_port : '');
     }
 
+    function getUri($component = null)
+    {
+        return $this->request->url->get($component);
+    }
+
     function url($component = null)
     {
         return $this->request->url->get($component);
     }
 
-    function method()
+    function getMethod()
     {
         return $this->request->method->get();
     }

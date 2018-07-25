@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+//namespace App;
 
 use Mcl\Db\DBManager;
 use Mcl\Kaiser\Controller;

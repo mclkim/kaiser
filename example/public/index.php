@@ -39,4 +39,4 @@ $container ['MYSQL'] = function ($c) {
  * Step 4: Run the Kaiser application
  */
 
-$app->run(["App\\" => BASE_PATH . '/app']);
+$app->run(BASE_PATH . '/app');

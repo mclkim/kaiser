@@ -9,7 +9,7 @@ class Router
     const NOT_FOUND_ACTION = 2;
     const METHOD_NOT_ALLOWED = 3;
 
-    private $AppDir;
+    private $AppMap;
 
     public function dispatch($url)
     {
@@ -19,24 +19,27 @@ class Router
         $controller = $route->getController();
         $action = $route->getAction();
         $parameters = $route->getParameters();
+        $map = $this->getAppMap();
 
         //TODO::
-        return $this->findController($controller, $action, $parameters, $this->getAppDir());
+        return $this->findController($controller, $action, $parameters, $map);
+    }
+
+    function getAppMap()
+    {
+        return $this->AppMap;
+    }
+
+    function setAppMap($map = [])
+    {
+        $this->AppMap = is_array($map) ? $map : ["" => $map];;
     }
 
     protected function findController($controller, $action, $parameters, $map)
     {
-        $directory = is_array($map) ? $map : ["App\\" => $map];
-
-        foreach ($directory as $prefix => $path) {
-            $length = strlen($prefix);
-            if ('\\' !== $prefix[$length - 1]) {
-                continue;
-            }
-
+        foreach ($map as $prefix => $path) {
             $classname = trim($prefix, '\\') . '/' . trim($controller, '/');
             $classname = self::normalizeClassName($classname);
-
             /**
              * TODO::UNIX 시스템에서 파일이름의 대소문자 구별한다.(2016-12-02)
              */
@@ -70,15 +73,5 @@ class Router
 
         $name = '\\' . ltrim($name, '\\');
         return $name;
-    }
-
-    function getAppDir()
-    {
-        return $this->AppDir;
-    }
-
-    function setAppDir($directory = [])
-    {
-        $this->AppDir = $directory;
     }
 }

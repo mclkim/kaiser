@@ -4,6 +4,21 @@
  * User: 김준수
  * Date: 2018-07-19
  * Time: 오후 12:40
+ *
+ * //  url like: http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
+ * echo base_url();    //  will produce something like: http://stackoverflow.com/questions/2820723/
+ * echo base_url(TRUE);    //  will produce something like: http://stackoverflow.com/
+ * echo base_url(TRUE, TRUE); || echo base_url(NULL, TRUE);    //  will produce something like: http://stackoverflow.com/questions/
+ * echo base_url(NULL, NULL, TRUE); //  and finally
+ * //  will produce something like:
+ * //      array(3) {
+ * //          ["scheme"]=>
+ * //          string(4) "http"
+ * //          ["host"]=>
+ * //          string(12) "stackoverflow.com"
+ * //          ["path"]=>
+ * //          string(35) "/questions/2820723/"
+ * //      }
  */
 if (!function_exists('base_url')) {
     function base_url($atRoot = FALSE, $atCore = FALSE, $parse = FALSE)

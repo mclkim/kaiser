@@ -49,7 +49,7 @@ class App
         echo 'hello world';
     }
 
-    function run($class = [])
+    function run($appMap = [])
     {
         /**
          *
@@ -58,12 +58,13 @@ class App
         $response = $this->container->get('response');
 
         $router = new Router();
-        $router->setAppDir($class);
+        $router->setAppMap($appMap);
 
         $path = $request->url(PHP_URL_PATH);
         $routeInfo = $router->dispatch($path);
-        if ($routeInfo[0] == Router::FOUND) {
+        if (is_array($routeInfo) && $routeInfo[0] == Router::FOUND) {
             $callable = new $routeInfo[1] ($this->container);
+            if($callable instanceof ControllerInterface)
             $this->addRoute($callable->methods(), $path, [$callable, $routeInfo[2]]);
         }
 
@@ -116,7 +117,6 @@ class App
         $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
     }
 
-    public
     function process($request, $response)
     {
         // Traverse middleware stack

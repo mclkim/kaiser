@@ -30,6 +30,7 @@ class Request
     {
         $scheme = $this->request->url->get(PHP_URL_SCHEME);
         $host = $this->request->url->get(PHP_URL_HOST);
+    
         if (!is_null($port)) {
             $port = $this->request->url->get(PHP_URL_PORT);
         }
@@ -39,17 +40,12 @@ class Request
         return ($scheme ? $scheme . ':' : '') . ($host_port ? '//' . $host_port : '');
     }
 
-    function getUri($component = null)
-    {
-        return $this->request->url->get($component);
-    }
-
     function url($component = null)
     {
         return $this->request->url->get($component);
     }
 
-    function getMethod()
+    function method()
     {
         return $this->request->method->get();
     }

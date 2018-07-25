@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2018-04-22
- * Time: 오후 3:34
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
  */
 
 namespace Mcl\Kaiser;
@@ -12,7 +11,7 @@ use Psr\Container\ContainerInterface;
 
 class App
 {
-    const VERSION = '1.5';
+    const VERSION = '20180715';
     const DATE_APPROVED = '2018-07-15';
     private $container;
 
@@ -30,6 +29,12 @@ class App
     function getContainer()
     {
         return $this->container;
+    }
+
+//TODO::
+        public function add($callable)
+    {
+        // return $this->addMiddleware(new DeferredCallable($callable, $this->container));
     }
 
     public function __call($method, $args)
@@ -75,7 +80,7 @@ class App
         $dispatcher = new \FastRoute\Dispatcher\GroupCountBased($routecollector->getData());
 
         $uri = '/' . ltrim($request->url(PHP_URL_PATH), '/');
-        $httpMethod = $request->getMethod();
+        $httpMethod = $request->method();
 
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {
@@ -114,7 +119,12 @@ class App
             $handler->setContainer($this->container);
         }
 
-        $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
+          $route = $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
+          return $route;
+    }
+        public function get($route, $handler)
+    {
+        return $this->addRoute(['GET'], $route, $handler);
     }
 
     function process($request, $response)

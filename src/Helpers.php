@@ -42,8 +42,8 @@ if (!function_exists('file_size')) {
         return $size ? round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
     }
 }
-if (!function_exists('bytesize')) {
-    function bytesize($bytes, $decimals = 0)
+if (!function_exists('byte_size')) {
+    function byte_size($bytes, $decimals = 0)
     {
         if (empty ($bytes) || $bytes < 0)
             return 0;

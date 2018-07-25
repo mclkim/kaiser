@@ -1,28 +1,25 @@
 {
   "name": "mclkim/kaiser",
-  "description": "The Kaiser framework for PHP",
   "type": "library",
-  "keywords": [
-    "framework",
-    "kaiser"
-  ],
+  "description": "The Kaiser framework for PHP",
+  "keywords": ["framework","kaiser"],
+  "homepage": "http://mclkim.github.io",
   "license": "MIT",
-  "homepage": "http://mclkim.github.com",
-  "support": {
-    "issues": "https://github.com/mclkim/kaiser/issues",
-    "source": "https://github.com/mclkim/kaiser"
-  },
   "authors": [
     {
       "name": "Kim myung chul",
       "email": "mclkims@gmail.com"
     }
   ],
+  "support": {
+    "issues": "https://github.com/mclkim/kaiser/issues",
+    "source": "https://github.com/mclkim/kaiser"
+  },
   "require": {
     "php": ">=5.4.0",
     "pimple/pimple": "^3.0",
-    "aura/web": "^2.0",
     "nikic/fast-route": "^1.3",
+    "aura/web": "^2.0",
     "katzgrau/klogger": "^1.2"
   },
   "autoload": {

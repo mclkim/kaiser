@@ -46,7 +46,7 @@ class Controller implements ControllerInterface
     /**
      * 로그아웃
      */
-    function logout()
+    function logout($request, $response)
     {
     }
 

@@ -70,7 +70,7 @@ class Auth
         $return_uri = $request->get('returnURI', $request_uri);
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
 
-        if ($this->getUser() || $this->getAdmin()) {
+        if ($this->getAdmin() || $this->getUser()) {
             return true;
         } else {
             $response->redirect($this->_loginPage . '?returnURI=' . $redirect);

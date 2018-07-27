@@ -2,7 +2,7 @@
 
 namespace Mcl\Kaiser;
 
-class Controller implements ControllerInterface
+abstract class Controller implements ControllerInterface
 {
     protected $container;
 

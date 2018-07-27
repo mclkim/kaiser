@@ -31,8 +31,8 @@ class App
         return $this->container;
     }
 
-//TODO::
-        public function add($callable)
+    //TODO::
+    public function add($callable)
     {
         // return $this->addMiddleware(new DeferredCallable($callable, $this->container));
     }
@@ -69,8 +69,8 @@ class App
         $routeInfo = $router->dispatch($path);
         if (is_array($routeInfo) && $routeInfo[0] == Router::FOUND) {
             $callable = new $routeInfo[1] ($this->container);
-            if($callable instanceof ControllerInterface)
-            $this->addRoute($callable->methods(), $path, [$callable, $routeInfo[2]]);
+            if ($callable instanceof ControllerInterface)
+                $this->addRoute($callable->methods(), $path, [$callable, $routeInfo[2]]);
         }
 
         /**
@@ -98,7 +98,7 @@ class App
                 $vars = $routeInfo[2];
 
                 $res = true;
-                if (is_array($handler) && $handler[0] instanceof ControllerInterface) {
+                if (is_array($handler)) {
                     $auth = new Auth();
                     $res = $auth($handler[0], $request, $response);
                 }
@@ -119,10 +119,12 @@ class App
             $handler->setContainer($this->container);
         }
 
-          $route = $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
-          return $route;
+        $route = $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
+        
+        return $route;
     }
-        public function get($route, $handler)
+
+    public function get($route, $handler)
     {
         return $this->addRoute(['GET'], $route, $handler);
     }

@@ -32,10 +32,12 @@ class Auth
     function __invoke($handler, $request, $response)
     {
         $res = true;
-        if ($handler->requireAdmin()) {
-            $res = $this->checkAdmin($request, $response);
-        } elseif ($handler->requireLogin()) {
-            $res = $this->checkUser($request, $response);
+        if ($handler instanceof ControllerInterface) {
+            if ($handler->requireAdmin()) {
+                $res = $this->checkAdmin($request, $response);
+            } elseif ($handler->requireLogin()) {
+                $res = $this->checkUser($request, $response);
+            }
         }
         return $res;
     }

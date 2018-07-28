@@ -30,7 +30,7 @@ class Request
     {
         $scheme = $this->request->url->get(PHP_URL_SCHEME);
         $host = $this->request->url->get(PHP_URL_HOST);
-    
+
         if (!is_null($port)) {
             $port = $this->request->url->get(PHP_URL_PORT);
         }
@@ -79,5 +79,22 @@ class Request
     function getContent()
     {
         return $this->request->content->getRaw();
+    }
+
+    public function getData()
+    {
+        $headers = [];
+        foreach ($this->request->getHeaders() as $name => $values) {
+            $headers[$name] = implode(', ', $values);
+        }
+
+        $data = [
+            'SERVER' => $this->request->getServerParams(),
+            'QUERY' => $this->request->getQueryParams(),
+            'COOKIES' => $this->request->getCookieParams(),
+            'HEADERS' => $headers,
+            'ATTRIBUTES' => $this->request->getAttributes()
+        ];
+        return $data;
     }
 }

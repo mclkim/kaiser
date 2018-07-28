@@ -7,6 +7,8 @@
 
 namespace Mcl\Kaiser;
 
+use Closure;
+use Mcl\Kaiser\Middleware\Middleware;
 use Psr\Container\ContainerInterface;
 
 class App
@@ -57,6 +59,11 @@ class App
     function run($appMap = [])
     {
         /**
+         * Middleware 사용
+         */
+        $middleware = new Middleware();
+
+        /**
          *
          */
         $request = $this->container->get('request');
@@ -69,8 +76,10 @@ class App
         $routeInfo = $router->dispatch($path);
         if (is_array($routeInfo) && $routeInfo[0] == Router::FOUND) {
             $callable = new $routeInfo[1] ($this->container);
-            if ($callable instanceof ControllerInterface)
+            if ($callable instanceof ControllerInterface) {
+                $middleware->addMiddleware(new Auth($callable));
                 $this->addRoute($callable->methods(), $path, [$callable, $routeInfo[2]]);
+            }
         }
 
         /**
@@ -96,17 +105,26 @@ class App
             case \FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
-
-                $res = true;
-                if (is_array($handler)) {
-                    $auth = new Auth();
-                    $res = $auth($handler[0], $request, $response);
-                }
-
-                if ($res) {
+                //TODO::
+                if ($handler instanceof Closure) {
+                    call_user_func($handler, $request, $response, $vars);
+                } else {
                     // ... call $handler with $vars
-                    call_user_func_array($handler, array($request, $response, $vars));
+                    $middleware->callMiddleware($request, $response, $handler, $vars);
                 }
+//
+//                $res = true;
+//                if (is_array($handler)) {
+//                    $auth = new Auth();
+//                    $res = $auth($handler[0], $request, $response);
+//                }
+//
+//                if ($res) {
+//                    // ... call $handler with $vars
+//                    call_user_func_array($handler, array($request, $response, $vars));
+//
+//
+//                }
 
                 break;
         }
@@ -120,7 +138,7 @@ class App
         }
 
         $route = $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
-        
+
         return $route;
     }
 

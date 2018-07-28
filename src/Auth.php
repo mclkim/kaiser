@@ -8,7 +8,9 @@
 
 namespace Mcl\Kaiser;
 
-class Auth
+use Mcl\Kaiser\Middleware\MiddlewareInterface;
+
+class Auth implements MiddlewareInterface
 {
 //    var $admin = [
 //        'username' => 'admin',//사용자명(아이디)
@@ -28,18 +30,23 @@ class Auth
     var $_loginAdminPage = '/admin.login';
     var $_admin = 'admin';
     var $_user = 'user';
+    private $handler;
 
-    function __invoke($handler, $request, $response)
+    function __construct($handler = null)
     {
-        $res = true;
-        if ($handler instanceof ControllerInterface) {
-            if ($handler->requireAdmin()) {
+        $this->handler = $handler;
+    }
+
+    function __invoke($request, $response, $next)
+    {
+        if ($this->handler instanceof ControllerInterface) {
+            if ($this->handler->requireAdmin()) {
                 $res = $this->checkAdmin($request, $response);
-            } elseif ($handler->requireLogin()) {
+            } elseif ($this->handler->requireLogin()) {
                 $res = $this->checkUser($request, $response);
             }
         }
-        return $res;
+        return $next($request, $response);
     }
 
     function checkAdmin($request, $response)

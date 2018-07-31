@@ -7,12 +7,12 @@
 
 namespace Mcl\Kaiser;
 
-use Closure;
-use Mcl\Kaiser\Middleware\Middleware;
 use Psr\Container\ContainerInterface;
 
 class App
 {
+    use MiddlewareStackTrait;
+
     const VERSION = '20180715';
     const DATE_APPROVED = '2018-07-15';
     private $container;
@@ -34,10 +34,6 @@ class App
     }
 
     //TODO::
-    public function add($callable)
-    {
-        // return $this->addMiddleware(new DeferredCallable($callable, $this->container));
-    }
 
     public function __call($method, $args)
     {
@@ -51,18 +47,8 @@ class App
         throw new \BadMethodCallException("Method $method is not a valid method");
     }
 
-    public function __invoke($request, $response)
-    {
-        echo 'hello world';
-    }
-
     function run($appMap = [])
     {
-        /**
-         * Middleware 사용
-         */
-        $middleware = new Middleware();
-
         /**
          *
          */
@@ -77,14 +63,43 @@ class App
         if (is_array($routeInfo) && $routeInfo[0] == Router::FOUND) {
             $callable = new $routeInfo[1] ($this->container);
             if ($callable instanceof ControllerInterface) {
-                $middleware->addMiddleware(new Auth($callable));
+                $this->add(new Auth($callable));
                 $this->addRoute($callable->methods(), $path, [$callable, $routeInfo[2]]);
             }
         }
 
-        /**
-         *
-         */
+        $this->process($request, $response);
+        $response->response_sender();
+    }
+
+    public function add($callable)
+    {
+        return $this->addMiddlewareStack($callable);
+    }
+
+    function addRoute($httpMethod, $route, $handler)
+    {
+        $route = $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
+
+        return $route;
+    }
+
+    function process($request, $response)
+    {
+        // Traverse middleware stack
+        try {
+            $response = $this->callMiddlewareStack($request, $response);
+        } catch (Exception $e) {
+            $response = $this->handleException($e, $request, $response);
+        } catch (Throwable $e) {
+            $response = $this->handlePhpError($e, $request, $response);
+        }
+
+        return $response;
+    }
+
+    public function __invoke($request, $response)
+    {
         $routecollector = $this->container->get('routecollector');
         $dispatcher = new \FastRoute\Dispatcher\GroupCountBased($routecollector->getData());
 
@@ -106,58 +121,14 @@ class App
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
                 //TODO::
-                if ($handler instanceof Closure) {
-                    call_user_func($handler, $request, $response, $vars);
-                } else {
-                    // ... call $handler with $vars
-                    $middleware->callMiddleware($request, $response, $handler, $vars);
-                }
-//
-//                $res = true;
-//                if (is_array($handler)) {
-//                    $auth = new Auth();
-//                    $res = $auth($handler[0], $request, $response);
-//                }
-//
-//                if ($res) {
-//                    // ... call $handler with $vars
-//                    call_user_func_array($handler, array($request, $response, $vars));
-//
-//
-//                }
-
+                call_user_func($handler, $request, $response, $vars);
                 break;
         }
-        $response->response_sender();
-    }
-
-    function addRoute($httpMethod, $route, $handler)
-    {
-        if (is_callable([$handler, 'setContainer'])) {
-            $handler->setContainer($this->container);
-        }
-
-        $route = $this->container->get('routecollector')->addRoute($httpMethod, $route, $handler);
-
-        return $route;
     }
 
     public function get($route, $handler)
     {
-        return $this->addRoute(['GET'], $route, $handler);
-    }
-
-    function process($request, $response)
-    {
-        // Traverse middleware stack
-        try {
-            $response = $this->callMiddlewareStack($request, $response);
-        } catch (Exception $e) {
-            $response = $this->handleException($e, $request, $response);
-        } catch (Throwable $e) {
-            $response = $this->handlePhpError($e, $request, $response);
-        }
-
-        return $response;
+        $this->addRoute(['GET'], $route, $handler);
+        return $this;
     }
 }

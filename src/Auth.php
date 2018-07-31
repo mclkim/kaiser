@@ -8,9 +8,9 @@
 
 namespace Mcl\Kaiser;
 
-use Mcl\Kaiser\Middleware\MiddlewareInterface;
+//use Mcl\Kaiser\Middleware\MiddlewareInterface;
 
-class Auth implements MiddlewareInterface
+class Auth //implements MiddlewareInterface
 {
 //    var $admin = [
 //        'username' => 'admin',//사용자명(아이디)

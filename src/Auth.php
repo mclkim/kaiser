@@ -51,16 +51,14 @@ class Auth //implements MiddlewareInterface
 
     function checkAdmin($request, $response)
     {
+        if ($this->getAdmin()) return true;
+
         $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
         $return_uri = $request->get('returnURI', $request_uri);
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+        $response->redirect($this->_loginAdminPage . '?returnURI=' . $redirect);
+        return false;
 
-        if ($this->getAdmin()) {
-            return true;
-        } else {
-            $response->redirect($this->_loginAdminPage . '?returnURI=' . $redirect);
-            return false;
-        }
     }
 
     function getAdmin()
@@ -75,16 +73,14 @@ class Auth //implements MiddlewareInterface
 
     function checkUser($request, $response)
     {
+        if ($this->getAdmin() || $this->getUser()) return true;
+
         $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
         $return_uri = $request->get('returnURI', $request_uri);
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
+        $response->redirect($this->_loginPage . '?returnURI=' . $redirect);
+        return false;
 
-        if ($this->getAdmin() || $this->getUser()) {
-            return true;
-        } else {
-            $response->redirect($this->_loginPage . '?returnURI=' . $redirect);
-            return false;
-        }
     }
 
     function getUser()

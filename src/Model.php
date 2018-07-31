@@ -8,7 +8,6 @@
 
 namespace Mcl\Kaiser;
 
-class Model extends Controller
+abstract class Model extends Controller
 {
-
 }

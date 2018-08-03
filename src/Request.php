@@ -97,4 +97,12 @@ class Request implements RequestInterface
         ];
         return $data;
     }
+
+    function getAttribute()
+    {
+    }
+
+    function withAttribute()
+    {
+    }
 }

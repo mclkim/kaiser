@@ -8,6 +8,9 @@
 
 namespace Mcl\Kaiser;
 
+use Mcl\Kaiser\RequestInterface as Request;
+use Mcl\Kaiser\ResponseInterface as Response;
+
 class Auth
 {
 //    var $admin = [
@@ -35,7 +38,7 @@ class Auth
         if ($handler instanceof ControllerInterface) $this->handler = $handler;
     }
 
-    function __invoke($request, $response, $next)
+    function __invoke(Request $request, Response $response, $next)
     {
         if ($this->handler->requireAdmin()) {
             $res = $this->checkAdmin($request, $response);

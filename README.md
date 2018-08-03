@@ -6,6 +6,9 @@ Kaiser is a PHP simple framework that helps you quickly write simple web applica
 
 ```php
 <?php
+use Mcl\Kaiser\RequestInterface as Request;
+use Mcl\Kaiser\ResponseInterface as Response;
+
 require 'vendor/autoload.php';
 
 $app = new \Mcl\Kaiser\App;

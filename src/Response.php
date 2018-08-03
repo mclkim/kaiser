@@ -11,7 +11,7 @@ namespace Mcl\Kaiser;
 use Aura\Web\ResponseSender;
 use Aura\Web\WebFactory;
 
-class Response
+class Response implements ResponseInterface
 {
     protected $response;
     protected $response_sender;

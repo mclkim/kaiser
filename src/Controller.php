@@ -2,15 +2,8 @@
 
 namespace Mcl\Kaiser;
 
-abstract class Controller implements ControllerInterface
+abstract class Controller extends Model implements ControllerInterface
 {
-    protected $container;
-
-    function __construct($container = [])
-    {
-        $this->container = $container;
-    }
-
     /**
      * 로그인 여부를 체크 할 페이지 인지에 대한 세팅을 한다.
      * true를 리턴하면 로그인 체크를 하며, false를 리턴할 경우 로그인 체크를 하지 않는다.
@@ -50,18 +43,4 @@ abstract class Controller implements ControllerInterface
     {
     }
 
-    function debug($message = null, array $context = array())
-    {
-        $this->container->logger->debug($message, $context);
-    }
-
-    function info($message = null, array $context = array())
-    {
-        $this->container->logger->info($message, $context);
-    }
-
-    function err($message = null, array $context = array())
-    {
-        $this->container->logger->error($message, $context);
-    }
 }

@@ -10,6 +10,8 @@
 namespace Mcl\Kaiser;
 
 use RuntimeException;
+use Mcl\Kaiser\RequestInterface as Request;
+use Mcl\Kaiser\ResponseInterface as Response;
 
 trait MiddlewareStackTrait
 {

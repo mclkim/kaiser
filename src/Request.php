@@ -4,7 +4,7 @@ namespace Mcl\Kaiser;
 
 use Aura\Web\WebFactory;
 
-class Request
+class Request implements RequestInterface
 {
     protected $request;
 

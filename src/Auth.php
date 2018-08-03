@@ -8,9 +8,7 @@
 
 namespace Mcl\Kaiser;
 
-//use Mcl\Kaiser\Middleware\MiddlewareInterface;
-
-class Auth //implements MiddlewareInterface
+class Auth
 {
 //    var $admin = [
 //        'username' => 'admin',//사용자명(아이디)
@@ -34,17 +32,15 @@ class Auth //implements MiddlewareInterface
 
     function __construct($handler = null)
     {
-        $this->handler = $handler;
+        if ($handler instanceof ControllerInterface) $this->handler = $handler;
     }
 
     function __invoke($request, $response, $next)
     {
-        if ($this->handler instanceof ControllerInterface) {
-            if ($this->handler->requireAdmin()) {
-                $res = $this->checkAdmin($request, $response);
-            } elseif ($this->handler->requireLogin()) {
-                $res = $this->checkUser($request, $response);
-            }
+        if ($this->handler->requireAdmin()) {
+            $res = $this->checkAdmin($request, $response);
+        } elseif ($this->handler->requireLogin()) {
+            $res = $this->checkUser($request, $response);
         }
         return $next($request, $response);
     }
@@ -58,7 +54,6 @@ class Auth //implements MiddlewareInterface
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
         $response->redirect($this->_loginAdminPage . '?returnURI=' . $redirect);
         return false;
-
     }
 
     function getAdmin()
@@ -80,7 +75,6 @@ class Auth //implements MiddlewareInterface
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
         $response->redirect($this->_loginPage . '?returnURI=' . $redirect);
         return false;
-
     }
 
     function getUser()

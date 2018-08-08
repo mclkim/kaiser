@@ -26,6 +26,10 @@ trait MiddlewareStackTrait
         $start = $this->tip;
         $this->middlewareLock = true;
         $response = $start($request, $response);
+//
+//        if ($response instanceof Response)
+//            $response->response_sender();
+
         $this->middlewareLock = false;
         return $response;
     }

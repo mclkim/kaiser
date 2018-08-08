@@ -34,7 +34,6 @@ class App
     }
 
     //TODO::
-
     public function __call($method, $args)
     {
         if ($this->container->has($method)) {
@@ -47,10 +46,10 @@ class App
         throw new \BadMethodCallException("Method $method is not a valid method");
     }
 
-    function run($appMap = [])
+    function run($appMap = ['App\\' => 'app'])
     {
         /**
-         *
+         *TODO::
          */
         $request = $this->container->get('request');
         $response = $this->container->get('response');
@@ -103,8 +102,18 @@ class App
         $routecollector = $this->container->get('routecollector');
         $dispatcher = new \FastRoute\Dispatcher\GroupCountBased($routecollector->getData());
 
-        $uri = '/' . ltrim($request->url(PHP_URL_PATH), '/');
-        $httpMethod = $request->method();
+        // Fetch method and URI from somewhere
+        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        $uri = $_SERVER['REQUEST_URI'];
+
+        // Strip query string (?foo=bar) and decode URI
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
+        $uri = rawurldecode($uri);
+
+//        $uri = '/' . ltrim($request->url(PHP_URL_PATH), '/');
+//        $httpMethod = $request->method();
 
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {

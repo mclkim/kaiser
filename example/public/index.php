@@ -1,9 +1,9 @@
 <?php
 
+require_once '../vendor/autoload.php';
+
 use Mcl\Kaiser\RequestInterface as Request;
 use Mcl\Kaiser\ResponseInterface as Response;
-
-require_once '../vendor/autoload.php';
 
 $app = new Mcl\Kaiser\App();
 

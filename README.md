@@ -6,10 +6,10 @@ Kaiser is a PHP simple framework that helps you quickly write simple web applica
 
 ```php
 <?php
+require 'vendor/autoload.php';
+
 use Mcl\Kaiser\RequestInterface as Request;
 use Mcl\Kaiser\ResponseInterface as Response;
-
-require 'vendor/autoload.php';
 
 $app = new \Mcl\Kaiser\App;
 
@@ -75,5 +75,6 @@ http://localhost:8000/hello.world?p1=1&p2=2&p3=3
  * [KLogger: Simple Logging for PHP](https://github.com/katzgrau/KLogger) 
  * [Template_](http://www.xtac.net)
  * [PHP-DB](https://github.com/delight-im/PHP-DB)
+ * [Respect\Validation](https://github.com/Respect/Validation)
 
 Released under the [MIT License](LICENSE)

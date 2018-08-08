@@ -21,7 +21,8 @@ abstract class Controller extends Model implements ControllerInterface
 
     function execute($request, $response)
     {
-        return $response->status(200)->setContent('OK! Kaiser PHP Framework');
+//        return $response->status(200)->setContent('OK! Kaiser PHP Framework');
+        return $response->withStatus(200)->write('OK! Kaiser PHP Framework');
     }
 
     function methods()

@@ -9,7 +9,7 @@ $app = new Mcl\Kaiser\App();
 
 //// Define app routes
 $app->addRoute('GET', '/hello/{name}', function ($request, $response, $args) {
-    $response->setContent("Hello " . $args['name']);
+    return $response->write("Hello " . $args['name']);
 });
 
 $app->run('../app');

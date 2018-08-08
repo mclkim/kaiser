@@ -17,7 +17,7 @@ class hello extends Controller
 
     function world($request, $response)
     {
-        $getParams = $request->get();
+        $getParams = $request->getParams();
         var_dump($getParams);
         echo '<br>';
         echo 'Admin! hello world~~~';

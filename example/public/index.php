@@ -8,8 +8,9 @@ use Mcl\Kaiser\ResponseInterface as Response;
 $app = new Mcl\Kaiser\App();
 
 //// Define app routes
-$app->addRoute('GET', '/hello/{name}', function ($request, $response, $args) {
-    return $response->write("Hello " . $args['name']);
+$app->get('/hello/{name}', function (Request $request, Response $response, $args) {
+    $response->getBody()->write("Hello " . $args['name']);
+    return $response;
 });
 
 $app->run('../app');

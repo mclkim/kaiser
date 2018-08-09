@@ -10,7 +10,6 @@ namespace Mcl\Kaiser;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Router;
 
 class Auth
 {
@@ -41,32 +40,21 @@ class Auth
 
     function __invoke(Request $request, Response $response, $next)
     {
-        $res = true;
-
-        if ($this->handler->requireAdmin()) {
-            $res = $this->checkAdmin($request, $response);
-        } elseif ($this->handler->requireLogin()) {
-            $res = $this->checkUser($request, $response);
-        }
-
-        if ($res === true) {
-            // The user must be logged in, so pass this request down the middleware chain
-            $response = $next($request, $response);
-
-            // And pass the request back up the middleware chain.
-            return $response;
-        }
-        return $res;
-    }
-
-    function checkAdmin($request, $response)
-    {
-        if ($this->getAdmin()) return true;
-
         $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-        $return_uri = $request->getQueryParam('returnURI', $request_uri);
+        $return_uri = $request->getParam('returnURI', $request_uri);
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-        return $response->withRedirect($this->_loginAdminPage . '?returnURI=' . $redirect, 301);
+
+        if ($this->handler->requireAdmin() && !$this->getAdmin()) {
+            return $response->withRedirect($this->_loginAdminPage . '?returnURI=' . $redirect, 301);
+        } elseif ($this->handler->requireLogin() && !$this->getUser() && !$this->getAdmin()) {
+            return $response->withRedirect($this->_loginPage . '?returnURI=' . $redirect, 301);
+        }
+
+        // The user must be logged in, so pass this request down the middleware chain
+        $response = $next($request, $response);
+
+        // And pass the request back up the middleware chain.
+        return $response;
     }
 
     function getAdmin()
@@ -77,16 +65,6 @@ class Auth
     function setAdmin($admin)
     {
         $_SESSION [$this->_admin] = $admin;
-    }
-
-    function checkUser($request, $response)
-    {
-        if ($this->getAdmin() || $this->getUser()) return true;
-
-        $request_uri = if_exists($_SERVER, 'X_HTTP_ORIGINAL_URL', $_SERVER ['REQUEST_URI']);
-        $return_uri = $request->getQueryParam('returnURI', $request_uri);
-        $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
-        return $response->withRedirect($this->_loginPage . '?returnURI=' . $redirect, 301);
     }
 
     function getUser()

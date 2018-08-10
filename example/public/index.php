@@ -2,10 +2,10 @@
 
 require_once '../vendor/autoload.php';
 
-use Mcl\Kaiser\RequestInterface as Request;
-use Mcl\Kaiser\ResponseInterface as Response;
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
 
-$app = new Mcl\Kaiser\App();
+$app = new Mcl\Kaiser\App(['settings' => ['displayErrorDetails' => true]]);
 
 //// Define app routes
 $app->get('/hello/{name}', function (Request $request, Response $response, $args) {

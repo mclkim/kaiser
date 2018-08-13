@@ -11,7 +11,7 @@ require 'vendor/autoload.php';
 $app = new \Mcl\Kaiser\App;
 
 //// Define app routes
-$app->addRoute('GET', '/hello/{name}', function ($request, $response, $args) {
+$app->get('/hello/{name}', function ($request, $response, $args) {
     return $response->write("Hello " . $args['name']);
 });
 

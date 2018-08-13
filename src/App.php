@@ -26,8 +26,7 @@ class App extends \Slim\App
         $reqServer['SCRIPT_NAME'] = "/{$_SERVER['SCRIPT_NAME']}";
         /**
          * Add Overide on Application initial
-         * set container request with new value of \Slim\Http\Request
-         *  with new values
+         * set container request with new value of \Slim\Http\Request with new values
          */
         $container['request'] = \Slim\Http\Request::createFromEnvironment(
             \Slim\Http\Environment::mock(

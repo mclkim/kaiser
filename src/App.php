@@ -56,8 +56,8 @@ class App extends \Slim\App
         $router->setAppMap($appMap);
 
         $path = $request->getUri()->getPath();
-
         $routeInfo = $router->dispatch($path);
+//        var_dump($routeInfo);
         if (is_array($routeInfo) && $routeInfo[0] == Router::FOUND) {
             $callable = new $routeInfo[1] ($container);
             if ($callable instanceof ControllerInterface) {

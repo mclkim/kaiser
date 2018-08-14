@@ -44,7 +44,7 @@ class Router
              * TODO::UNIX 시스템에서 파일이름의 대소문자 구별한다.(2016-12-02)
              */
             if (!class_exists($classname)) {
-                $controllerFile = trim($path, '/') . '/' . trim($controller, '/') . '.php';
+                $controllerFile = rtrim($path, '/') . '/' . trim($controller, '/') . '.php';
                 $controllerFile = realpath($controllerFile);
                 if (file_exists($controllerFile)) {
                     include_once($controllerFile);

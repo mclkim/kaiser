@@ -41,10 +41,6 @@ class Route
         $this->parameters = $param;
 
         $x = $this->__URIPath($uri);
-//        var_dump($x);
-//        $this->path = if_empty($x, 'dirname', '');
-//        $this->class = if_empty($x, 'filename', 'index');
-//        $this->action = if_empty($x, 'extension', 'execute');
         $this->path = empty($x['dirname']) ? '' : $x['dirname'];
         $this->class = empty($x['filename']) ? 'index' : $x['filename'];
         $this->action = empty($x['extension']) ? 'execute' : $x['extension'];

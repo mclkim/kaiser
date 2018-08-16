@@ -22,6 +22,9 @@ class App extends \Slim\App
 
     private function registerDefaultServices($container)
     {
+        /**
+         * TODO::
+         */
         $reqServer = $_SERVER;
         $reqServer['SCRIPT_NAME'] = "/{$_SERVER['SCRIPT_NAME']}";
         /**

@@ -26,8 +26,12 @@ class TwigExtension extends \Twig_Extension
 
     public function baseUrl()
     {
-        if (method_exists($this->uri, 'getBaseUrl')) {
+        if (is_string($this->uri)) {
+            return $this->uri;
+        } else if (method_exists($this->uri, 'getBaseUrl')) {
             return $this->uri->getBaseUrl();
+        } else if (method_exists($this->uri->getUri(), 'getBaseUrl')) {
+            return $this->uri->getUri()->getBaseUrl();
         }
     }
 }

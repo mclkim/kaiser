@@ -17,3 +17,11 @@ class AjaxException extends ExceptionBase
 class EchoException extends AjaxException
 {
 }
+
+class AuthException extends \Exception
+{
+}
+
+class InvalidPasswordException extends AuthException
+{
+}

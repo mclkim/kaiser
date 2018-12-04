@@ -29,12 +29,19 @@
 // define('KAISER_START', microtime(true));
 
 if (!function_exists('performance')) {
+    function convert($size)
+    {
+        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+    }
+
     function performance()
     {
         return [
-            '처리시간(ms): ' . (microtime(true) - KAISER_START),
-            '메모리(MB): ' . memory_get_usage() / 1000000,
-            '메모리(MB): ' . memory_get_usage() / 1048576,
+            'Time: ' . (microtime(true) - KAISER_START),
+            'Memory in use: ' . convert(memory_get_usage(true)),
+            'Peak usage: ' . convert(memory_get_peak_usage()),
+            'Memory limit: ' . ini_get('memory_limit'),
             // 'CPU(%): ' . sys_getloadavg()[0],
         ];
     }

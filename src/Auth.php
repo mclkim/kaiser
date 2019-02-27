@@ -28,7 +28,7 @@ class Auth
     var $_defaultPage = '/';
     var $_defaultAdminPage = '/admin';
     var $_loginPage = '/login';
-    var $_loginAdminPage = '/admin.login';
+    var $_loginAdminPage = '/login.admin';
     var $_admin = 'admin';
     var $_user = 'user';
     private $handler;

@@ -41,9 +41,9 @@ class App extends \Slim\App
             return new Logger(__DIR__ . '/../log');
         };
 
-//        $container['template'] = function ($container) {
-//            return new \Template_();
-//        };
+        $container['template'] = function ($container) {
+            return new \Template_();
+        };
     }
 
     function run($appMap = ['App\\' => 'app'])

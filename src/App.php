@@ -49,11 +49,19 @@ class App extends \Slim\App
     function run($appMap = ['App\\' => 'app'])
     {
         /**
-         *TODO::
+         * TODO::
          */
         $container = $this->getContainer();
         $request = $container->get('request');
         $response = $container->get('response');
+
+        if ($container->has('session')) {
+            $container->get('session');
+            // 세션 스타트
+            if (session_status() !== PHP_SESSION_ACTIVE) {
+                session_start();
+            }
+        }
 
         $router = new Router();
         $router->setAppMap($appMap);

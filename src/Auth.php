@@ -44,9 +44,9 @@ class Auth
         $return_uri = $request->getParam('returnURI', $request_uri);
         $redirect = implode("/", array_map("rawurlencode", explode("/", $return_uri)));
 
-        if ($this->handler->requireAdmin() && !$this->getAdmin()) {
+        if ($this->handler->requireAdmin() && empty($this->getAdmin())) {
             return $response->withRedirect($this->_loginAdminPage . '?returnURI=' . $redirect, 301);
-        } elseif ($this->handler->requireLogin() && !$this->getUser() && !$this->getAdmin()) {
+        } elseif ($this->handler->requireLogin() && empty($this->getUser()) && empty($this->getAdmin())) {
             return $response->withRedirect($this->_loginPage . '?returnURI=' . $redirect, 301);
         }
 
@@ -59,7 +59,7 @@ class Auth
 
     function getAdmin()
     {
-        return if_exists($_SESSION, $this->_admin, false);
+        return empty($_SESSION) ? '' : if_exists($_SESSION, $this->_admin, false);
     }
 
     function setAdmin($admin)
@@ -69,7 +69,7 @@ class Auth
 
     function getUser()
     {
-        return if_exists($_SESSION, $this->_user, false);
+        return empty($_SESSION) ? '' : if_exists($_SESSION, $this->_user, false);
     }
 
     function setUser($user)

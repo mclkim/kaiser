@@ -3,21 +3,25 @@
 //namespace Mcl\Kaiser;
 /**
  * 프레임워크의 장점으로 생산성, 안정성, 보안을 들 수 있다.
- * 수퍼 개발자가 있어 열 명이 해야 할일을 혼자서 처리하고, 해킹에 뚫릴 일이 전혀 없고 유지보수 하기도 편리한 자체 서비스 프레임워크를 직접 개발할 수 있다면, 라라벨과 루멘과 같은 프레임워크를 쓸 필요 없다.
+ * 수퍼 개발자가 있어 열 명이 해야 할일을 혼자서 처리하고,
+ * 해킹에 뚫릴 일이 전혀 없고 유지보수 하기도 편리한 자체 서비스 프레임워크를 직접 개발할 수 있다면,
+ * 라라벨과 루멘과 같은 프레임워크를 쓸 필요 없다.
  *
  * 경험적으로 수퍼 개발자에 의존하는 서비스 운영은 절대 바람직하지 않다.
- * 수퍼 개발자가 자신의 직위를 악용하거나, 아프거나 퇴사라도 하는 순간 서비스는 한 순간에 무너진다.
+ * 수퍼 개발자가 자신의 직위를 악용하거나,
+ * 아프거나 퇴사라도 하는 순간 서비스는 한 순간에 무너진다.
  *
  * 컴퓨터의 성능은 좋아졌고, 가격은 싸져서 스케일 업(scale-up)이 쉬워졌다.
  * 또, 쉽게 스케일 아웃(scale-out)할 수 있는 클라우드도 널렸다.
  * 개발자 한 명 채용하는 비용보다 컴퓨터 비용이 훨씬 싸다는 점을 잊지 말자.
  * 좋은 서버 쓰고 안정적인 코드를 빨리 개발하는 것이 더 현명하다.
  *
- * 반면 서비스가 궤도에 올라 사용자가 늘고 1ms와 1KB라도 쥐어 짜야 하는 상황이라면 자체 프레임워크 개발을 고려해볼 만한다.
+ * 반면 서비스가 궤도에 올라 사용자가 늘고 1ms와 1KB라도 쥐어 짜야 하는 상황이라면
+ * 자체 프레임워크 개발을 고려해볼 만한다.
  * 물론 성능이 더 좋은 플랫폼으로 갈아 타는 방법도 있다.
  * 서비스를 살리기 위해 스택을 버려야지, 스택을 살리기 위해 서비스를 버리는 어리석음을 범하지 말라.
  *
- * 라라벨이나 루멘은 범용 프레임워크이므로 최적화가 필요한 초대형 서비스에는 적합하지 않다는 생각이 든다.
+ * 그러나, 라라벨이나 루멘은 범용 프레임워크이므로 최적화가 필요한 초대형 서비스에는 적합하지 않다는 생각이 든다.
  *
  * 출처:https://blog.appkr.kr
  */
@@ -51,6 +55,23 @@ if (!function_exists('performance')) {
  * 기본함수
  * ---------------------------------------------------------------
  */
+if (!function_exists('get_client_ip_address')) {
+    function get_client_ip_address($env)
+    {
+        foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
+            if (array_key_exists($key, $env) === true) {
+                foreach (explode(',', $env[$key]) as $ip) {
+                    $ip = trim($ip); // just to be safe
+                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                        return $ip;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+}
+
 if (!function_exists('if_exists')) {
     function if_exists($array, $key, $default = null)
     {

@@ -42,7 +42,7 @@ $ cd homepage
 ```
 and require the necessary libraries:
 ```
-$ composer require mclkim/kaiser:dev-master
+$ composer require mclkim/kaiser
 ```
 
 ## 2.Example copy on local development

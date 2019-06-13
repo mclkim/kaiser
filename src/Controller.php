@@ -19,9 +19,13 @@ abstract class Controller extends Model implements ControllerInterface
         return false;
     }
 
+    /**
+     * TODO::2019-06-13
+     * 프로그램 접근 권한 수정
+     */
     function requirePermit()
     {
-        return false;
+        return true;
     }
 
     function execute($request, $response)

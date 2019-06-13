@@ -48,7 +48,7 @@ class Auth
             return $response->withRedirect($this->_loginAdminPage . '?returnURI=' . $redirect, 301);
         } elseif ($this->handler->requireLogin() && empty($this->getUser()) && empty($this->getAdmin())) {
             return $response->withRedirect($this->_loginPage . '?returnURI=' . $redirect, 301);
-        } elseif ($this->handler->requirePermit()) {
+        } elseif ($this->handler->requirePermit() == false) {
             return $response->withStatus(400)->write('Permission denied');
         }
 

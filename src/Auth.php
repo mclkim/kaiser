@@ -48,6 +48,8 @@ class Auth
             return $response->withRedirect($this->_loginAdminPage . '?returnURI=' . $redirect, 301);
         } elseif ($this->handler->requireLogin() && empty($this->getUser()) && empty($this->getAdmin())) {
             return $response->withRedirect($this->_loginPage . '?returnURI=' . $redirect, 301);
+        } elseif ($this->handler->requirePermit()) {
+            return $response->withStatus(400)->write('Permission denied');
         }
 
         // The user must be logged in, so pass this request down the middleware chain

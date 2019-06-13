@@ -19,6 +19,11 @@ abstract class Controller extends Model implements ControllerInterface
         return false;
     }
 
+    function requirePermit()
+    {
+        return false;
+    }
+
     function execute($request, $response)
     {
 //        return $response->status(200)->setContent('OK! Kaiser PHP Framework');

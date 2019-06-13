@@ -14,6 +14,8 @@ interface ControllerInterface
 
     function requireAdmin();
 
+    function requirePermit();
+
     function execute($request, $response);
 
     function methods();

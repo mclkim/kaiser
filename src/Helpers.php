@@ -137,6 +137,15 @@ if (!function_exists('byte_size')) {
         return number_format($bytes / pow(1024, $unit), $decimals) . ' ' . $units [$unit];
     }
 }
+if (!function_exists('get_name_space')) {
+    function get_name_space($classname)
+    {
+//        if ($pos = strrpos($classname, '\\')) return substr($classname, 0, $pos);
+//        return $pos;
+        if ($pos = strrpos($classname, '\\')) return str_replace("\\", "/", $classname);
+        return $classname;
+    }
+}
 if (!function_exists('get_class_name')) {
     function get_class_name($classname)
     {

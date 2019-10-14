@@ -78,14 +78,14 @@ if (!function_exists('if_exists')) {
         if (is_array($array) == false) {
             return $default;
         }
-        return array_key_exists($key, $array) ? trim($array [$key]) : $default;
+        return array_key_exists($key, $array) ? $array [$key] : $default;
     }
 }
 if (!function_exists('if_empty')) {
     function if_empty($array, $key, $default = null)
     {
         $ret = if_exists($array, $key, $default);
-        return empty ($ret) ? $default : $ret;
+        return empty ($ret) ? $default : trim($ret);
     }
 }
 if (!function_exists('if_digit')) {

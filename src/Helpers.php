@@ -85,7 +85,7 @@ if (!function_exists('if_empty')) {
     function if_empty($array, $key, $default = null)
     {
         $ret = if_exists($array, $key, $default);
-        return empty ($ret) ? $default : trim($ret);
+        return empty ($ret) ? $default : $ret;
     }
 }
 if (!function_exists('if_digit')) {

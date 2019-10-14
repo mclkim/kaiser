@@ -78,7 +78,7 @@ if (!function_exists('if_exists')) {
         if (is_array($array) == false) {
             return $default;
         }
-        return array_key_exists($key, $array) ? $array [$key] : $default;
+        return array_key_exists($key, $array) ? trim($array [$key]) : $default;
     }
 }
 if (!function_exists('if_empty')) {

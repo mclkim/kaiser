@@ -21,6 +21,7 @@
   "require": {
     "php": ">=5.4.0",
     "katzgrau/klogger": "^1.2",
+    "mustangostang/spyc": "0.6.2",
     "slim/slim": "^3.12"
   },
   "autoload": {
@@ -28,7 +29,8 @@
       "Mcl\\Kaiser\\": "src/"
     },
     "classmap": [
-      "src/Template_/Template_.class.php"
+      "src/Template_/Template_.class.php",
+      "src/php-i18n/i18n.class.php"
     ],
     "files": [
       "src/Helpers.php"

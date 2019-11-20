@@ -44,10 +44,6 @@ class App extends \Slim\App
         $container['template'] = function ($container) {
             return new \Template_();
         };
-
-        $container['i18n'] = function ($container) {
-            return new \i18n();
-        };
     }
 
     function run($appMap = ['App\\' => 'app'])

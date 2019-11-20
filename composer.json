@@ -29,8 +29,7 @@
       "Mcl\\Kaiser\\": "src/"
     },
     "classmap": [
-      "src/Template_/Template_.class.php",
-      "src/php-i18n/i18n.class.php"
+      "src/Template_/Template_.class.php"
     ],
     "files": [
       "src/Helpers.php"

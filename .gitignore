@@ -10,5 +10,9 @@
 .project
 .settings
 .vagrant
+<<<<<<< HEAD
 /config/*.php
+=======
+/config/config.php
+>>>>>>> 51d4b5e5e9e580fe08a219953837cf852f7e366a
 !robots.txt

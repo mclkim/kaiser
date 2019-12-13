@@ -18,7 +18,6 @@ class Router extends Route
     const METHOD_NOT_ALLOWED = 3;
 
     protected $map;
-//TODO::mclkim
 //    protected $path;
 
     public function __construct($path = null)
@@ -29,7 +28,7 @@ class Router extends Route
         }
 
         parent::__construct($path);
-//TODO::mclkim
+
 //        $this->path = $path;
     }
 
@@ -50,11 +49,6 @@ class Router extends Route
     {
         return $this->map;
     }
-
-//    function getPath()
-//    {
-//        return $this->path;
-//    }
 
     function setAppMap($map = [])
     {

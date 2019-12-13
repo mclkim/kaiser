@@ -19,9 +19,13 @@
     "source": "https://github.com/mclkim/kaiser"
   },
   "require": {
-    "php": ">=5.4.0",
-    "katzgrau/klogger": "^1.2",
-    "slim/slim": "^3.12"
+    "slim/slim": "4.*",
+    "slim/psr7": "^0.6.0",
+    "slim/http": "^0.8.0",
+    "php-di/php-di": "^6.0",
+    "selective/config": "^0.1.1",
+    "monolog/monolog": "~1.12",
+    "katzgrau/klogger": "^1.2"
   },
   "autoload": {
     "psr-4": {

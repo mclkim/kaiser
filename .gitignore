@@ -1,0 +1,14 @@
+**/_compile/**
+**/bootstrap/**
+**/log/**
+**/logs/**
+**/test/**
+**/vendor/**
+*.lock
+.buildpath
+.idea
+.project
+.settings
+.vagrant
+/config/*.php
+!robots.txt

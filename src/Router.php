@@ -10,7 +10,7 @@ namespace Mcl\Kaiser;
 
 use Slim\Psr7\Factory\ServerRequestFactory;
 
-class Router extends Route
+class Router
 {
     const NOT_FOUND = 0;
     const FOUND = 1;
@@ -18,31 +18,36 @@ class Router extends Route
     const METHOD_NOT_ALLOWED = 3;
 
     protected $map;
-//    protected $path;
+    protected $path;
 
-    public function __construct($path = null)
+    public function __construct($map = [], $path = null)
     {
         if (!isset($path)) {
             $request = ServerRequestFactory::createFromGlobals();
             $path = $request->getUri()->getPath();
         }
 
-        parent::__construct($path);
-
-//        $this->path = $path;
+        $this->path = $path;
+        $this->map = is_array($map) ? $map : ["" => $map];
     }
 
     public function dispatch()
     {
-        $this->getRoute();
+        $route = new Route($this->path);
+        $route->getRoute();
 
-        $controller = $this->getController();
-        $action = $this->getAction();
-        $parameters = $this->getParameters();
+        $controller = $route->getController();
+        $action = $route->getAction();
+        $parameters = $route->getParameters();
         $map = $this->getAppMap();
 
         //TODO::
         return $this->findController($controller, $action, $parameters, $map);
+    }
+
+    function getPath()
+    {
+        return $this->path;
     }
 
     function getAppMap()
@@ -52,7 +57,7 @@ class Router extends Route
 
     function setAppMap($map = [])
     {
-        $this->map = is_array($map) ? $map : ["" => $map];;
+        $this->map = is_array($map) ? $map : ["" => $map];
     }
 
     protected function findController($controller, $action, $parameters, $map)

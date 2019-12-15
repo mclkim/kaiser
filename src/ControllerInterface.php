@@ -21,7 +21,5 @@ interface ControllerInterface
 
     function execute(ServerRequest $request, Response $response): Response;
 
-//    function execute($request, $response);
-
     function methods();
 }

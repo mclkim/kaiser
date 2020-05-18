@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2019-12-13
- * Time: 오전 7:36
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
  */
 
 namespace Mcl\Kaiser;
@@ -46,7 +45,7 @@ class Route
         }
         $this->parameters = $param;
 
-        $x = $this->__URIPath($uri);
+        $x = self::URIPath($uri);
         $this->path = empty($x['dirname']) ? '' : $x['dirname'];
         $this->class = empty($x['filename']) ? 'index' : $x['filename'];
         $this->action = empty($x['extension']) ? 'execute' : $x['extension'];
@@ -54,7 +53,7 @@ class Route
         return $this;
     }
 
-    private function __URIPath($url)
+    private function URIPath($url)
     {
         preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $url, $m);
         return array(

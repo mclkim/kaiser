@@ -1,14 +1,11 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2019-12-13
- * Time: 오전 7:36
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
  */
 
 namespace Mcl\Kaiser;
-
-use Katzgrau\KLogger\Logger as KLogger;
 
 /**
  * composer require katzgrau/klogger "^1.2"
@@ -30,7 +27,7 @@ if (!function_exists('byte_size')) {
     }
 }
 
-class Logger extends KLogger
+class Logger extends \Katzgrau\KLogger\Logger
 {
     function log($level, $message, array $context = array())
     {
@@ -40,7 +37,7 @@ class Logger extends KLogger
          */
         $memory_peak_usage = byte_size(\memory_get_peak_usage(true));
 
-        $message = "[{$file} {$line} {$function}] [{$memory_peak_usage}] {$message}";
+        $message = "[{$file} {$line} {$function} {$class}] [{$memory_peak_usage}] {$message}";
 
         parent::log($level, $message, $context);
     }

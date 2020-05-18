@@ -1,6 +1,12 @@
 <?php
+/**
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
+ */
 
 //namespace Mcl\Kaiser;
+
 /**
  * 프레임워크의 장점으로 생산성, 안정성, 보안을 들 수 있다.
  * 수퍼 개발자가 있어 열 명이 해야 할일을 혼자서 처리하고,
@@ -71,6 +77,26 @@ if (!function_exists('get_client_ip_address')) {
         return null;
     }
 }
+/**
+ * $args = ["database"=>"people", "user"=>"staff", "pass"=>"pass123", "host"=>"localhost"];
+ *
+ * // With PHP-like placeholders: the variable is embedded in a string "{$database}" but without the dollar sign
+ * $format = <<<SQL
+ * CREATE DATABASE IF NOT EXISTS {database};
+ * GRANT ALL PRIVILEGES ON {database_name}.* TO '{user}'@'{host}';
+ * SET PASSWORD = PASSWORD('{pass}');
+ *
+ * SQL;
+ * echo p($format, $args);
+ */
+if (!function_exists('p')) {
+    function p($format, array $args, $pattern = "/\{(\w+)\}/")
+    {
+        return preg_replace_callback($pattern, function ($matches) use ($args) {
+            return @$args[$matches[1]] ?: $matches[0];
+        }, $format);
+    }
+}
 
 if (!function_exists('if_exists')) {
     function if_exists($array, $key, $default = null)
@@ -99,16 +125,23 @@ if (!function_exists('search')) {
     function search($array, $key, $value)
     {
         $results = array();
-
         if (is_array($array)) {
             if (isset($array[$key]) && $array[$key] == $value)
                 $results[] = $array;
-
             foreach ($array as $subarray)
                 $results = array_merge($results, search($subarray, $key, $value));
         }
-
         return $results;
+    }
+}
+if (!function_exists('array_sort_by_column')) {
+    function array_sort_by_column(&$arr, $col, $dir = SORT_ASC)
+    {
+        $sort_col = array();
+        foreach ($arr as $key => $row) {
+            $sort_col[$key] = $row[$col];
+        }
+        array_multisort($sort_col, $dir, $arr);
     }
 }
 /**

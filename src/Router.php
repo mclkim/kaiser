@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2019-12-13
- * Time: 오전 7:36
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
  */
 
 namespace Mcl\Kaiser;
@@ -17,8 +16,8 @@ class Router
     const NOT_FOUND_ACTION = 2;
     const METHOD_NOT_ALLOWED = 3;
 
-    protected $map;
     protected $path;
+    protected $map;
 
     public function __construct($map = [], $path = null)
     {
@@ -45,22 +44,12 @@ class Router
         return $this->findController($controller, $action, $parameters, $map);
     }
 
-    function getPath()
-    {
-        return $this->path;
-    }
-
     function getAppMap()
     {
         return $this->map;
     }
 
-    function setAppMap($map = [])
-    {
-        $this->map = is_array($map) ? $map : ["" => $map];
-    }
-
-    protected function findController($controller, $action, $parameters, $map)
+    protected function findController($controller, $action, $parameters, $map): array
     {
         foreach ($map as $prefix => $path) {
             $classname = trim($prefix, '\\') . '/' . trim($controller, '/');
@@ -98,5 +87,15 @@ class Router
 
         $name = '\\' . ltrim($name, '\\');
         return $name;
+    }
+
+    function getPath()
+    {
+        return $this->path;
+    }
+
+    function setAppMap($map = [])
+    {
+        $this->map = is_array($map) ? $map : ["" => $map];
     }
 }

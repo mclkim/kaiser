@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2019-12-13
- * Time: 오전 7:36
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
  */
 
 namespace Mcl\Kaiser;
@@ -11,13 +10,41 @@ namespace Mcl\Kaiser;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
-abstract class Model
+class Model
 {
     protected $container;
 
     public function __construct(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    public function getJWT()
+    {
+        return $this->container->has("jwt") ? $this->container->get("jwt") : null;
+    }
+
+    public function getToken()
+    {
+        $token = self::getJWT();
+        return (array)($token['decoded'] ?? null);
+    }
+
+    public function getAdmin()
+    {
+        $token = self::getToken();
+        return (array)($token['data'] ?? null);
+    }
+
+    public function getUser()
+    {
+        $token = self::getToken();
+        return (array)($token['data'] ?? null);
     }
 
     function debug($message = null, array $context = array())

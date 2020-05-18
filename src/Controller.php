@@ -1,12 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: 김명철
- * Date: 2019-12-13
- * Time: 오전 7:36
+ * @link      https://github.com/mclkim/kaiser
+ * @copyright Copyright (p) myung chul kim
+ * @license   MIT License
  */
 
 namespace Mcl\Kaiser;
+
 
 use Slim\Http\Response;
 use Slim\Http\ServerRequest;

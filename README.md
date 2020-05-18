@@ -1,8 +1,10 @@
 # The Kaiser framework for PHP
 
-## Description
-
 Kaiser is a PHP simple framework that helps you quickly write simple web applications and APIs.
+
+## Description
+It is a framework created by adding RoutingMiddleware to Slim Framework.
+All of the features work on the Slim Framework platform.
 
 ```php
 <?php

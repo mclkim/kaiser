@@ -22,7 +22,8 @@ class App extends \Slim\App
         if (is_array($routeInfo) && $routeInfo[0] == Router::FOUND) {
             $callable = new $routeInfo[1] ($this->container);
             if ($callable instanceof ControllerInterface) {
-                $this->map($callable->methods(), $router->getPath(), [$callable, $routeInfo[2]])->add(new Auth($callable));
+                $this->map($callable->methods(), $router->getPath(), [$callable, $routeInfo[2]])
+                    ->add(new Auth($callable));
             }
         }
 

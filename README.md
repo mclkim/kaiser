@@ -39,15 +39,22 @@ $app->run();
 [PHP](http://php.net/)
 ```
 $ php -v
-PHP 5.5.X (cli) (built: Jul  6 2017 16:51:52) ( ZTS MSVC14 (Visual C++ 2015) x64 )
-Copyright (c) 1997-2017 The PHP Group
-Zend Engine v3.1.0, Copyright (c) 1998-2017 Zend Technologies
-    with Zend OPcache v7.1.7, Copyright (c) 1999-2017, by Zend Technologies
+PHP 7.3.8 (cli) (built: Jul 30 2019 12:44:06) ( ZTS MSVC15 (Visual C++ 2017) x64
+ )
+Copyright (c) 1997-2018 The PHP Group
+Zend Engine v3.3.8, Copyright (c) 1998-2018 Zend Technologies
+    with Zend OPcache v7.3.8, Copyright (c) 1999-2018, by Zend Technologies
 ```
 [Composer](https://getcomposer.org/)
 ```
-$ composer --version
-Composer version 1.5.1 2017-08-09 16:07:22
+$ composer -v
+   ______
+  / ____/___  ____ ___  ____  ____  ________  _____
+ / /   / __ \/ __ `__ \/ __ \/ __ \/ ___/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ (__  )  __/ /
+\____/\____/_/ /_/ /_/ .___/\____/____/\___/_/
+                    /_/
+Composer version 1.9.1 2019-11-01 17:20:17
 ```
 
 ## 1.Install
@@ -82,12 +89,9 @@ http://localhost:8000/hello/world
 http://localhost:8000/hello.world?p1=1&p2=2&p3=3
 ```
 ## Reference
- * [Pimple](https://github.com/silexphp/Pimple)
- * [Aura.Web](https://github.com/auraphp/Aura.Web)
- * [FastRoute: Fast request router for PHP](https://github.com/nikic/FastRoute)
+ * [Slim Framework](https://github.com/slimphp)
  * [KLogger: Simple Logging for PHP](https://github.com/katzgrau/KLogger) 
  * [Template_](http://www.xtac.net)
  * [PHP-DB](https://github.com/delight-im/PHP-DB)
- * [Respect\Validation](https://github.com/Respect/Validation)
 
 Released under the [MIT License](LICENSE)

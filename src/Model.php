@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @link      https://github.com/mclkim/kaiser
  * @copyright Copyright (p) myung chul kim
@@ -24,9 +26,10 @@ class Model
         return $this->container;
     }
 
-    public function getJWT()
+    public function getAdmin()
     {
-        return $this->container->has("jwt") ? $this->container->get("jwt") : null;
+        $token = self::getToken();
+        return (array)($token['data'] ?? null);
     }
 
     public function getToken()
@@ -35,10 +38,9 @@ class Model
         return (array)($token['decoded'] ?? null);
     }
 
-    public function getAdmin()
+    public function getJWT()
     {
-        $token = self::getToken();
-        return (array)($token['data'] ?? null);
+        return $this->container->has("jwt") ? $this->container->get("jwt") : null;
     }
 
     public function getUser()

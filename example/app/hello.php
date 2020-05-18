@@ -13,11 +13,6 @@ class hello extends Controller
     {
         $getParams = $request->getParams();
         var_dump($getParams);
-//        var_dump($this->container);
-//        $logger = $this->container->get('logger');
-//        $logger = $this->container->get(LoggerInterface::class);
-//        $logger->info('hello world');
-        $this->info('', $getParams);
         echo '<br>';
         echo 'hello world~~~';
         return $response;

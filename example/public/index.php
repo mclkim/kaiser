@@ -1,42 +1,28 @@
 <?php
 
-use DI\ContainerBuilder;
-use Slim\Psr7\Factory\ServerRequestFactory;
+use Mcl\Kaiser\Middleware\AuthMiddleware;
+use Mcl\Kaiser\Middleware\RoutingMiddleware;
+use Mcl\Kaiser\Middleware\SessionMiddleware;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-$containerBuilder = new ContainerBuilder();
-
-// configure PHP-DI here
-$containerBuilder->addDefinitions([
-    'settings' => [
-        'displayErrorDetails' => true, // Should be set to false in production
-    ],
-]);
-
-// Build PHP-DI Container instance
-$container = $containerBuilder->build();
-
-AppFactory::setContainer($container);
 $app = AppFactory::create();
 
-$container = $app->getContainer();
+$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
+    $name = $args['name'];
+    $response->getBody()->write("Hello, $name");
+    return $response;
+});
 
-//TODO::KAR-START
-$request = ServerRequestFactory::createFromGlobals();
-$path = $request->getUri()->getPath();
-
-$router = new \Mcl\Kaiser\Router($path);
-$router->setAppMap(__DIR__ . '../app');
-$routeInfo = $router->dispatch();
-
-if (is_array($routeInfo) && $routeInfo[0] == \Mcl\Kaiser\Router::FOUND) {
-    $callable = new $routeInfo[1] ($container);
-    if ($callable instanceof \Mcl\Kaiser\ControllerInterface) {
-        $app->map($callable->methods(), $path, [$callable, $routeInfo[2]])->add(new \Mcl\Kaiser\Auth($callable));
-    }
+//TODO::mclkim
+$route = new RoutingMiddleware($app->getContainer(), __DIR__ . '/../app');
+if ($route = $route()) {
+    $app->map($route['methods'], $route['pattern'], $route['handler'])
+        ->add(new SessionMiddleware())
+        ->add(new AuthMiddleware($route['callable']));
 }
-//TODO::KAR-END
 
 $app->run();

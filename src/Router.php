@@ -61,8 +61,12 @@ class Router
              */
             if (!class_exists($classname)) {
                 $controllerFile = rtrim($path, '/') . '/' . trim($controller, '/') . '.php';
+                error_log(print_r($controllerFile, TRUE));
+
                 $controllerFile = realpath($controllerFile);
-                if (file_exists($controllerFile)) {
+                error_log(print_r($controllerFile, TRUE));
+
+                if ($controllerFile && file_exists($controllerFile)) {
                     include_once($controllerFile);
                     break;
                 }

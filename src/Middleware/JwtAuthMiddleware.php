@@ -13,6 +13,8 @@ class JwtAuthMiddleware implements Middleware
 {
     var $_loginAdminPage = '/login.admin';
     var $_loginPage = '/login';
+    var $_admin = 'admin';
+    var $_user = 'user';
 
     private $handler;
 
@@ -45,12 +47,12 @@ class JwtAuthMiddleware implements Middleware
     function getAdmin()
     {
         $token = $this->handler->getToken();
-        return (array)($token['data'] ?? null);
+        return (array)($token[$this->_admin] ?? null);
     }
 
     function getUser()
     {
         $token = $this->handler->getToken();
-        return (array)($token['data'] ?? null);
+        return (array)($token[$this->_user] ?? null);
     }
 }

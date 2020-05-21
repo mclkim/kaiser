@@ -29,7 +29,7 @@ class Model
     public function getAdmin()
     {
         $token = self::getToken();
-        return (array)($token['data'] ?? null);
+        return (array)($token['admin'] ?? null);
     }
 
     public function getToken()
@@ -46,7 +46,7 @@ class Model
     public function getUser()
     {
         $token = self::getToken();
-        return (array)($token['data'] ?? null);
+        return (array)($token['user'] ?? null);
     }
 
     function debug($message = null, array $context = array())

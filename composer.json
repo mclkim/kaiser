@@ -19,7 +19,7 @@
     "source": "https://github.com/mclkim/kaiser"
   },
   "require": {
-    "php": "^7.2",
+    "php": "^7.2" || "^8.0",
     "slim/http": "^1.0",
     "slim/psr7": "^1.0",
     "slim/slim": "^4.5",

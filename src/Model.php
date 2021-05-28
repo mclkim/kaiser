@@ -15,8 +15,8 @@ use Psr\Log\LoggerInterface;
 class Model
 {
     protected $container;
-    protected $original_memory_limit;
-    protected $original_max_execution_time;
+    protected $original_memory_limit = '128M';
+    protected $original_max_execution_time = '30';
 
     public function __construct(ContainerInterface $container = null)
     {
@@ -75,10 +75,10 @@ class Model
         $this->original_memory_limit = ini_get('memory_limit');
 
         // then set it to the value you think you need (experiment)
-        ini_set('memory_limit', '256M');
+        ini_set('memory_limit', '512M');
 
         $this->original_max_execution_time = ini_get('max_execution_time');
-        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+        ini_set('max_execution_time', '300'); //300 seconds = 5 minutes
     }
 
     protected function end()
